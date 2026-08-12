@@ -363,6 +363,23 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Tests | `tests/Feature/User/UserShowTest.php` covers safe profile/role shape, foreign-role exclusion, hidden/elevated cross-tenant access, malformed/missing/deleted targets, authentication, permission checks, no audit side effect and throttling. |
 | Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
 
+### **RBAC-03 — PUT /api/v1/users/{id}/roles**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | RBAC-03 / P0 |
+| Purpose | Atomically replace a managed user's complete role assignment set. |
+| Required permission | `roles.manage`; cross-organization targets additionally require `organizations.manage`. |
+| Dependencies | USR-03, RBAC-01, users, roles, user/role joins, scoped-user resolution and immutable audit storage. |
+| Request / validation | A present array of at most 20 distinct role UUIDs. An empty array intentionally removes all assignments. Every non-empty role must be global or owned by the target user's organization. |
+| Success | `200` standard envelope containing target `user_id`, sorted safe Role resources and request ID metadata. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `404 NOT_FOUND` for hidden/missing users; `422 VALIDATION_FAILED` for malformed, missing or foreign roles; `429 RATE_LIMITED`; unexpected persistence failures remain `500`. |
+| Workflow / tenant scope | Normal managers can replace roles only for users in their organization. Elevated managers may target a foreign user, but replacement roles remain pinned to global plus that user's organization. Existing malicious foreign assignments are removed by full-set replacement. |
+| Side effects | Pivot deletion/insertion and mandatory `role.assign` audit persistence share one transaction and roll back together. |
+| Audit / notifications | Audit evidence stores actor, target UUID, sorted old/new role UUID sets, request ID, IP and user agent. No notification is required. |
+| Tests | `tests/Feature/Rbac/UserRoleReplaceTest.php` covers exact full/empty replacement, tenant scope, elevated cross-tenant access, unavailable-role rejection, old/new audit evidence, rollback, authentication, permission and validation errors, and throttling. |
+| Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
+
 ## **Survey sites, boundaries, plots and permits**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |

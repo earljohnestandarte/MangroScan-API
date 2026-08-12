@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
+use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
 use App\Http\Controllers\Api\V1\User\UserIndexController;
 use App\Http\Controllers\Api\V1\User\UserShowController;
 use App\Http\Controllers\Api\V1\User\UserStoreController;
@@ -83,6 +84,16 @@ Route::prefix('v1')->group(function () {
             'auth:sanctum',
             EnsureActiveIdentity::class,
             'permission:users.manage',
+            'throttle:auth.authenticated',
+        ]);
+
+    // [RBAC-03] PUT /api/v1/users/{id}/roles
+    Route::put('/users/{user}/roles', UserRoleReplaceController::class)
+        ->whereUuid('user')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:roles.manage',
             'throttle:auth.authenticated',
         ]);
 });
