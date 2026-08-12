@@ -11,6 +11,7 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -27,6 +28,18 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (BadRequestHttpException $exception, Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+            $requestId = AddRequestId::resolve($request);
+
+            return response()->json(['error' => [
+                'code' => 'BAD_REQUEST', 'message' => $exception->getMessage(),
+                'details' => (object) [], 'request_id' => $requestId,
+            ]], 400, ['X-Request-ID' => $requestId]);
+        });
+
         $exceptions->render(function (WorkflowConflictException $exception, Request $request) {
             if (! $request->is('api/*')) {
                 return null;
