@@ -390,7 +390,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | SITE-04 | PATCH /sites/{id}Update site metadata. | Partial Site fields | 200 {data:Site} | SITE-03 | **P1** | TBD \- GIS/API | **Blocked** |
 | SITE-05 | DELETE /sites/{id}Soft archive site after dependency checks. | Path: id | 204 | SITE-03 | **P2** | TBD \- GIS/API | Backlog |
 | BOUND-01 | GET /sites/{id}/boundariesList site polygons. | Path: site id | 200 {data:\[Boundary\]} | SITE-03 | **P0** | Codex \- GIS/API | **Done** |
-| BOUND-02 | POST /sites/{id}/boundariesCreate survey/no-fly/restoration polygon. | {boundary\_name,boundary\_type,boundary\_geom:GeoJSON,source?} | 201 {data:Boundary} | BOUND-01 | **P0** | TBD \- GIS/API | **Blocked** |
+| BOUND-02 | POST /sites/{id}/boundariesCreate survey/no-fly/restoration polygon. | {boundary\_name,boundary\_type,boundary\_geom:GeoJSON,source?} | 201 {data:Boundary} | BOUND-01 | **P0** | Codex \- GIS/API | **Done** |
 | BOUND-03 | PATCH /boundaries/{id}Update boundary metadata/geometry. | Partial boundary fields | 200 {data:Boundary} | BOUND-02 | **P1** | TBD \- GIS/API | **Blocked** |
 | PLOT-01 | GET /sites/{id}/plotsList monitoring plots. | Path: site id | 200 {data:\[Plot\]} | SITE-03 | **P1** | TBD \- GIS/API | **Blocked** |
 | PLOT-02 | POST /sites/{id}/plotsCreate validation plot. | {plot\_code,plot\_name?,plot\_geom:GeoJSON,area\_square\_meters?,description?} | 201 {data:Plot} | PLOT-01 | **P1** | TBD \- GIS/API | **Blocked** |
@@ -470,6 +470,24 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Database privileges | `004_site_boundary_grants.sql` grants `SELECT` only to API and reporting roles. API insert/update/delete plus worker/auditor access remain denied until explicitly needed. |
 | Tests | `tests/Feature/Site/SiteBoundaryIndexTest.php` covers ordered same-site output, PostGIS GeoJSON, foreign-row exclusion, SITE-03 count integration, hidden parent IDs, authentication, missing/foreign permission grants, no audit side effect and throttling. |
 | Implementation status | Done - focused and complete SQLite plus PostgreSQL 18/PostGIS suites pass at 105 tests / 612 assertions; PostgreSQL confirms Polygon(4326), GiST and DCL shape; touched PHP passes Pint, Composer/routes validate, and diff checks are clean. |
+
+### **BOUND-02 - POST /api/v1/sites/{id}/boundaries**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | BOUND-02 / P0 |
+| Purpose | Create a survey, no-fly or restoration polygon inside one tenant-visible monitoring site. |
+| Required permission | `boundaries.manage`, derived only from global/current-organization roles after Sanctum and active-identity enforcement. |
+| Dependencies | BOUND-01, scoped site resolution, Polygon(4326) persistence/resource projection and immutable audit storage. |
+| Request / validation | Required trimmed name, normalized type (`survey_area`, `no_fly_zone`, `restoration_area`) and GeoJSON Polygon; optional normalized source (`manual`, `drone_map`, `imported_geojson`). Every ring requires at least four positions, three distinct vertices, closure, WGS84 bounds and no self-intersection. |
+| Success | `201` standard envelope containing the complete safe Boundary resource and request ID metadata. Geometry is returned as GeoJSON and the actor is persisted as `created_by`. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `404 NOT_FOUND` for hidden/missing/malformed parent sites; `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected failures remain `500`. |
+| Workflow / tenant scope | The parent site is resolved under caller organization before creation; no organization/site ownership field from the body is accepted. Foreign site UUIDs are indistinguishable from missing rows. |
+| Spatial persistence | Structural validation runs at the API boundary, then PostgreSQL rechecks `ST_IsValid` and inserts with parameterized `ST_SetSRID(ST_GeomFromGeoJSON(?),4326)`. SQLite JSON is a compatibility-test substitute only. |
+| Transaction / audit | Polygon insertion and mandatory immutable `boundary.create` audit share one transaction. Evidence stores actor, site/boundary UUIDs, normalized metadata, GeoJSON, request ID, IP and user agent; audit failure rolls back the polygon. No notification is required. |
+| Database privileges | Boundary DCL grants API `SELECT, INSERT` and reporting `SELECT`; API update/delete plus worker/auditor access remain denied. |
+| Tests | `tests/Feature/Site/SiteBoundaryStoreTest.php` covers exact creation output/persistence/audit, numeric normalization, ring structure/bounds/self-intersection, hidden parents, authentication, local/foreign permission scope, rollback and throttling. |
+| Implementation status | Done - focused and complete SQLite plus PostgreSQL 18/PostGIS suites pass at 113 tests / 664 assertions; touched PHP passes Pint, Composer/routes validate, DCL executes with the intended matrix, and diff checks are clean. |
 
 ## **Drone, sensor and hardware registry**
 

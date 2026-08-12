@@ -2,8 +2,7 @@
 
 BEGIN;
 
-GRANT SELECT ON TABLE app.site_boundaries TO
-    mangroscan_api_rw,
-    mangroscan_report_ro;
+GRANT SELECT, INSERT ON TABLE app.site_boundaries TO mangroscan_api_rw;
+GRANT SELECT ON TABLE app.site_boundaries TO mangroscan_report_ro;
 
 COMMIT;
