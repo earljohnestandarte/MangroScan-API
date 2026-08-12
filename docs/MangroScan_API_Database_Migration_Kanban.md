@@ -669,9 +669,9 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | DRONE-01 | GET /dronesList drone units. | Query: status,search,page | 200 {data:\[Drone\],meta} | AUTH-08 | **P1** | Codex \- Backend/API | **Done** |
 | DRONE-02 | POST /dronesRegister drone. | {drone\_name,model?,serial\_number?,firmware\_version?,max\_flight\_minutes?,payload\_capacity\_grams?,status} | 201 {data:Drone} | DRONE-01 | **P1** | Codex \- Backend/API | **Done** |
-| DRONE-03 | GET /drones/{id}Drone detail \+ attached sensors. | Path: id | 200 {data:{drone,sensors}} | DRONE-01 | **P1** | TBD \- Backend/API | **Blocked** |
+| DRONE-03 | GET /drones/{id}Drone detail \+ attached sensors. | Path: id | 200 {data:{drone,sensors}} | DRONE-01 | **P1** | Codex \- Backend/API | **Done** |
 | DRONE-04 | PATCH /drones/{id}Update drone status/metadata. | Partial Drone fields | 200 {data:Drone} | DRONE-03 | **P2** | TBD \- Backend/API | Backlog |
-| SENSOR-01 | POST /drones/{id}/sensorsAttach/register sensor. | {sensor\_name,sensor\_type,manufacturer?,model?,serial\_number?,resolution?,range\_meters?,calibration\_required,status} | 201 {data:Sensor} | DRONE-03 | **P1** | TBD \- Backend/API | **Blocked** |
+| SENSOR-01 | POST /drones/{id}/sensorsAttach/register sensor. | {sensor\_name,sensor\_type,manufacturer?,model?,serial\_number?,resolution?,range\_meters?,calibration\_required,status} | 201 {data:Sensor} | DRONE-03 | **P1** | Codex \- Backend/API | **Ready** |
 | SENSOR-02 | PATCH /sensors/{id}Update sensor. | Partial Sensor fields | 200 {data:Sensor} | SENSOR-01 | **P2** | TBD \- Backend/API | Backlog |
 | CAL-01 | POST /sensors/{id}/calibrationsRecord sensor calibration. | {calibration\_date,calibration\_method,calibration\_file\_path?,calibration\_notes?,is\_valid} | 201 {data:Calibration} | SENSOR-01 | **P2** | TBD \- Backend/API | Backlog |
 | BAT-01 | GET /batteriesList battery packs. | Query: status,type,page | 200 {data:\[Battery\],meta} | AUTH-08 | **P2** | TBD \- Backend/API | Backlog |
@@ -697,6 +697,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Request / success | Required normalized name/status; optional model, uppercased serial, firmware and positive bounded flight/payload decimals. Returns `201` exact safe Drone plus request ID with server-owned tenant UUID. |
 | Conflicts / transaction | Serial numbers are globally reserved by active and soft-deleted units. PostgreSQL advisory locking prevents concurrent duplicate registration. Drone insert and immutable `drone.create` evidence share one rollback-safe transaction. |
 | DCL / tests | `019_drone_write_grants.sql` adds API INSERT only; API update/delete remain denied, reporting remains SELECT-only and worker insert is denied. Done — full SQLite passes 382 tests / 2148 assertions and PostgreSQL 18/PostGIS passes 382 / 2155; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
+
+### **DRONE-03 - GET /api/v1/drones/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Return one tenant-owned, non-deleted drone and its attached sensors. Sanctum and active identity checks are mandatory; no undocumented hardware permission is invented, matching Appendix B and DRONE-01/02. |
+| Success / errors | Returns the exact `200 {data:{drone,sensors}}` contract plus request ID metadata. Missing, malformed, foreign-tenant, and soft-deleted drone identifiers are all hidden behind `404 NOT_FOUND`; standard `401`, inactive-identity `403`, `429`, and unexpected `500` handling remain in force. |
+| Ordering / side effects | Sensors sort deterministically by name then UUID and expose only documented fields. This detail read creates no audit event or notification. |
+| Database schema | Adds UUID-backed `drone_sensors` with cascade FK to drones, documented sensor metadata, positive optional range, calibration flag, drone/status and serial indexes, and PostgreSQL checks for the documented sensor types and lifecycle states. Sensors do not use soft deletion because the authoritative schema does not define it. |
+| DCL / tests | `020_drone_sensor_read_grants.sql` grants sensor SELECT only to API and reporting roles; API insert/update/delete and worker access remain denied. Done - full SQLite passes 389 tests / 2182 assertions and PostgreSQL 18/PostGIS passes 389 / 2192; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
 
 ## **Mission planning and lifecycle**
 

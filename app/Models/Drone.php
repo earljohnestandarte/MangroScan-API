@@ -47,4 +47,9 @@ class Drone extends Model
     {
         return $this->hasMany(FlightSession::class, 'drone_id', 'drone_id');
     }
+
+    public function sensors(): HasMany
+    {
+        return $this->hasMany(DroneSensor::class, 'drone_id', 'drone_id');
+    }
 }
