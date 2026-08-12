@@ -696,7 +696,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | SYNC-01 | POST /mobile/devices/registerRegister app installation for sync/audit. | {device\_id,platform,app\_version,device\_name?} | 201 {data:{device\_id,server\_time}} | AUTH-02 \+ schema extension | **P0** | Codex \- Mobile/API | **Done** |
-| SYNC-02 | GET /mobile/bootstrapDownload authorized mission/flight reference bundle. | Query: cursor? | 200 {data:{missions,flights,checklist\_templates,settings,tombstones},meta:{cursor,server\_time}} | MSN/FLT \+ AUTH | **P0** | TBD \- Mobile/API | **Blocked** |
+| SYNC-02 | GET /mobile/bootstrapDownload authorized mission/flight reference bundle. | Query: cursor? | 200 {data:{missions,flights,checklist\_templates,settings,tombstones},meta:{cursor,server\_time}} | MSN/FLT \+ AUTH | **P0** | Codex \- Mobile/API | **Done** |
 | SYNC-03 | GET /mobile/missions/{id}/bundleDownload one mission for offline use. | Path: mission id | 200 {data:{mission,site,flights,team,boundaries,plots}} | MSN-06 | **P0** | TBD \- Mobile/API | **Blocked** |
 | SYNC-04 | POST /mobile/syncPush offline changes and receive server changes/conflicts. | {device\_id,base\_cursor,changes:\[{client\_id,entity,operation,version,payload}\]} | 200 {data:{applied,conflicts,server\_changes},meta:{cursor}} | SYNC-01 \+ all mutable mobile resources | **P0** | TBD \- Mobile/API | **Blocked** |
 | SYNC-05 | GET /mobile/sync/statusShow pending server work relevant to device. | Query: device\_id | 200 {data:{last\_cursor,last\_sync\_at,pending\_notifications}} | SYNC-04 | **P1** | TBD \- Mobile/API | **Blocked** |
@@ -710,6 +710,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Ownership / idempotency | A device UUID is permanently scoped to its registering user. Identical retries return the same registration without extra audit or timestamp churn; owned metadata changes update in place; another account receives 409 without exposing user details. |
 | Schema / transaction / DCL | Adds UUID `sync_devices` with user FK, platform constraint, cursor and last-sync fields needed by SYNC-04/05. Registration/update and `sync.device.register` audit share one transaction. API receives SELECT/INSERT/UPDATE only; report/worker roles receive no device access. |
 | Tests / status | `SyncDeviceRegisterTest` covers exact response/persistence, retry idempotency, metadata refresh/null, cross-account conflict, validation, active identity, rollback, throttling, PostgreSQL constraint and DCL. Done - full SQLite passes 222 tests / 1238 assertions and PostgreSQL 18/PostGIS passes 222 / 1242; live privilege and static gates pass. |
+
+### **SYNC-02 - GET /api/v1/mobile/bootstrap**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Download a stable offline reference snapshot after active identity plus tenant-valid `missions.read` and `flights.read`. It is read-only and creates no audit event. |
+| Full / delta behavior | Without a cursor, returns all non-deleted tenant missions and their flights. A valid cursor returns mission/flight rows updated after its boundary through the response snapshot time plus tenant mission tombstones deleted in that interval. |
+| Cursor / consistency | Cursors are encrypted, versioned and opaque; tampered, unsupported or future boundaries return 422. Queries use one transaction and a shared server-time upper boundary, with explicit offset-safe PostgreSQL bindings. |
+| Contract / forward compatibility | Returns exact mission and Flight resource arrays plus structurally stable `checklist_templates`, `settings` and `tombstones`. The first two remain explicit empty arrays until their authoritative P0/P1 schemas land; no P2 endpoint is claimed. |
+| Tests / status | `MobileBootstrapTest` covers full and delta snapshots, tenant/deleted isolation, tombstones, cursor tampering/future validation, active identity, both local/foreign permissions, no audit and throttling. Done - full SQLite passes 228 tests / 1272 assertions and PostgreSQL 18/PostGIS passes 228 / 1276; route, Pint and diff gates pass. |
 
 ## **Media, sensor uploads and quality control**
 

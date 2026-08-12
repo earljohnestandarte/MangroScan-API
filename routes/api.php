@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\Mission\MissionShowController;
 use App\Http\Controllers\Api\V1\Mission\MissionStoreController;
 use App\Http\Controllers\Api\V1\Mission\MissionTeamReplaceController;
 use App\Http\Controllers\Api\V1\Mission\MissionUpdateController;
+use App\Http\Controllers\Api\V1\Mobile\MobileBootstrapController;
 use App\Http\Controllers\Api\V1\Mobile\SyncDeviceRegisterController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
@@ -68,6 +69,15 @@ Route::prefix('v1')->group(function () {
     Route::post('/mobile/devices/register', SyncDeviceRegisterController::class)->middleware([
         'auth:sanctum',
         EnsureActiveIdentity::class,
+        'throttle:auth.authenticated',
+    ]);
+
+    // [SYNC-02] GET /api/v1/mobile/bootstrap
+    Route::get('/mobile/bootstrap', MobileBootstrapController::class)->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:missions.read',
+        'permission:flights.read',
         'throttle:auth.authenticated',
     ]);
 
