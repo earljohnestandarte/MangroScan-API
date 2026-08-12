@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthenticatedProfileController;
 use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
+use App\Http\Controllers\Api\V1\Mission\MissionIndexController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
@@ -147,4 +148,12 @@ Route::prefix('v1')->group(function () {
             'permission:boundaries.manage',
             'throttle:auth.authenticated',
         ]);
+
+    // [MSN-01] GET /api/v1/missions
+    Route::get('/missions', MissionIndexController::class)->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:missions.read',
+        'throttle:auth.authenticated',
+    ]);
 });

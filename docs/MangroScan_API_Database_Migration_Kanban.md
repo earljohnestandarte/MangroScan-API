@@ -507,7 +507,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| MSN-01 | GET /missionsList missions visible to caller. | Query: site\_id,status,from,to,search,page | 200 {data:\[Mission\],meta} | SITE-01 | **P0** | TBD \- Backend/API | **Blocked** |
+| MSN-01 | GET /missionsList missions visible to caller. | Query: site\_id,status,from,to,search,page | 200 {data:\[Mission\],meta} | SITE-01 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-02 | POST /missionsCreate survey mission. | {site\_id,mission\_code,mission\_title,mission\_objective,planned\_start\_at?,planned\_end\_at?,coverage\_target\_hectares?} | 201 {data:Mission} | MSN-01 | **P0** | TBD \- Backend/API | **Blocked** |
 | MSN-03 | GET /missions/{id}Mission detail with team/flights/summary. | Path: id | 200 {data:{mission,team,flight\_summary}} | MSN-01 | **P0** | TBD \- Backend/API | **Blocked** |
 | MSN-04 | PATCH /missions/{id}Update planning fields before finalization. | Partial Mission fields | 200 {data:Mission} | MSN-03 | **P0** | TBD \- Backend/API | **Blocked** |
@@ -516,6 +516,25 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | MSN-06 | POST /missions/{id}/approveApprove mission and record approver. | {decision:"approved"|"rejected",notes?} | 200 {data:Mission} | MSN-03 \+ AUTH-08 | **P0** | TBD \- Backend/API | **Blocked** |
 | MSN-07 | POST /missions/{id}/startTransition mission to in\_progress. | {started\_at?} | 200 {data:Mission} | MSN-06 | **P1** | TBD \- Backend/API | **Blocked** |
 | MSN-08 | POST /missions/{id}/completeFinalize mission operations. | {ended\_at?,completion\_notes?} | 200 {data:Mission} | Flights completed | **P1** | TBD \- Backend/API | **Blocked** |
+
+### **MSN-01 - GET /api/v1/missions**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | MSN-01 / P0 |
+| Purpose | Return a stable, paginated mission catalog reachable through the caller's tenant-owned survey sites. |
+| Required permission | `missions.read`, accepted only from global/current-organization roles after Sanctum and active-identity checks. |
+| Dependencies | SITE-01, organizations/users, survey sites, tenant-aware RBAC, standard pagination and the documented mission schema. |
+| Request / validation | Optional UUID `site_id`, normalized lifecycle `status`, inclusive `from`/`to` dates (`YYYY-MM-DD`), case-insensitive `search`, positive `page`, and `per_page` from 1 through 100. Reversed dates fail validation. |
+| Success | `200` standard envelope containing safe Mission resources and exact `request_id`, `page`, `per_page`, `total`, `last_page` metadata. Physical `mission_status` is intentionally projected as public `status`. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `404 NOT_FOUND` for an explicit hidden/missing site filter; `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected failures remain `500`. |
+| Workflow / tenant scope | Missions are selected only through non-deleted sites whose `organization_id` matches the actor. A supplied site filter is resolved through the same anti-enumeration site service before querying. Foreign missions and missions under soft-deleted sites never affect data or pagination. |
+| Query behavior | Search covers code, title and objective. Site, status, planned-start date and search filters compose. Scheduled missions sort by planned start then UUID; unscheduled missions sort last on both supported databases. |
+| Database schema | Adds UUID-backed `survey_missions` with documented planning/actual timestamps, target/completed coverage, creator/approver references, soft deletion, code uniqueness, site/status and site/date indexes, and PostgreSQL lifecycle check (`planned`, `in_progress`, `completed`, `cancelled`, `failed`). |
+| Side effects / audit / notifications | Read-only mission lookup. No audit event or notification is created. |
+| Database privileges | `005_survey_mission_grants.sql` grants `SELECT` only to API and reporting roles; insert/update/delete plus worker/auditor access remain denied. |
+| Tests | `tests/Feature/Mission/MissionIndexTest.php` covers exact fields/meta/order, site-lineage and soft-delete isolation, composed filters, hidden explicit sites, validation, authentication, missing/foreign-role permission rejection, no audit side effect and throttling. |
+| Implementation status | Done - focused and complete SQLite plus PostgreSQL 18/PostGIS suites pass at 120 tests / 698 assertions; PostgreSQL confirms the lifecycle constraint and DCL matrix; touched PHP passes Pint, Composer/routes validate, and diff checks are clean. |
 
 ## **Flight operations and field readiness**
 
