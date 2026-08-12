@@ -671,7 +671,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | DRONE-02 | POST /dronesRegister drone. | {drone\_name,model?,serial\_number?,firmware\_version?,max\_flight\_minutes?,payload\_capacity\_grams?,status} | 201 {data:Drone} | DRONE-01 | **P1** | Codex \- Backend/API | **Done** |
 | DRONE-03 | GET /drones/{id}Drone detail \+ attached sensors. | Path: id | 200 {data:{drone,sensors}} | DRONE-01 | **P1** | Codex \- Backend/API | **Done** |
 | DRONE-04 | PATCH /drones/{id}Update drone status/metadata. | Partial Drone fields | 200 {data:Drone} | DRONE-03 | **P2** | TBD \- Backend/API | Backlog |
-| SENSOR-01 | POST /drones/{id}/sensorsAttach/register sensor. | {sensor\_name,sensor\_type,manufacturer?,model?,serial\_number?,resolution?,range\_meters?,calibration\_required,status} | 201 {data:Sensor} | DRONE-03 | **P1** | Codex \- Backend/API | **Ready** |
+| SENSOR-01 | POST /drones/{id}/sensorsAttach/register sensor. | {sensor\_name,sensor\_type,manufacturer?,model?,serial\_number?,resolution?,range\_meters?,calibration\_required,status} | 201 {data:Sensor} | DRONE-03 | **P1** | Codex \- Backend/API | **Done** |
 | SENSOR-02 | PATCH /sensors/{id}Update sensor. | Partial Sensor fields | 200 {data:Sensor} | SENSOR-01 | **P2** | TBD \- Backend/API | Backlog |
 | CAL-01 | POST /sensors/{id}/calibrationsRecord sensor calibration. | {calibration\_date,calibration\_method,calibration\_file\_path?,calibration\_notes?,is\_valid} | 201 {data:Calibration} | SENSOR-01 | **P2** | TBD \- Backend/API | Backlog |
 | BAT-01 | GET /batteriesList battery packs. | Query: status,type,page | 200 {data:\[Battery\],meta} | AUTH-08 | **P2** | TBD \- Backend/API | Backlog |
@@ -707,6 +707,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Ordering / side effects | Sensors sort deterministically by name then UUID and expose only documented fields. This detail read creates no audit event or notification. |
 | Database schema | Adds UUID-backed `drone_sensors` with cascade FK to drones, documented sensor metadata, positive optional range, calibration flag, drone/status and serial indexes, and PostgreSQL checks for the documented sensor types and lifecycle states. Sensors do not use soft deletion because the authoritative schema does not define it. |
 | DCL / tests | `020_drone_sensor_read_grants.sql` grants sensor SELECT only to API and reporting roles; API insert/update/delete and worker access remain denied. Done - full SQLite passes 389 tests / 2182 assertions and PostgreSQL 18/PostGIS passes 389 / 2192; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
+
+### **SENSOR-01 - POST /api/v1/drones/{id}/sensors**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Attach a documented sensor to a tenant-owned, non-deleted drone. Active Sanctum identity is required, while no undocumented hardware permission is invented. |
+| Request / success | Requires normalized name, one of `rgb_camera`, `lidar`, `depth`, `gps`, or `imu`, a boolean calibration flag, and one of `active`, `inactive`, or `maintenance`; documented manufacturer, model, serial, resolution and positive two-decimal range remain optional. Returns `201 {data:Sensor}` plus request ID. |
+| Tenant / conflicts | Parent lookup is tenant-scoped and hides foreign, deleted, missing, and malformed drone IDs behind `404 NOT_FOUND`. Sensor serial numbers are normalized but intentionally not treated as unique because the authoritative schema defines only a nullable indexed field; concurrent attachments are therefore valid. |
+| Transaction / audit | Sensor insertion and immutable `sensor.create` evidence share one transaction, including actor, parent/sensor UUIDs, normalized safe metadata and request context. Audit failure rolls the sensor back; no notification is required. |
+| DCL / tests | `021_drone_sensor_write_grants.sql` adds API INSERT only. Combined with DRONE-03 grants, API has SELECT/INSERT, reporting has SELECT, and API update/delete plus reporting/worker writes remain denied. Done - full SQLite passes 398 tests / 2242 assertions and PostgreSQL 18/PostGIS passes 398 / 2252; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
 
 ## **Mission planning and lifecycle**
 
