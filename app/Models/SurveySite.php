@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
@@ -64,5 +65,10 @@ class SurveySite extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by', 'user_id');
+    }
+
+    public function boundaries(): HasMany
+    {
+        return $this->hasMany(SiteBoundary::class, 'site_id', 'site_id');
     }
 }

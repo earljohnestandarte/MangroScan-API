@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
+use App\Http\Controllers\Api\V1\Site\SiteBoundaryIndexController;
 use App\Http\Controllers\Api\V1\Site\SiteIndexController;
 use App\Http\Controllers\Api\V1\Site\SiteShowController;
 use App\Http\Controllers\Api\V1\Site\SiteStoreController;
@@ -118,6 +119,16 @@ Route::prefix('v1')->group(function () {
 
     // [SITE-03] GET /api/v1/sites/{id}
     Route::get('/sites/{site}', SiteShowController::class)
+        ->whereUuid('site')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:sites.read',
+            'throttle:auth.authenticated',
+        ]);
+
+    // [BOUND-01] GET /api/v1/sites/{id}/boundaries
+    Route::get('/sites/{site}/boundaries', SiteBoundaryIndexController::class)
         ->whereUuid('site')
         ->middleware([
             'auth:sanctum',

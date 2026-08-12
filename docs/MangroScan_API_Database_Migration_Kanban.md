@@ -389,7 +389,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | SITE-03 | GET /sites/{id}Site detail with summary counts. | Path: id | 200 {data:{site,counts}} | SITE-01 | **P0** | Codex \- GIS/API | **Done** |
 | SITE-04 | PATCH /sites/{id}Update site metadata. | Partial Site fields | 200 {data:Site} | SITE-03 | **P1** | TBD \- GIS/API | **Blocked** |
 | SITE-05 | DELETE /sites/{id}Soft archive site after dependency checks. | Path: id | 204 | SITE-03 | **P2** | TBD \- GIS/API | Backlog |
-| BOUND-01 | GET /sites/{id}/boundariesList site polygons. | Path: site id | 200 {data:\[Boundary\]} | SITE-03 | **P0** | TBD \- GIS/API | **Blocked** |
+| BOUND-01 | GET /sites/{id}/boundariesList site polygons. | Path: site id | 200 {data:\[Boundary\]} | SITE-03 | **P0** | Codex \- GIS/API | **Done** |
 | BOUND-02 | POST /sites/{id}/boundariesCreate survey/no-fly/restoration polygon. | {boundary\_name,boundary\_type,boundary\_geom:GeoJSON,source?} | 201 {data:Boundary} | BOUND-01 | **P0** | TBD \- GIS/API | **Blocked** |
 | BOUND-03 | PATCH /boundaries/{id}Update boundary metadata/geometry. | Partial boundary fields | 200 {data:Boundary} | BOUND-02 | **P1** | TBD \- GIS/API | **Blocked** |
 | PLOT-01 | GET /sites/{id}/plotsList monitoring plots. | Path: site id | 200 {data:\[Plot\]} | SITE-03 | **P1** | TBD \- GIS/API | **Blocked** |
@@ -452,6 +452,24 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Side effects / audit / notifications | Read-only detail and aggregate lookup. No audit event or notification is created. Existing site DCL `SELECT` access is sufficient; no privilege expansion is introduced. |
 | Tests | `tests/Feature/Site/SiteShowTest.php` covers exact site/count envelope, PostGIS GeoJSON, current-tenant resolution, foreign/missing/deleted/malformed anti-enumeration 404s, authentication, foreign-role rejection, inactive organization, no audit side effect and throttling. |
 | Implementation status | Done - focused and complete SQLite plus PostgreSQL 18/PostGIS suites pass at 100 tests / 586 assertions; touched PHP files pass Pint, Composer metadata validates, all three site routes are registered, and diff checks are clean. |
+
+### **BOUND-01 - GET /api/v1/sites/{id}/boundaries**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | BOUND-01 / P0 |
+| Purpose | Return the ordered polygon boundaries attached to one tenant-visible survey site. |
+| Required permission | `sites.read`, since the permission catalog defines no separate boundary-read code; mutation remains reserved for `boundaries.manage`. |
+| Dependencies | SITE-03, scoped site resolution, users, survey sites, PostGIS and the safe boundary resource projection. |
+| Request / validation | UUID site path constrained at routing. Foreign, missing, soft-deleted and malformed site targets return the same standard 404 before child rows are queried. |
+| Success | `200` standard envelope containing safe Boundary resources ordered by name then UUID plus request ID metadata. Geometry is emitted as GeoJSON Polygon. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `404 NOT_FOUND`; `429 RATE_LIMITED`; unexpected database failures remain `500`. |
+| Workflow / tenant scope | The parent site is resolved under caller `organization_id`, then every boundary query is pinned to that resolved site UUID. Foreign boundaries cannot enter the result set. |
+| Spatial persistence | Adds the documented `site_boundaries` table with UUID ownership, `geometry(Polygon,4326)`, GiST spatial index, site/type lookup index, cascade-on-site deletion and restricted creator deletion. SQLite uses JSON only for compatibility testing. |
+| Side effects / audit / notifications | Read-only boundary lookup. No audit event or notification is created. SITE-03 immediately reflects the table through its `boundaries` summary count. |
+| Database privileges | `004_site_boundary_grants.sql` grants `SELECT` only to API and reporting roles. API insert/update/delete plus worker/auditor access remain denied until explicitly needed. |
+| Tests | `tests/Feature/Site/SiteBoundaryIndexTest.php` covers ordered same-site output, PostGIS GeoJSON, foreign-row exclusion, SITE-03 count integration, hidden parent IDs, authentication, missing/foreign permission grants, no audit side effect and throttling. |
+| Implementation status | Done - focused and complete SQLite plus PostgreSQL 18/PostGIS suites pass at 105 tests / 612 assertions; PostgreSQL confirms Polygon(4326), GiST and DCL shape; touched PHP passes Pint, Composer/routes validate, and diff checks are clean. |
 
 ## **Drone, sensor and hardware registry**
 
