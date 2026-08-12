@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\Mission\MissionStoreController;
 use App\Http\Controllers\Api\V1\Mission\MissionTeamReplaceController;
 use App\Http\Controllers\Api\V1\Mission\MissionUpdateController;
 use App\Http\Controllers\Api\V1\Mobile\MobileBootstrapController;
+use App\Http\Controllers\Api\V1\Mobile\MobileMissionBundleController;
 use App\Http\Controllers\Api\V1\Mobile\SyncDeviceRegisterController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
@@ -80,6 +81,18 @@ Route::prefix('v1')->group(function () {
         'permission:flights.read',
         'throttle:auth.authenticated',
     ]);
+
+    // [SYNC-03] GET /api/v1/mobile/missions/{id}/bundle
+    Route::get('/mobile/missions/{mission}/bundle', MobileMissionBundleController::class)
+        ->whereUuid('mission')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:missions.read',
+            'permission:flights.read',
+            'permission:sites.read',
+            'throttle:auth.authenticated',
+        ]);
 
     // [RBAC-01] GET /api/v1/roles
     Route::get('/roles', RoleIndexController::class)->middleware([

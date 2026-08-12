@@ -697,7 +697,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | SYNC-01 | POST /mobile/devices/registerRegister app installation for sync/audit. | {device\_id,platform,app\_version,device\_name?} | 201 {data:{device\_id,server\_time}} | AUTH-02 \+ schema extension | **P0** | Codex \- Mobile/API | **Done** |
 | SYNC-02 | GET /mobile/bootstrapDownload authorized mission/flight reference bundle. | Query: cursor? | 200 {data:{missions,flights,checklist\_templates,settings,tombstones},meta:{cursor,server\_time}} | MSN/FLT \+ AUTH | **P0** | Codex \- Mobile/API | **Done** |
-| SYNC-03 | GET /mobile/missions/{id}/bundleDownload one mission for offline use. | Path: mission id | 200 {data:{mission,site,flights,team,boundaries,plots}} | MSN-06 | **P0** | TBD \- Mobile/API | **Blocked** |
+| SYNC-03 | GET /mobile/missions/{id}/bundleDownload one mission for offline use. | Path: mission id | 200 {data:{mission,site,flights,team,boundaries,plots}} | MSN-06 | **P0** | Codex \- Mobile/API | **Done** |
 | SYNC-04 | POST /mobile/syncPush offline changes and receive server changes/conflicts. | {device\_id,base\_cursor,changes:\[{client\_id,entity,operation,version,payload}\]} | 200 {data:{applied,conflicts,server\_changes},meta:{cursor}} | SYNC-01 \+ all mutable mobile resources | **P0** | TBD \- Mobile/API | **Blocked** |
 | SYNC-05 | GET /mobile/sync/statusShow pending server work relevant to device. | Query: device\_id | 200 {data:{last\_cursor,last\_sync\_at,pending\_notifications}} | SYNC-04 | **P1** | TBD \- Mobile/API | **Blocked** |
 
@@ -720,6 +720,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Cursor / consistency | Cursors are encrypted, versioned and opaque; tampered, unsupported or future boundaries return 422. Queries use one transaction and a shared server-time upper boundary, with explicit offset-safe PostgreSQL bindings. |
 | Contract / forward compatibility | Returns exact mission and Flight resource arrays plus structurally stable `checklist_templates`, `settings` and `tombstones`. The first two remain explicit empty arrays until their authoritative P0/P1 schemas land; no P2 endpoint is claimed. |
 | Tests / status | `MobileBootstrapTest` covers full and delta snapshots, tenant/deleted isolation, tombstones, cursor tampering/future validation, active identity, both local/foreign permissions, no audit and throttling. Done - full SQLite passes 228 tests / 1272 assertions and PostgreSQL 18/PostGIS passes 228 / 1276; route, Pint and diff gates pass. |
+
+### **SYNC-03 - GET /api/v1/mobile/missions/{id}/bundle**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Download one approved tenant mission's field graph after active identity and tenant-valid mission, flight and site read permissions. It is read-only and creates no audit event. |
+| Approval / anti-enumeration | A recorded MSN-06 approver is required, while approved missions remain downloadable in later lifecycle states. Unapproved, foreign, soft-deleted and missing missions all return the documented 404 rather than exposing approval or tenancy. |
+| Bundle composition | Returns exact `{mission,site,flights,team,boundaries,plots}` using existing safe resources, stable child ordering, and real PostGIS Point/Polygon GeoJSON. Only the target mission/site graph is included. |
+| Forward compatibility | `plots` remains an explicit empty array until P1 PLOT-01/02 deliver the authoritative monitoring plot schema; the bundle contract will not change and those endpoint cards are not claimed here. |
+| Tests / status | `MobileMissionBundleTest` covers exact graph/spatial serialization, approval and later lifecycle behavior, unavailable mission hiding, active identity, three local/foreign permissions, no audit and throttling. Done - full SQLite passes 234 tests / 1301 assertions and PostgreSQL 18/PostGIS passes 234 / 1305; route, Pint and diff gates pass. |
 
 ## **Media, sensor uploads and quality control**
 
