@@ -23,6 +23,8 @@ class AiModel extends Model
         'model_type',
         'framework',
         'description',
+        'ai_service_id',
+        'external_model_key',
         'created_by',
     ];
 

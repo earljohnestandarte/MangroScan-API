@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Ai\AiModelShowController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceHealthTestController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceOverviewController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceStoreController;
+use App\Http\Controllers\Api\V1\Ai\AiServiceSynchronizeController;
 use App\Http\Controllers\Api\V1\Audit\AuditLogIndexController;
 use App\Http\Controllers\Api\V1\Auth\AuthenticatedProfileController;
 use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
@@ -541,6 +542,14 @@ Route::prefix('v1')->group(function () {
 
     // [AISVC-03] POST /api/v1/admin/ai-services/{id}/test
     Route::post('/admin/ai-services/{service}/test', AiServiceHealthTestController::class)
+        ->whereUuid('service')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_services.manage', 'throttle:auth.authenticated',
+        ]);
+
+    // [AISVC-04] POST /api/v1/admin/ai-services/{id}/synchronize
+    Route::post('/admin/ai-services/{service}/synchronize', AiServiceSynchronizeController::class)
         ->whereUuid('service')
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
