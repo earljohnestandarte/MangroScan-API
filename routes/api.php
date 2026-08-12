@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\Drone\DroneShowController;
 use App\Http\Controllers\Api\V1\Drone\DroneStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightChecklistStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightCompleteController;
+use App\Http\Controllers\Api\V1\Flight\FlightFailController;
 use App\Http\Controllers\Api\V1\Flight\FlightShowController;
 use App\Http\Controllers\Api\V1\Flight\FlightStartController;
 use App\Http\Controllers\Api\V1\Flight\FlightUpdateController;
@@ -436,6 +437,14 @@ Route::prefix('v1')->group(function () {
 
     // [FLT-06] POST /api/v1/flights/{id}/complete
     Route::post('/flights/{flight}/complete', FlightCompleteController::class)
+        ->whereUuid('flight')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:flights.complete', 'throttle:auth.authenticated',
+        ]);
+
+    // [FLT-07] POST /api/v1/flights/{id}/fail
+    Route::post('/flights/{flight}/fail', FlightFailController::class)
         ->whereUuid('flight')
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,

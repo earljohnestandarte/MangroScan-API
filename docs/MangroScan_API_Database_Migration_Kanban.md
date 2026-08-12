@@ -842,7 +842,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | CHK-01 | POST /flights/{id}/checklistsSubmit pre/post-flight checklist. | {checklist\_type,battery\_ok,weather\_ok,gps\_ok,camera\_ok,lidar\_depth\_ok,storage\_ok,overall\_status,remarks?} | 201 {data:Checklist} | FLT-03 | **P0** | Codex \- Mobile/API | **Done** |
 | FLT-05 | POST /flights/{id}/startStart flight only after required preflight gate. | {started\_at,takeoff\_location?:GeoJSON} | 200 {data:Flight} | CHK-01 passed | **P0** | Codex \- Mobile/API | **Done** |
 | FLT-06 | POST /flights/{id}/completeComplete flight and capture landing summary. | {ended\_at,landing\_location?:GeoJSON,actual\_avg\_altitude\_meters?,notes?} | 200 {data:Flight} | FLT-05 | **P0** | Codex \- Mobile/API | **Done** |
-| FLT-07 | POST /flights/{id}/failAbort/fail flight with reason. | {status:"aborted"|"failed",reason,ended\_at?} | 200 {data:Flight} | FLT-05 | **P1** | TBD \- Mobile/API | **Blocked** |
+| FLT-07 | POST /flights/{id}/failAbort/fail flight with reason. | {status:"aborted"|"failed",reason,ended\_at?} | 200 {data:Flight} | FLT-05 | **P1** | Codex \- Mobile/API | **Done** |
 | WPT-01 | PUT /flights/{id}/waypointsBatch replace ordered route waypoints. | {waypoints:\[{sequence\_no,location:GeoJSON,altitude\_meters?,speed\_mps?,action?}\]} | 200 {data:{count}} | FLT-03 | **P1** | TBD \- GIS/API | **Blocked** |
 | ENV-01 | POST /flights/{id}/environment-logsAppend environment observation. | {recorded\_at,weather\_condition,wind\_speed\_mps?,temperature\_celsius?,humidity\_percent?,visibility\_status?,notes?} | 201 {data:EnvironmentLog} | FLT-03 | **P2** | TBD \- Mobile/API | Backlog |
 | BAT-03 | POST /flights/{id}/battery-usageRecord battery use for sortie. | {battery\_id,start\_percentage,end\_percentage,usage\_minutes?,notes?} | 201 {data:BatteryUsage} | FLT-03 \+ BAT-01 | **P2** | TBD \- Mobile/API | Backlog |
@@ -924,6 +924,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Request / spatial behavior | Optional nullable GeoJSON landing Point, non-negative two-decimal average altitude and trimmed notes follow omitted-versus-explicit-null semantics. PostgreSQL stores landing as `POINT(4326)` and timestamp instants remain offset-safe. |
 | Transaction / audit / privileges | Lifecycle, end time, duration and optional summary updates share one transaction with immutable `flight.complete` old/new evidence. Existing API UPDATE privilege is sufficient; reporting stays read-only. |
 | Tests / status | `FlightCompleteTest` covers full/minimal/null summaries, lifecycle/time ordering, validation, PostGIS geometry, tenant hiding, rollback, local/foreign RBAC and throttling. Done - full SQLite passes 213 tests / 1188 assertions and PostgreSQL 18/PostGIS passes 213 / 1191; route, Pint, DCL and diff gates pass. |
+
+### **FLT-07 - POST /api/v1/flights/{id}/fail**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Terminate one active tenant sortie as `aborted` or `failed`. Appendix B defines no separate failure permission, so the transition uses tenant-valid `flights.complete`, the documented terminal-flight authority. |
+| Request / response | Required normalized terminal status and trimmed reason up to 5000 characters; optional nullable `ended_at` defaults to server time. Success returns the safe Flight resource plus request ID, canonical UTC timestamps and computed duration. The authoritative flight `notes` field stores the terminal reason. |
+| Workflow / tenant | Only a `flying` flight with a start time may transition, and end must be strictly after start. Planned/already-terminal states return `409 CONFLICT`; foreign, deleted-lineage, missing and malformed IDs remain hidden. |
+| Transaction / audit / DCL | Row lock, lifecycle/time/duration/reason update, sync-version increment and immutable `flight.fail` evidence share one rollback-safe transaction. Existing API UPDATE privilege suffices; reporting stays read-only and DELETE/worker mutation remain denied. |
+| Tests / status | `FlightFailTest` covers both outcomes, explicit/default UTC timing, duration/reason, validation/time ordering, state/tenant hiding, rollback, permission and throttling. Done - full SQLite passes 432 tests / 2464 assertions and PostgreSQL 18/PostGIS passes 432 / 2474; focused suites, route, Pint, Composer, DCL and diff gates pass. |
 
 ## **Mobile offline synchronization**
 
