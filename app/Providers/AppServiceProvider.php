@@ -36,5 +36,13 @@ class AppServiceProvider extends ServiceProvider
             ))
                 ->by($email.'|'.$request->ip());
         });
+
+        RateLimiter::for('auth.authenticated', function (Request $request): Limit {
+            return Limit::perMinute(max(
+                1,
+                (int) config('mangroscan.auth.authenticated_requests_per_minute'),
+            ))
+                ->by(($request->user()?->getAuthIdentifier() ?? 'guest').'|'.$request->ip());
+        });
     }
 }

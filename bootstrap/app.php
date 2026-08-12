@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AddRequestId;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +20,23 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('api', AddRequestId::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (AuthenticationException $exception, Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+
+            $requestId = AddRequestId::resolve($request);
+
+            return response()->json([
+                'error' => [
+                    'code' => 'UNAUTHENTICATED',
+                    'message' => 'Authentication is required.',
+                    'details' => (object) [],
+                    'request_id' => $requestId,
+                ],
+            ], 401, ['X-Request-ID' => $requestId]);
+        });
+
         $exceptions->render(function (ValidationException $exception, Request $request) {
             if (! $request->is('api/*')) {
                 return null;

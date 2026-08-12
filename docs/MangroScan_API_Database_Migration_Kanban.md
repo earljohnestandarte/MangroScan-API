@@ -209,6 +209,23 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Implementation compatibility | Uses the existing physical `password` and `status` columns without renaming or deleting identity fields; the public contract remains aligned with Section 7.1. |
 | Implementation status | Done — the endpoint passes the complete SQLite suite and the complete PostgreSQL 18/PostGIS suite against an isolated `mangroscan_test` database. |
 
+### **AUTH-02 — GET /api/v1/auth/me**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | AUTH-02 / P0 |
+| Purpose | Refresh the authenticated web/mobile caller's safe profile, organization metadata and effective access. |
+| Required permission | Any valid Sanctum Bearer token belonging to an active user in an active organization. |
+| Dependencies | AUTH-01, UUID Sanctum tokens, organizations, users, roles, permissions and role/user joins. |
+| Request / validation | No body. The opaque token is supplied through `Authorization: Bearer ...`. |
+| Success | `200` standard envelope containing `user`, `organization`, sorted tenant-scoped `roles`, sorted effective `permissions`, and request ID metadata. Passwords, token material and internal timestamps are never projected. |
+| Errors | `401 UNAUTHENTICATED` for missing, invalid, expired or orphaned tokens; `403 ACCOUNT_INACTIVE` for inactive users or organizations; `429 RATE_LIMITED`; unexpected persistence failures remain `500`. |
+| Workflow / tenant scope | Includes global roles and roles owned by the authenticated user's organization. Foreign-organization role assignments and their permissions are excluded. |
+| Side effects / audit / notifications | Read-only identity refresh. Sanctum may update the token's `last_used_at`; no business audit event or notification is created. |
+| Tests | `tests/Feature/Auth/AuthenticatedProfileTest.php` covers exact success shape, tenant isolation, last-use tracking, missing/invalid/expired/orphaned tokens, inactive user/organization state, no audit side effect and throttling. |
+| Implementation compatibility | Uses the current identity columns and a shared effective-access service also consumed by AUTH-01, preventing role/permission projection drift. |
+| Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
+
 ## **Organizations, users and RBAC**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |

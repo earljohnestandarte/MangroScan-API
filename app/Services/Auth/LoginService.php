@@ -2,7 +2,6 @@
 
 namespace App\Services\Auth;
 
-use App\Models\Role;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
 use Illuminate\Support\Carbon;
@@ -11,7 +10,10 @@ use Illuminate\Support\Facades\Hash;
 
 class LoginService
 {
-    public function __construct(private readonly AuditLogger $auditLogger) {}
+    public function __construct(
+        private readonly AuditLogger $auditLogger,
+        private readonly EffectiveAccessService $effectiveAccess,
+    ) {}
 
     /**
      * @return array{user: array<string, string>, access_token: string, expires_at: string, roles: list<string>, permissions: list<string>}|null
@@ -75,23 +77,7 @@ class LoginService
                 requestId: $requestId,
             );
 
-            $scopedRoles = $user->roles->filter(
-                fn (Role $role): bool => $role->organization_id === null
-                    || $role->organization_id === $user->organization_id,
-            );
-            $roles = $scopedRoles
-                ->pluck('role_name')
-                ->unique()
-                ->sort()
-                ->values()
-                ->all();
-            $permissions = $scopedRoles
-                ->flatMap->permissions
-                ->pluck('permission_code')
-                ->unique()
-                ->sort()
-                ->values()
-                ->all();
+            $access = $this->effectiveAccess->rolesAndPermissions($user);
 
             return [
                 'user' => [
@@ -103,8 +89,7 @@ class LoginService
                 ],
                 'access_token' => $issuedToken->plainTextToken,
                 'expires_at' => $expiresAt->toIso8601String(),
-                'roles' => $roles,
-                'permissions' => $permissions,
+                ...$access,
             ];
         });
     }

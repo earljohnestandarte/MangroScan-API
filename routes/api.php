@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Auth\AuthenticatedProfileController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
+use App\Http\Middleware\EnsureActiveIdentity;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -14,4 +16,11 @@ Route::prefix('v1')->group(function () {
 
     // [AUTH-01] POST /api/v1/auth/login
     Route::post('/auth/login', LoginController::class)->middleware('throttle:auth.login');
+
+    // [AUTH-02] GET /api/v1/auth/me
+    Route::get('/auth/me', AuthenticatedProfileController::class)->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'throttle:auth.authenticated',
+    ]);
 });
