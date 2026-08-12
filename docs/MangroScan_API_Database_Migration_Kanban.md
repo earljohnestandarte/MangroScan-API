@@ -1506,7 +1506,7 @@ V-01 is implemented by `2026_08_12_070000_create_user_effective_permissions_view
 | :---- | :---- | :---- | :---- | :---- |
 | R-01 | fn\_touch\_updated\_at() \+ triggers | BEFORE UPDATE | Set updated\_at consistently on mutable tables. | **P0** |
 | R-02 | fn\_audit\_row\_change() \+ triggers | AFTER INSERT/UPDATE/DELETE | Append old/new JSONB to immutable audit\_logs; include app user/request context where available. | **P0** |
-| R-03 | fn\_user\_has\_permission(user\_id, permission\_code) | SQL function | Optional DB-side helper for routines/RLS. API policies remain primary authorization surface. | **P1** |
+| R-03 | fn\_user\_has\_permission(user\_id, permission\_code) | SQL function | Optional DB-side helper for routines/RLS. API policies remain primary authorization surface. Implemented with V-01 tenant-safe semantics, invoker rights and API-only EXECUTE. | **P1 — Done** |
 | R-04 | fn\_flight\_readiness(flight\_id) | SQL function | Return passed:boolean and reasons\[\] from preflight/resource/approval state. | **P0** |
 | R-05 | sp\_recompute\_tree\_count\_summary(mission\_id) | Procedure / transaction | Upsert total/species counts after completed processing/validation. | **P0** |
 | R-06 | sp\_recompute\_accuracy\_metrics(validation\_session\_id) | Procedure / transaction | Compute sample size, precision/recall/F1/species accuracy and error metrics from validation matches. | **P0** |
