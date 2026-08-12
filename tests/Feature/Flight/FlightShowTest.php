@@ -125,10 +125,17 @@ class FlightShowTest extends TestCase
         $this->assertStringContainsString('flight_checklists_status_check', $migration);
         $this->assertIsString($dcl);
         $this->assertStringContainsString(
-            'GRANT SELECT ON TABLE app.flight_waypoints, app.flight_checklists',
+            'GRANT SELECT ON TABLE app.flight_waypoints TO mangroscan_api_rw, mangroscan_report_ro;',
             $dcl,
         );
-        $this->assertStringContainsString('TO mangroscan_api_rw, mangroscan_report_ro;', $dcl);
+        $this->assertStringContainsString(
+            'GRANT SELECT, INSERT ON TABLE app.flight_checklists TO mangroscan_api_rw;',
+            $dcl,
+        );
+        $this->assertStringContainsString(
+            'GRANT SELECT ON TABLE app.flight_checklists TO mangroscan_report_ro;',
+            $dcl,
+        );
 
         if (DB::getDriverName() !== 'pgsql') {
             return;

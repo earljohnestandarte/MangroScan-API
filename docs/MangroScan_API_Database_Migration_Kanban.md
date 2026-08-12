@@ -615,7 +615,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | FLT-02 | POST /missions/{id}/flightsCreate flight sortie. | {drone\_id,pilot\_user\_id,flight\_code,planned\_altitude\_meters?,notes?} | 201 {data:Flight} | MSN-06 \+ DRONE-01 | **P0** | Codex \- Backend/API | **Done** |
 | FLT-03 | GET /flights/{id}Flight detail/readiness summary. | Path: id | 200 {data:{flight,checklists,waypoint\_count,media\_count}} | FLT-01 | **P0** | Codex \- Backend/API | **Done** |
 | FLT-04 | PATCH /flights/{id}Update planned flight metadata. | Partial Flight fields | 200 {data:Flight} | FLT-03 | **P1** | TBD \- Backend/API | **Blocked** |
-| CHK-01 | POST /flights/{id}/checklistsSubmit pre/post-flight checklist. | {checklist\_type,battery\_ok,weather\_ok,gps\_ok,camera\_ok,lidar\_depth\_ok,storage\_ok,overall\_status,remarks?} | 201 {data:Checklist} | FLT-03 | **P0** | TBD \- Mobile/API | **Blocked** |
+| CHK-01 | POST /flights/{id}/checklistsSubmit pre/post-flight checklist. | {checklist\_type,battery\_ok,weather\_ok,gps\_ok,camera\_ok,lidar\_depth\_ok,storage\_ok,overall\_status,remarks?} | 201 {data:Checklist} | FLT-03 | **P0** | Codex \- Mobile/API | **Done** |
 | FLT-05 | POST /flights/{id}/startStart flight only after required preflight gate. | {started\_at,takeoff\_location?:GeoJSON} | 200 {data:Flight} | CHK-01 passed | **P0** | TBD \- Mobile/API | **Blocked** |
 | FLT-06 | POST /flights/{id}/completeComplete flight and capture landing summary. | {ended\_at,landing\_location?:GeoJSON,actual\_avg\_altitude\_meters?,notes?} | 200 {data:Flight} | FLT-05 | **P0** | TBD \- Mobile/API | **Blocked** |
 | FLT-07 | POST /flights/{id}/failAbort/fail flight with reason. | {status:"aborted"|"failed",reason,ended\_at?} | 200 {data:Flight} | FLT-05 | **P1** | TBD \- Mobile/API | **Blocked** |
@@ -658,6 +658,18 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Child schema | Adds authoritative `flight_waypoints` with unique per-flight sequence, optional motion/action metadata and PostGIS `POINT(4326)` + GiST; adds `flight_checklists` with checker FK, documented boolean evidence and type/status domains. These shared tables are physical prerequisites for CHK-01 and WPT-01 but those write cards are not claimed here. |
 | Side effects / privileges | Read-only; no audit or notification. API/reporting roles receive SELECT only on both child tables. |
 | Tests / status | `FlightShowTest` covers exact detail/checklist fields/order, GeoJSON, real waypoint count, forward-compatible media count, tenant/deleted-lineage hiding, local/foreign RBAC, no audit, throttling, domains and DCL. Done - full SQLite passes 185 tests / 1028 assertions and PostgreSQL 18/PostGIS passes 185 / 1031; route, Pint, Composer, DCL and diff gates pass. |
+
+### **CHK-01 - POST /api/v1/flights/{id}/checklists**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Append pre-flight or post-flight readiness evidence; requires tenant-valid `checklists.submit`. |
+| Request / response | Required normalized documented type, six strict booleans, documented overall status and optional trimmed remarks. Success is `201 {data:Checklist}` plus request ID; `checked_by` and evidence time are server controlled. |
+| Lifecycle | Pre-flight evidence is accepted only while the flight is `planned`; post-flight evidence is accepted only after `completed`, `aborted`, or `failed`. Invalid combinations return 409. |
+| Repeat behavior | The authoritative schema/manual specifies no unique flight/type invariant, so repeated submissions are append-only evidence rather than overwrites. FLT-05 evaluates the latest pre-flight record deterministically by `created_at` then UUID. |
+| Tenant / transaction / audit | Flight lookup follows mission/site organization lineage and hides foreign/deleted-lineage IDs. A locked flight-state recheck, checklist insertion and immutable `flight.checklist.submit` audit share one transaction; audit failure rolls back evidence. |
+| Database privileges | API receives checklist `SELECT, INSERT`, reporting remains SELECT-only, and waypoint privileges remain unchanged/read-only; no update/delete grants. |
+| Tests / status | `FlightChecklistStoreTest` covers normalized persistence and exact audit, repeat evidence, validation, lifecycle conflicts, tenant hiding, rollback, local/foreign RBAC and throttling. Done - full SQLite passes 194 tests / 1083 assertions and PostgreSQL 18/PostGIS passes 194 / 1086; route, Pint, Composer, DCL and diff gates pass. |
 
 ## **Mobile offline synchronization**
 
