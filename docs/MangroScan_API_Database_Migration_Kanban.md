@@ -509,7 +509,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | MSN-01 | GET /missionsList missions visible to caller. | Query: site\_id,status,from,to,search,page | 200 {data:\[Mission\],meta} | SITE-01 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-02 | POST /missionsCreate survey mission. | {site\_id,mission\_code,mission\_title,mission\_objective,planned\_start\_at?,planned\_end\_at?,coverage\_target\_hectares?} | 201 {data:Mission} | MSN-01 | **P0** | Codex \- Backend/API | **Done** |
-| MSN-03 | GET /missions/{id}Mission detail with team/flights/summary. | Path: id | 200 {data:{mission,team,flight\_summary}} | MSN-01 | **P0** | TBD \- Backend/API | **Blocked** |
+| MSN-03 | GET /missions/{id}Mission detail with team/flights/summary. | Path: id | 200 {data:{mission,team,flight\_summary}} | MSN-01 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-04 | PATCH /missions/{id}Update planning fields before finalization. | Partial Mission fields | 200 {data:Mission} | MSN-03 | **P0** | TBD \- Backend/API | **Blocked** |
 | MSN-05 | DELETE /missions/{id}Soft archive allowed mission. | Path: id | 204 | MSN-03 | **P2** | TBD \- Backend/API | Backlog |
 | TEAM-01 | PUT /missions/{id}/teamReplace mission team assignments atomically. | {members:\[{user\_id,team\_role}\]} | 200 {data:\[MissionTeamMember\]} | MSN-03 \+ USR-01 | **P0** | TBD \- Backend/API | **Blocked** |
@@ -550,6 +550,18 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Database privileges | Mission DCL grants API `SELECT, INSERT` and reporting `SELECT`; update/delete remain denied. |
 | Tests | `tests/Feature/Mission/MissionStoreTest.php` covers output/persistence, normalization, time/precision/uniqueness validation, hidden sites, audit/rollback, authentication, local/foreign RBAC and throttling. |
 | Implementation status | Done - complete SQLite and PostgreSQL suites pass at 127 tests / 733 assertions; touched Pint, Composer, DCL and diff gates pass. |
+
+### **MSN-03 - GET /api/v1/missions/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | MSN-03 / P0 |
+| Purpose / permission | Return one mission, ordered team and flight-status summary; requires tenant-valid `missions.read`. |
+| Tenant / response | Mission lookup follows non-deleted site organization lineage. Success is exact `{mission,team,flight_summary}` plus request ID; foreign/missing/deleted/malformed IDs share 404. |
+| Team schema | Adds UUID `mission_team_members`, mission/user FKs, assignment timestamp, mission/role index and unique mission/user/role invariant. |
+| Flight summary | Stable `total`, `planned`, `flying`, `completed`, `aborted`, `failed` integers; reads real `flight_sessions` once its drone-dependent FLT-01 migration lands and returns zeros beforehand. |
+| Side effects / DCL | Read-only, with no audit/notification. Team DCL grants API/reporting `SELECT` only. |
+| Tests / status | `MissionShowTest` covers exact shape/order, tenant 404s, RBAC, no audit and throttling. Done at 132 tests / 750 assertions on SQLite and PostgreSQL; Pint, Composer, DCL and diff gates pass. |
 
 ## **Flight operations and field readiness**
 
