@@ -17,6 +17,15 @@ class Organization extends Model
 
     protected $keyType = 'string';
 
+    protected $fillable = [
+        'organization_name',
+        'organization_type',
+        'contact_email',
+        'contact_number',
+        'address',
+        'status',
+    ];
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class, 'organization_id', 'organization_id');

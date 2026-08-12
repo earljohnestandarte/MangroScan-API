@@ -293,7 +293,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | ORG-01 | GET /organizationsList organizations for system admin. | Query: page,per\_page,search,status | 200 {data:\[Organization\],meta} | AUTH-08 | **P1** | Backend/API | **Done** |
-| ORG-02 | POST /organizationsCreate tenant/owner organization. | {organization\_name,organization\_type,contact\_email?,contact\_number?,address?} | 201 {data:Organization} | ORG-01 | **P1** | TBD \- Backend/API | **Ready** |
+| ORG-02 | POST /organizationsCreate tenant/owner organization. | {organization\_name,organization\_type,contact\_email?,contact\_number?,address?} | 201 {data:Organization} | ORG-01 | **P1** | Backend/API | **Done** |
 | ORG-03 | GET /organizations/{id}Organization detail. | Path: id | 200 {data:Organization} | ORG-01 | **P1** | TBD \- Backend/API | **Ready** |
 | ORG-04 | PATCH /organizations/{id}Update/archive organization metadata. | Partial Organization fields | 200 {data:Organization} | ORG-03 | **P1** | TBD \- Backend/API | **Blocked** |
 | USR-01 | GET /usersList users inside authorized org scope. | Query: org\_id?,role?,active?,search,page | 200 {data:\[User\],meta} | AUTH-08 | **P0** | TBD \- Backend/API | **Blocked** |
@@ -321,6 +321,21 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Ordering / side effects | Results sort by organization name then UUID for stable pages. The operation is read-only and creates no business audit event or notification. |
 | DCL | Existing identity DCL gives the API role organization access needed by identity and organization workflows. Reporting, worker and auditor roles receive no organization-table access; the live PostgreSQL privilege check confirms API SELECT only among those readers. |
 | Tests / status | `OrganizationIndexTest` covers exact fields/meta/order, global scope, search/status composition, soft deletion, validation, authentication, local/foreign RBAC, inactive identity, no audit, throttling and DCL. Done — full SQLite passes 294 tests / 1647 assertions and PostgreSQL 18/PostGIS passes 294 / 1654; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
+
+### **ORG-02 — POST /api/v1/organizations**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | ORG-02 / P1 |
+| Purpose | Create a new active tenant/owner organization for subsequent user, site and asset ownership workflows. |
+| Required permission | `organizations.manage`, enforced after Sanctum and active-identity checks. Foreign-tenant role assignments cannot authorize global organization creation. |
+| Dependencies | ORG-01, organizations, immutable audit storage, standard request IDs, validation and authenticated throttling. |
+| Request / validation | Required trimmed name (150 characters) and normalized documented type (`school`, `lgu`, `denr`, `ngo`, `research_group`); optional normalized RFC email, 50-character contact number and text address. Status is server-owned and begins as `active`. |
+| Success | `201` standard envelope containing the safe Organization resource plus request ID metadata. Omitted contact fields remain null and no internal soft-delete state is projected. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; case-insensitive duplicate name `409 CONFLICT`; malformed input `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected persistence failures remain `500`. |
+| Concurrency / conflict policy | Organization names are normalized before comparison and remain reserved by soft-deleted rows. PostgreSQL uses a transaction-scoped advisory lock keyed by the normalized name so concurrent same-name requests cannot both pass the absence check. |
+| Transaction / audit | Organization persistence and immutable `organization.create` evidence share one transaction. Audit failure rolls back the tenant; evidence records normalized public metadata, actor and request context without timestamps or secrets. |
+| DCL / tests | Existing identity DCL grants API organization INSERT and audit INSERT while audit UPDATE and report/worker organization INSERT remain denied. `OrganizationStoreTest` covers normalized success, null optionals, validation, active/archived duplicates, rollback, authentication, local/foreign RBAC, inactive identity, throttling and DCL. Done — full SQLite passes 304 tests / 1714 assertions and PostgreSQL 18/PostGIS passes 304 / 1721; route, Pint, Composer, live privilege and diff gates pass. |
 
 ### **RBAC-01 — GET /api/v1/roles**
 

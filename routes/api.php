@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\V1\Mobile\MobileBootstrapController;
 use App\Http\Controllers\Api\V1\Mobile\MobileMissionBundleController;
 use App\Http\Controllers\Api\V1\Mobile\SyncDeviceRegisterController;
 use App\Http\Controllers\Api\V1\Organization\OrganizationIndexController;
+use App\Http\Controllers\Api\V1\Organization\OrganizationStoreController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobIndexController;
@@ -91,6 +92,14 @@ Route::prefix('v1')->group(function () {
 
     // [ORG-01] GET /api/v1/organizations
     Route::get('/organizations', OrganizationIndexController::class)->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:organizations.manage',
+        'throttle:auth.authenticated',
+    ]);
+
+    // [ORG-02] POST /api/v1/organizations
+    Route::post('/organizations', OrganizationStoreController::class)->middleware([
         'auth:sanctum',
         EnsureActiveIdentity::class,
         'permission:organizations.manage',
