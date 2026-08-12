@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Mission\MissionIndexController;
+use App\Http\Controllers\Api\V1\Mission\MissionStoreController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
@@ -155,5 +156,11 @@ Route::prefix('v1')->group(function () {
         EnsureActiveIdentity::class,
         'permission:missions.read',
         'throttle:auth.authenticated',
+    ]);
+
+    // [MSN-02] POST /api/v1/missions
+    Route::post('/missions', MissionStoreController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:missions.create', 'throttle:auth.authenticated',
     ]);
 });

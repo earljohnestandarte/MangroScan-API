@@ -508,7 +508,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | MSN-01 | GET /missionsList missions visible to caller. | Query: site\_id,status,from,to,search,page | 200 {data:\[Mission\],meta} | SITE-01 | **P0** | Codex \- Backend/API | **Done** |
-| MSN-02 | POST /missionsCreate survey mission. | {site\_id,mission\_code,mission\_title,mission\_objective,planned\_start\_at?,planned\_end\_at?,coverage\_target\_hectares?} | 201 {data:Mission} | MSN-01 | **P0** | TBD \- Backend/API | **Blocked** |
+| MSN-02 | POST /missionsCreate survey mission. | {site\_id,mission\_code,mission\_title,mission\_objective,planned\_start\_at?,planned\_end\_at?,coverage\_target\_hectares?} | 201 {data:Mission} | MSN-01 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-03 | GET /missions/{id}Mission detail with team/flights/summary. | Path: id | 200 {data:{mission,team,flight\_summary}} | MSN-01 | **P0** | TBD \- Backend/API | **Blocked** |
 | MSN-04 | PATCH /missions/{id}Update planning fields before finalization. | Partial Mission fields | 200 {data:Mission} | MSN-03 | **P0** | TBD \- Backend/API | **Blocked** |
 | MSN-05 | DELETE /missions/{id}Soft archive allowed mission. | Path: id | 204 | MSN-03 | **P2** | TBD \- Backend/API | Backlog |
@@ -535,6 +535,21 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Database privileges | `005_survey_mission_grants.sql` grants `SELECT` only to API and reporting roles; insert/update/delete plus worker/auditor access remain denied. |
 | Tests | `tests/Feature/Mission/MissionIndexTest.php` covers exact fields/meta/order, site-lineage and soft-delete isolation, composed filters, hidden explicit sites, validation, authentication, missing/foreign-role permission rejection, no audit side effect and throttling. |
 | Implementation status | Done - focused and complete SQLite plus PostgreSQL 18/PostGIS suites pass at 120 tests / 698 assertions; PostgreSQL confirms the lifecycle constraint and DCL matrix; touched PHP passes Pint, Composer/routes validate, and diff checks are clean. |
+
+### **MSN-02 - POST /api/v1/missions**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | MSN-02 / P0 |
+| Purpose / permission | Create a planned mission in one visible site; requires tenant-valid `missions.create`. |
+| Dependencies | MSN-01, scoped site resolution, mission schema/resource and immutable audit storage. |
+| Request / validation | Required site UUID, normalized unique code, title and objective; optional ordered planning timestamps and non-negative `NUMERIC(12,4)` coverage target. |
+| Success / errors | `201 {data:Mission}` plus request ID; standard `401`, `403`, anti-enumeration `404`, `422`, `429`, and unexpected `500`. |
+| Tenant / workflow | Site ownership derives from scoped resolution; foreign/missing sites are hidden. New missions always start `planned`; clients cannot inject lifecycle/actor/approval fields. |
+| Transaction / audit | Mission insertion and immutable `mission.create` evidence share one transaction; audit failure rolls back creation. No notification is required at initial planning. |
+| Database privileges | Mission DCL grants API `SELECT, INSERT` and reporting `SELECT`; update/delete remain denied. |
+| Tests | `tests/Feature/Mission/MissionStoreTest.php` covers output/persistence, normalization, time/precision/uniqueness validation, hidden sites, audit/rollback, authentication, local/foreign RBAC and throttling. |
+| Implementation status | Done - complete SQLite and PostgreSQL suites pass at 127 tests / 733 assertions; touched Pint, Composer, DCL and diff gates pass. |
 
 ## **Flight operations and field readiness**
 
