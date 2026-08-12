@@ -1099,7 +1099,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | NOTIF-01 | GET /notificationsList durable notifications for current user. | Query: unread\_only?,type?,page | 200 {data:\[Notification\],meta} | AUTH \+ notification\_logs | **P1** | Codex \- Backend/API | **Done** |
-| NOTIF-02 | GET /notifications/unread-countLightweight badge count. | No body | 200 {data:{unread\_count}} | NOTIF-01 | **P1** | TBD \- Backend/API | **Blocked** |
+| NOTIF-02 | GET /notifications/unread-countLightweight badge count. | No body | 200 {data:{unread\_count}} | NOTIF-01 | **P1** | Codex \- Backend/API | **Done** |
 | NOTIF-03 | POST /notifications/{id}/readMark one notification read. | No body | 200 {data:Notification} | NOTIF-01 | **P1** | TBD \- Backend/API | **Blocked** |
 | NOTIF-04 | POST /notifications/read-allMark caller notifications read. | No body | 204 | NOTIF-01 | **P2** | TBD \- Backend/API | Backlog |
 | SET-01 | GET /settingsRead permitted settings by group. | Query: group? | 200 {data:\[Setting\]} | AUTH | **P2** | TBD \- Backend/API | Backlog |
@@ -1118,6 +1118,15 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Database / DCL | Adds the documented UUID `notification_logs` table with required user lineage, durable message fields, unread default and user/read/time plus user/type/time indexes. `023_notification_log_grants.sql` gives only `mangroscan_api_rw` SELECT; INSERT and UPDATE remain withheld until notification-producing workflows and NOTIF-03 explicitly require them. Worker, reporting and auditor roles receive no access. |
 | Side effects / errors | Read-only polling creates no audit event and does not mutate read state. Errors are `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected failures remain `500`. No target identifier exists for a normal 404 response. |
 | Tests / status | `NotificationIndexTest` covers exact shape/pages/order, user/tenant isolation, unread/type composition, validation, authentication, local/foreign RBAC, inactive identity, no audit, throttling, durable FK/index schema and DCL. Done — full SQLite passes 457 tests / 2625 assertions (two PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 457 / 2636; focused suites, route, Pint, Composer, migration, index and live privilege gates pass. |
+
+### **NOTIF-02 — GET /api/v1/notifications/unread-count**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Return the lightweight unread badge count for the authenticated user. Requires active Sanctum authentication and tenant-valid `notifications.read`; foreign-role grants cannot authorize it. |
+| Request / success | No body or query parameters. Returns `200` with exact integer `{data:{unread_count}}` plus request ID metadata, including zero when the caller has no unread rows. |
+| Scope / side effects | Counts only `notification_logs` rows matching both the caller's `user_id` and `is_read=false`; same-organization colleagues and foreign tenants never contribute. The read creates no audit/notification and never changes read state. |
+| Database / tests / status | Reuses NOTIF-01's user/read/time index and API SELECT-only `023_notification_log_grants.sql`; no schema or privilege expansion. `NotificationUnreadCountTest` covers exact output/type, zero behavior, caller isolation, authentication, local/foreign RBAC, inactive identity, throttling, no audit and read-only DCL. Done — full SQLite passes 463 tests / 2649 assertions (two PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 463 / 2660; focused suites and static gates pass. |
 
 ### **AUD-01 — GET /api/v1/audit-logs**
 

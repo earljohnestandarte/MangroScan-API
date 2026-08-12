@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\V1\Mobile\MobileBootstrapController;
 use App\Http\Controllers\Api\V1\Mobile\MobileMissionBundleController;
 use App\Http\Controllers\Api\V1\Mobile\SyncDeviceRegisterController;
 use App\Http\Controllers\Api\V1\Notification\NotificationIndexController;
+use App\Http\Controllers\Api\V1\Notification\NotificationUnreadCountController;
 use App\Http\Controllers\Api\V1\Organization\OrganizationIndexController;
 use App\Http\Controllers\Api\V1\Organization\OrganizationShowController;
 use App\Http\Controllers\Api\V1\Organization\OrganizationStoreController;
@@ -481,6 +482,12 @@ Route::prefix('v1')->group(function () {
 
     // [NOTIF-01] GET /api/v1/notifications
     Route::get('/notifications', NotificationIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:notifications.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [NOTIF-02] GET /api/v1/notifications/unread-count
+    Route::get('/notifications/unread-count', NotificationUnreadCountController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:notifications.read', 'throttle:auth.authenticated',
     ]);
