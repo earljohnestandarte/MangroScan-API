@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\V1\Site\SiteBoundaryIndexController;
 use App\Http\Controllers\Api\V1\Site\SiteBoundaryStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteIndexController;
 use App\Http\Controllers\Api\V1\Site\SitePlotIndexController;
+use App\Http\Controllers\Api\V1\Site\SitePlotStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteShowController;
 use App\Http\Controllers\Api\V1\Site\SiteStoreController;
 use App\Http\Controllers\Api\V1\User\UserIndexController;
@@ -191,6 +192,14 @@ Route::prefix('v1')->group(function () {
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:sites.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [PLOT-02] POST /api/v1/sites/{id}/plots
+    Route::post('/sites/{site}/plots', SitePlotStoreController::class)
+        ->whereUuid('site')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:plots.manage', 'throttle:auth.authenticated',
         ]);
 
     // [BOUND-02] POST /api/v1/sites/{id}/boundaries
