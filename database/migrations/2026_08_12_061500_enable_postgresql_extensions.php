@@ -13,6 +13,10 @@ return new class extends Migration
 
         DB::unprepared('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');
         DB::unprepared('CREATE EXTENSION IF NOT EXISTS postgis');
+
+        if (app()->environment('testing')) {
+            DB::unprepared('CREATE SCHEMA IF NOT EXISTS app');
+        }
     }
 
     public function down(): void

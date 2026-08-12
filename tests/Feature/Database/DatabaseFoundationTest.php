@@ -56,4 +56,21 @@ class DatabaseFoundationTest extends TestCase
 
         $this->assertSame('app,public', config('database.connections.pgsql.search_path'));
     }
+
+    public function test_postgresql_profile_is_pinned_to_the_dedicated_test_database(): void
+    {
+        $profile = file_get_contents(base_path('phpunit.pgsql.xml'));
+
+        $this->assertIsString($profile);
+        $this->assertStringContainsString(
+            '<env name="DB_CONNECTION" value="pgsql" force="true"/>',
+            $profile,
+        );
+        $this->assertStringContainsString(
+            '<env name="DB_DATABASE" value="mangroscan_test" force="true"/>',
+            $profile,
+        );
+        $this->assertStringNotContainsString('DB_DATABASE" value="mangroscan"', $profile);
+        $this->assertStringContainsString('.env.testing', file_get_contents(base_path('.gitignore')));
+    }
 }
