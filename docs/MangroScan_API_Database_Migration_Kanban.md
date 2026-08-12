@@ -294,6 +294,22 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Tests | `tests/Feature/Rbac/RoleIndexTest.php` covers exact resource shape/order, global/current-tenant scope, authentication, missing permission, foreign-role privilege rejection, inactive organization state, no audit side effect and throttling. |
 | Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
 
+### **RBAC-02 — GET /api/v1/permissions**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | RBAC-02 / P0 |
+| Purpose | Return the canonical global permission catalog used by role administration workflows. |
+| Required permission | `permissions.manage`, enforced through the reusable tenant-aware permission middleware. |
+| Dependencies | AUTH-08, permissions, roles, role/permission joins and the shared effective-access service. |
+| Request / validation | No body or query parameters. |
+| Success | `200` standard envelope containing permission resources sorted by code (`permission_id`, `permission_code`, `permission_name`, `description`) and request ID metadata. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `429 RATE_LIMITED`; unexpected database failures remain `500`. |
+| Workflow / tenant scope | Permission definitions are global reference data. Access to the catalog is still authorized only from global/current-organization roles; a foreign-organization assignment cannot grant catalog access. |
+| Side effects / audit / notifications | Read-only catalog lookup. No business audit event or notification is created. |
+| Tests | `tests/Feature/Rbac/PermissionIndexTest.php` covers exact resource shape/order, authentication, missing permission, foreign-role privilege rejection, inactive user state, no audit side effect and throttling. |
+| Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
+
 ## **Survey sites, boundaries, plots and permits**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
