@@ -510,7 +510,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | MSN-01 | GET /missionsList missions visible to caller. | Query: site\_id,status,from,to,search,page | 200 {data:\[Mission\],meta} | SITE-01 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-02 | POST /missionsCreate survey mission. | {site\_id,mission\_code,mission\_title,mission\_objective,planned\_start\_at?,planned\_end\_at?,coverage\_target\_hectares?} | 201 {data:Mission} | MSN-01 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-03 | GET /missions/{id}Mission detail with team/flights/summary. | Path: id | 200 {data:{mission,team,flight\_summary}} | MSN-01 | **P0** | Codex \- Backend/API | **Done** |
-| MSN-04 | PATCH /missions/{id}Update planning fields before finalization. | Partial Mission fields | 200 {data:Mission} | MSN-03 | **P0** | TBD \- Backend/API | **Blocked** |
+| MSN-04 | PATCH /missions/{id}Update planning fields before finalization. | Partial Mission fields | 200 {data:Mission} | MSN-03 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-05 | DELETE /missions/{id}Soft archive allowed mission. | Path: id | 204 | MSN-03 | **P2** | TBD \- Backend/API | Backlog |
 | TEAM-01 | PUT /missions/{id}/teamReplace mission team assignments atomically. | {members:\[{user\_id,team\_role}\]} | 200 {data:\[MissionTeamMember\]} | MSN-03 \+ USR-01 | **P0** | TBD \- Backend/API | **Blocked** |
 | MSN-06 | POST /missions/{id}/approveApprove mission and record approver. | {decision:"approved"|"rejected",notes?} | 200 {data:Mission} | MSN-03 \+ AUTH-08 | **P0** | TBD \- Backend/API | **Blocked** |
@@ -562,6 +562,18 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Flight summary | Stable `total`, `planned`, `flying`, `completed`, `aborted`, `failed` integers; reads real `flight_sessions` once its drone-dependent FLT-01 migration lands and returns zeros beforehand. |
 | Side effects / DCL | Read-only, with no audit/notification. Team DCL grants API/reporting `SELECT` only. |
 | Tests / status | `MissionShowTest` covers exact shape/order, tenant 404s, RBAC, no audit and throttling. Done at 132 tests / 750 assertions on SQLite and PostgreSQL; Pint, Composer, DCL and diff gates pass. |
+
+### **MSN-04 - PATCH /api/v1/missions/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | MSN-04 / P0 |
+| Purpose / permission | Partially update mission planning fields before lifecycle finalization; requires tenant-valid `missions.update`. |
+| Request / validation | One or more of site, code, title, objective, planned start/end and coverage target. Codes normalize/retain uniqueness; final combined time window and numeric precision are validated. Lifecycle, actual, creator and approval fields are not accepted. |
+| Workflow / tenant | Only `planned` missions may change; later states return standard `409 CONFLICT`. Mission and replacement-site lookup both use anti-enumeration organization scope. |
+| Transaction / audit | Update and immutable `mission.update` old/new evidence share one transaction; audit failure restores the prior row. |
+| Errors / DCL | Standard 401/403/404/409/422/429/500. API gains `UPDATE` only; delete and reporting mutation remain denied. |
+| Tests / status | `MissionUpdateTest` covers partial success, site move, conflict, validation, tenant hiding, audit rollback, RBAC and throttling. Complete suites pass at 140 tests / 779 assertions; focused PostgreSQL, Pint, Composer, DCL and diff gates pass. |
 
 ## **Flight operations and field readiness**
 

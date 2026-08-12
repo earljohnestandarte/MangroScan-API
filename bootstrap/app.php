@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\WorkflowConflictException;
 use App\Http\Middleware\AddRequestId;
 use App\Http\Middleware\RequirePermission;
 use Illuminate\Auth\AuthenticationException;
@@ -26,6 +27,17 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (WorkflowConflictException $exception, Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+            $requestId = AddRequestId::resolve($request);
+
+            return response()->json(['error' => [
+                'code' => 'CONFLICT', 'message' => $exception->getMessage(),
+                'details' => $exception->details, 'request_id' => $requestId,
+            ]], 409, ['X-Request-ID' => $requestId]);
+        });
         $exceptions->render(function (AccessDeniedHttpException $exception, Request $request) {
             if (! $request->is('api/*')) {
                 return null;

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Mission\MissionIndexController;
 use App\Http\Controllers\Api\V1\Mission\MissionShowController;
 use App\Http\Controllers\Api\V1\Mission\MissionStoreController;
+use App\Http\Controllers\Api\V1\Mission\MissionUpdateController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
@@ -168,5 +169,10 @@ Route::prefix('v1')->group(function () {
     // [MSN-03] GET /api/v1/missions/{id}
     Route::get('/missions/{mission}', MissionShowController::class)->whereUuid('mission')->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [MSN-04] PATCH /api/v1/missions/{id}
+    Route::patch('/missions/{mission}', MissionUpdateController::class)->whereUuid('mission')->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.update', 'throttle:auth.authenticated',
     ]);
 });
