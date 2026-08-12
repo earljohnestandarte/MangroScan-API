@@ -11,7 +11,17 @@ class AddRequestId
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $requestId = $request->header('X-Request-ID');
+        $requestId = self::resolve($request);
+
+        $response = $next($request);
+        $response->headers->set('X-Request-ID', $requestId);
+
+        return $response;
+    }
+
+    public static function resolve(Request $request): string
+    {
+        $requestId = $request->attributes->get('request_id') ?: $request->header('X-Request-ID');
 
         if (! is_string($requestId) || ! preg_match('/^[A-Za-z0-9._-]{1,100}$/', $requestId)) {
             $requestId = 'req_'.Str::uuid()->toString();
@@ -19,9 +29,6 @@ class AddRequestId
 
         $request->attributes->set('request_id', $requestId);
 
-        $response = $next($request);
-        $response->headers->set('X-Request-ID', $requestId);
-
-        return $response;
+        return $requestId;
     }
 }

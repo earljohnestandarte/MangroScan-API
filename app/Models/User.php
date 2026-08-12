@@ -6,6 +6,9 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -13,7 +16,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, HasUuids, Notifiable;
+    use HasApiTokens, HasFactory, HasUuids, Notifiable, SoftDeletes;
 
     protected $primaryKey = 'user_id';
 
@@ -27,9 +30,13 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'organization_id',
+        'first_name',
+        'middle_name',
+        'last_name',
         'email',
         'password',
+        'status',
     ];
 
     /**
@@ -53,5 +60,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class, 'organization_id', 'organization_id');
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id')
+            ->withTimestamps();
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active' && $this->deleted_at === null;
     }
 }

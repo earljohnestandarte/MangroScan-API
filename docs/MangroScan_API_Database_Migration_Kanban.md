@@ -184,12 +184,30 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Required permission | None; clients may inspect compatibility before login. |
 | Dependencies | SYS-01 readiness checks must pass. |
 | Request / validation | No body. An optional valid `X-Request-ID` is echoed; otherwise the API generates one. |
-| Success | `200` standard envelope with `api_version: v1`, `features: {health_checks: true, request_ids: true}` and `limits: {pagination_per_page_max: 100}`. |
+| Success | `200` standard envelope with `api_version: v1`, `features: {health_checks: true, request_ids: true, token_authentication: true}` and `limits: {pagination_per_page_max: 100}`. |
 | Errors | `503 SERVICE_UNAVAILABLE` when a SYS-01 dependency is unavailable; unexpected framework/configuration errors remain `500`. |
 | Workflow / tenant scope | No authentication or organization data is required or returned. |
 | Side effects / audit / notifications | Read-only platform metadata; no audit event or notification is created. |
 | Tests | `tests/Feature/Platform/MetaCapabilitiesTest.php` covers the exact success payload, request ID and dependency failure. |
 | Implementation status | Done. |
+
+### **AUTH-01 — POST /api/v1/auth/login**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | AUTH-01 / P0 |
+| Purpose | Authenticate an active web/mobile user and issue an expiring Sanctum Bearer token. |
+| Required permission | None; this is the public credential-exchange endpoint. |
+| Dependencies | Organizations, users, roles, permissions, role/user joins, UUID Sanctum tokens and immutable audit storage. |
+| Request / validation | Required normalized `email` and `password`; optional nullable `device_name` up to 100 characters. |
+| Success | `200` standard envelope containing the exact documented `user`, `access_token`, `expires_at`, `roles` and `permissions` fields. The user projection contains only `user_id`, `organization_id`, `first_name`, `last_name` and `email`. |
+| Errors | `401 INVALID_CREDENTIALS` for unknown, inactive, deleted or password-mismatched users; `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected persistence failures remain `500`. |
+| Workflow / tenant scope | Role and effective-permission output includes global roles and roles belonging to the authenticated user's organization; foreign-organization role assignments are ignored. |
+| Side effects | Creates one hashed UUID-backed token. Token and mandatory audit insertion share a transaction and roll back together. |
+| Audit / notifications | Writes `auth.login` or `auth.failed` with request ID, IP, user agent and a one-way email hash. Passwords and token material are sanitized and never stored. No notification is required. |
+| Tests | `tests/Feature/Auth/LoginTest.php` covers exact success shape/status, RBAC projection, tenant isolation, hashed token persistence, inactive/invalid credentials, validation, rate limiting, audit safety and transaction rollback. |
+| Implementation compatibility | Uses the existing physical `password` and `status` columns without renaming or deleting identity fields; the public contract remains aligned with Section 7.1. |
+| Implementation status | Done — the endpoint passes the complete SQLite suite and the complete PostgreSQL 18/PostGIS suite against an isolated `mangroscan_test` database. |
 
 ## **Organizations, users and RBAC**
 

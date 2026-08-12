@@ -37,6 +37,7 @@ class MetaCapabilitiesTest extends TestCase
                     'features' => [
                         'health_checks' => true,
                         'request_ids' => true,
+                        'token_authentication' => true,
                     ],
                     'limits' => [
                         'pagination_per_page_max' => 100,
