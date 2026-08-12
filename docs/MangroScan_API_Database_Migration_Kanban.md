@@ -243,6 +243,22 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Tests | `tests/Feature/Auth/LogoutTest.php` covers exact 204 semantics, current-token-only revocation, follow-up token validity, standard 401/429 errors, inactive-identity logout, safe audit evidence and transactional rollback. |
 | Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
 
+### **AUTH-08 — GET /api/v1/auth/permissions**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | AUTH-08 / P1; implemented now because it unlocks multiple P0 authorization dependencies. |
+| Purpose | Provide a small role/permission refresh payload for web/mobile authorization state without repeating the full AUTH-02 profile. |
+| Required permission | Any valid Sanctum Bearer token belonging to an active user in an active organization. |
+| Dependencies | AUTH-02 and the shared effective-access service. |
+| Request / validation | No body. The opaque token is supplied through `Authorization: Bearer ...`. |
+| Success | `200` standard envelope containing sorted `roles`, sorted effective `permissions`, and request ID metadata. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE`; `429 RATE_LIMITED`; unexpected persistence failures remain `500`. |
+| Workflow / tenant scope | Includes global roles and roles owned by the authenticated user's organization only. Foreign-organization assignments and permissions are excluded. |
+| Side effects / audit / notifications | Read-only authorization refresh. Sanctum may update `last_used_at`; no business audit event or notification is created. |
+| Tests | `tests/Feature/Auth/EffectivePermissionsTest.php` covers exact response shape, tenant isolation, authentication, inactive organization state, no audit side effect and throttling. |
+| Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
+
 ## **Organizations, users and RBAC**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |

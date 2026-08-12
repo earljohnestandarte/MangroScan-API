@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthenticatedProfileController;
+use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
@@ -28,6 +29,13 @@ Route::prefix('v1')->group(function () {
     // [AUTH-03] POST /api/v1/auth/logout
     Route::post('/auth/logout', LogoutController::class)->middleware([
         'auth:sanctum',
+        'throttle:auth.authenticated',
+    ]);
+
+    // [AUTH-08] GET /api/v1/auth/permissions
+    Route::get('/auth/permissions', EffectivePermissionsController::class)->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
         'throttle:auth.authenticated',
     ]);
 });
