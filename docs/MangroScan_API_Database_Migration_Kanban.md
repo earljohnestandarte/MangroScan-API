@@ -1159,12 +1159,12 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | TREE-01 | GET /tree-observationsFilter canonical tree observations. | Query: mission\_id,flight\_id,species\_id,validation\_status,min\_confidence,page | 200 {data:\[TreeObservation\],meta} | JOB-03 completed | **P0** | Codex \- Results/API | **Done** |
-| TREE-02 | GET /tree-observations/{id}Tree detail with model provenance/results. | Path: id | 200 {data:{tree,species\_predictions,height\_estimations,age\_estimations,source\_media,model\_run}} | TREE-01 | **P0** | TBD \- Results/API | **Ready** |
+| TREE-02 | GET /tree-observations/{id}Tree detail with model provenance/results. | Path: id | 200 {data:{tree,species\_predictions,height\_estimations,age\_estimations,source\_media,model\_run}} | TREE-01 | **P0** | Codex \- Results/API | **Done** |
 | TREE-03 | GET /missions/{id}/trees.geojsonMap-ready tree features. | Query: species\_id?,validated\_only? | 200 GeoJSON FeatureCollection | TREE-01 \+ PostGIS | **P0** | TBD \- GIS/API | **Ready** |
 | COUNT-01 | GET /missions/{id}/tree-countsMission/species count summary. | Query: species\_id? | 200 {data:\[TreeCountSummary\]} | TREE-01 \+ count routine | **P0** | TBD \- Results/API | **Ready** |
-| RESULT-01 | GET /tree-observations/{id}/speciesSpecies prediction history. | Path: id | 200 {data:\[ClassificationResult\]} | TREE-02 | **P1** | TBD \- Results/API | **Blocked** |
-| RESULT-02 | GET /tree-observations/{id}/heightsHeight estimates. | Path: id | 200 {data:\[HeightEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Blocked** |
-| RESULT-03 | GET /tree-observations/{id}/agesAge estimates \+ assumptions. | Path: id | 200 {data:\[AgeEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Blocked** |
+| RESULT-01 | GET /tree-observations/{id}/speciesSpecies prediction history. | Path: id | 200 {data:\[ClassificationResult\]} | TREE-02 | **P1** | TBD \- Results/API | **Ready** |
+| RESULT-02 | GET /tree-observations/{id}/heightsHeight estimates. | Path: id | 200 {data:\[HeightEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Ready** |
+| RESULT-03 | GET /tree-observations/{id}/agesAge estimates \+ assumptions. | Path: id | 200 {data:\[AgeEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Ready** |
 | LAYER-01 | GET /missions/{id}/layersList geospatial/photogrammetry outputs. | Query: type? | 200 {data:\[Layer\]} | JOB-03 | **P1** | TBD \- GIS/API | **Ready** |
 | LAYER-02 | POST /missions/{id}/layers/buildQueue map layer build/refresh. | {layer\_types:\[...\],parameters?} | 202 {data:{job\_id}} | TREE-01 \+ photogrammetry inputs | **P1** | TBD \- GIS/API | **Blocked** |
 
@@ -1178,6 +1178,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Resource / geospatial boundary | The base TreeObservation projection includes lineage IDs, tree code, GeoJSON point/crown geometry, bounding box, confidence, canonical species/height/age values, validation status, and UTC timestamps. PostgreSQL reads geometries with `ST_AsGeoJSON`; storage internals and unrelated model/service details are not exposed. Reads create no audit or notification. |
 | Schema / DCL | Adds the documented mangrove species, persistent tree entity, and canonical observation foundations with UUID lineage, PostGIS Point/Polygon SRID 4326 columns, spatial/query indexes, uniqueness, soft deletion, and PostgreSQL domain/range checks. API/report roles receive SELECT only. The worker receives only the selected INSERT/UPDATE inference-result columns and cannot set validation state or delete rows. |
 | Tests / status | `TreeObservationIndexTest` covers exact shape/order/pagination, composed filters, GeoJSON, validation, inaccessible filters and deleted lineage, authentication/RBAC/inactivity, tenant isolation, no audit, throttling, schema constraints and DCL. Done — focused SQLite passes 7 tests / 59 assertions and PostgreSQL passes 7 / 60; full SQLite passes 569 / 3465 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 569 / 3482; live privilege checks pass. |
+
+### **TREE-02 — GET /api/v1/tree-observations/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | TREE-02 / P0 |
+| Purpose / permission | Return one canonical tenant-visible tree with its complete prediction, height, age, source-media and execution provenance. Requires active Sanctum authentication and tenant-valid `results.read`; lookup follows tree → mission → non-deleted site → caller organization, yielding anti-enumerable 404s. |
+| Exact response / ordering | Returns exact `200 {data:{tree,species_predictions,height_estimations,age_estimations,source_media,model_run}}` plus request ID. Result histories place final evidence first with deterministic rank/time/UUID tie-breakers. Empty histories are arrays and optional media/run provenance is null. |
+| Security / response boundary | Reuses safe TreeObservation, MediaAsset and ModelRun projections. Private storage keys, model artifact paths, service topology and encrypted credentials never cross the API. Source-media and model-run lookups are independently tenant-constrained as defense in depth. This read creates no audit, notification, or downstream call. |
+| Schema / DCL / tests | Adds documented sensor-dataset, species-growth-model, species-classification, canopy-height and age-estimation foundations with UUID provenance, indexes, uniqueness and PostgreSQL domain/range checks. API receives result SELECT only; reporting receives reference/result SELECT; worker receives result INSERT/SELECT but no update/delete. `TreeObservationShowTest` covers exact shape/order, empty/null state, tenant/path/deleted-lineage hiding, authentication/RBAC/inactivity, throttling, safe provenance, constraints and DCL. Done — focused SQLite passes 6 tests / 49 assertions and PostgreSQL passes 6 / 50; full SQLite passes 575 / 3514 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 575 / 3532; live privilege gates pass. |
 
 ## **Confidence review and field validation**
 

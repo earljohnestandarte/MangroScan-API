@@ -68,6 +68,7 @@ use App\Http\Controllers\Api\V1\Site\SiteShowController;
 use App\Http\Controllers\Api\V1\Site\SiteStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteUpdateController;
 use App\Http\Controllers\Api\V1\Tree\TreeObservationIndexController;
+use App\Http\Controllers\Api\V1\Tree\TreeObservationShowController;
 use App\Http\Controllers\Api\V1\User\UserActivationController;
 use App\Http\Controllers\Api\V1\User\UserIndexController;
 use App\Http\Controllers\Api\V1\User\UserShowController;
@@ -522,6 +523,14 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:results.read', 'throttle:auth.authenticated',
     ]);
+
+    // [TREE-02] GET /api/v1/tree-observations/{id}
+    Route::get('/tree-observations/{tree}', TreeObservationShowController::class)
+        ->whereUuid('tree')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:results.read', 'throttle:auth.authenticated',
+        ]);
 
     // [AUD-01] GET /api/v1/audit-logs
     Route::get('/audit-logs', AuditLogIndexController::class)->middleware([

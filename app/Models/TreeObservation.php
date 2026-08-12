@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
@@ -71,5 +72,20 @@ class TreeObservation extends Model
     public function finalSpecies(): BelongsTo
     {
         return $this->belongsTo(MangroveSpecies::class, 'final_species_id', 'species_id');
+    }
+
+    public function speciesPredictions(): HasMany
+    {
+        return $this->hasMany(SpeciesClassificationResult::class, 'tree_observation_id', 'tree_observation_id');
+    }
+
+    public function heightEstimations(): HasMany
+    {
+        return $this->hasMany(CanopyHeightEstimation::class, 'tree_observation_id', 'tree_observation_id');
+    }
+
+    public function ageEstimations(): HasMany
+    {
+        return $this->hasMany(AgeEstimation::class, 'tree_observation_id', 'tree_observation_id');
     }
 }
