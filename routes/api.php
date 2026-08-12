@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Audit\AuditLogIndexController;
 use App\Http\Controllers\Api\V1\Auth\AuthenticatedProfileController;
 use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
@@ -469,5 +470,11 @@ Route::prefix('v1')->group(function () {
     Route::get('/processing-jobs', ProcessingJobIndexController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:processing_jobs.manage', 'throttle:auth.authenticated',
+    ]);
+
+    // [AUD-01] GET /api/v1/audit-logs
+    Route::get('/audit-logs', AuditLogIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:audit.read', 'throttle:auth.authenticated',
     ]);
 });

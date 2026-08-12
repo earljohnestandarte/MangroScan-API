@@ -1104,8 +1104,20 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | NOTIF-04 | POST /notifications/read-allMark caller notifications read. | No body | 204 | NOTIF-01 | **P2** | TBD \- Backend/API | Backlog |
 | SET-01 | GET /settingsRead permitted settings by group. | Query: group? | 200 {data:\[Setting\]} | AUTH | **P2** | TBD \- Backend/API | Backlog |
 | SET-02 | PUT /settings/{key}Update managed setting. | {setting\_value,description?} | 200 {data:Setting} | SET-01 \+ admin permission | **P2** | TBD \- Backend/API | Backlog |
-| AUD-01 | GET /audit-logsSearch immutable audit trail. | Query: user\_id?,action?,table\_name?,record\_id?,from?,to?,page | 200 {data:\[AuditLog\],meta} | AUTH \+ audit trigger | **P1** | TBD \- Security/API | **Blocked** |
+| AUD-01 | GET /audit-logsSearch immutable audit trail. | Query: user\_id?,action?,table\_name?,record\_id?,from?,to?,page | 200 {data:\[AuditLog\],meta} | AUTH \+ audit trigger | **P1** | Codex \- Security/API | **Done** |
 | AUD-02 | GET /audit-logs/{id}Audit event detail. | Path: id | 200 {data:AuditLog} | AUD-01 | **P2** | TBD \- Security/API | Backlog |
+
+### **AUD-01 — GET /api/v1/audit-logs**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | AUD-01 / P1 |
+| Purpose / permission | Search immutable audit evidence through the standard paginated API envelope. Requires active Sanctum authentication and tenant-valid `audit.read`; a permission inherited only from a foreign-organization role cannot authorize access. |
+| Request / validation | Optional UUID `user_id` and `record_id`; normalized exact `action` and `table_name`; ISO-8601 `from`/`to` instants with `to >= from`; positive `page`; and optional `per_page` from 1 through 100 under the common pagination standard. |
+| Response / ordering | Returns exact safe AuditLog resources (`audit_log_id`, actor/action/target, old/new JSON evidence, request context and UTC timestamp), newest first by timestamp then UUID, with request ID and complete page metadata. The read creates no audit event or notification. |
+| Organization isolation | By default, only events whose actor belongs to the caller's organization are visible, including evidence from soft-deleted historical actors. Foreign and null-actor/system events are excluded because the current audit schema has no organization column. An independently effective `organizations.manage` grant supplies the manual's explicit cross-organization administrator elevation and permits global/system-event review. Foreign or missing `user_id` filters remain non-enumerable 404s without that elevation. |
+| Immutability / DCL | Reuses `trg_audit_logs_append_only`, Eloquent mutation guards and `002_identity_and_audit_grants.sql`. Live PostgreSQL checks confirm API SELECT/INSERT but no UPDATE/DELETE/TRUNCATE, auditor SELECT only, and no worker/report access; no privilege expansion or schema change is introduced. |
+| Errors / tests / status | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `404 NOT_FOUND` for an unavailable actor filter; `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected failures remain `500`. `AuditLogIndexTest` covers exact shape/pages/order, every filter, timestamp bounds, tenant/global scope, historical actors, anti-enumeration, validation, authentication/RBAC, inactive identity, throttling and DCL. Done — full SQLite passes 449 tests / 2571 assertions (one PostgreSQL-only skip) and PostgreSQL 18/PostGIS passes 449 / 2581; focused suites, route, Pint, Composer, trigger and live privilege gates pass. |
 
 ## **Training datasets and annotation extension**
 
