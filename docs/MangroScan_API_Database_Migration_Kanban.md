@@ -617,7 +617,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | FLT-04 | PATCH /flights/{id}Update planned flight metadata. | Partial Flight fields | 200 {data:Flight} | FLT-03 | **P1** | TBD \- Backend/API | **Blocked** |
 | CHK-01 | POST /flights/{id}/checklistsSubmit pre/post-flight checklist. | {checklist\_type,battery\_ok,weather\_ok,gps\_ok,camera\_ok,lidar\_depth\_ok,storage\_ok,overall\_status,remarks?} | 201 {data:Checklist} | FLT-03 | **P0** | Codex \- Mobile/API | **Done** |
 | FLT-05 | POST /flights/{id}/startStart flight only after required preflight gate. | {started\_at,takeoff\_location?:GeoJSON} | 200 {data:Flight} | CHK-01 passed | **P0** | Codex \- Mobile/API | **Done** |
-| FLT-06 | POST /flights/{id}/completeComplete flight and capture landing summary. | {ended\_at,landing\_location?:GeoJSON,actual\_avg\_altitude\_meters?,notes?} | 200 {data:Flight} | FLT-05 | **P0** | TBD \- Mobile/API | **Blocked** |
+| FLT-06 | POST /flights/{id}/completeComplete flight and capture landing summary. | {ended\_at,landing\_location?:GeoJSON,actual\_avg\_altitude\_meters?,notes?} | 200 {data:Flight} | FLT-05 | **P0** | Codex \- Mobile/API | **Done** |
 | FLT-07 | POST /flights/{id}/failAbort/fail flight with reason. | {status:"aborted"|"failed",reason,ended\_at?} | 200 {data:Flight} | FLT-05 | **P1** | TBD \- Mobile/API | **Blocked** |
 | WPT-01 | PUT /flights/{id}/waypointsBatch replace ordered route waypoints. | {waypoints:\[{sequence\_no,location:GeoJSON,altitude\_meters?,speed\_mps?,action?}\]} | 200 {data:{count}} | FLT-03 | **P1** | TBD \- GIS/API | **Blocked** |
 | ENV-01 | POST /flights/{id}/environment-logsAppend environment observation. | {recorded\_at,weather\_condition,wind\_speed\_mps?,temperature\_celsius?,humidity\_percent?,visibility\_status?,notes?} | 201 {data:EnvironmentLog} | FLT-03 | **P2** | TBD \- Mobile/API | Backlog |
@@ -670,6 +670,26 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Tenant / transaction / audit | Flight lookup follows mission/site organization lineage and hides foreign/deleted-lineage IDs. A locked flight-state recheck, checklist insertion and immutable `flight.checklist.submit` audit share one transaction; audit failure rolls back evidence. |
 | Database privileges | API receives checklist `SELECT, INSERT`, reporting remains SELECT-only, and waypoint privileges remain unchanged/read-only; no update/delete grants. |
 | Tests / status | `FlightChecklistStoreTest` covers normalized persistence and exact audit, repeat evidence, validation, lifecycle conflicts, tenant hiding, rollback, local/foreign RBAC and throttling. Done - full SQLite passes 194 tests / 1083 assertions and PostgreSQL 18/PostGIS passes 194 / 1086; route, Pint, Composer, DCL and diff gates pass. |
+
+### **FLT-05 - POST /api/v1/flights/{id}/start**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Transition a ready planned sortie to `flying`; requires tenant-valid `flights.start`. |
+| Readiness / concurrency | The flight row and latest deterministic pre-flight checklist are locked. Only `planned` with latest `passed` evidence can transition; missing, failed, conditional, repeated and later-state starts return 409. |
+| Request / spatial behavior | Required start timestamp preserves the submitted instant across database session timezones. Optional takeoff is validated GeoJSON Point and persisted as PostGIS `POINT(4326)`. |
+| Transaction / audit / privileges | State, timestamp, optional geometry and immutable `flight.start` evidence share one transaction. API flight privileges expand to UPDATE while reporting remains SELECT-only and DELETE remains denied. |
+| Tests / status | `FlightStartTest` covers readiness ordering, lifecycle, UTC instants, PostGIS geometry, validation, tenant hiding, rollback, local/foreign RBAC and throttling. Done - full SQLite passes 203 tests / 1128 assertions and PostgreSQL 18/PostGIS passes 203 / 1131; live privilege and static gates pass. |
+
+### **FLT-06 - POST /api/v1/flights/{id}/complete**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Complete one active sortie with its landing summary; requires tenant-valid `flights.complete`. |
+| Lifecycle / time | A row-locked flight must be `flying` with a stored start time, and the required end instant must be strictly later. Repeated, unstarted and invalid-time completions return 409. Duration in minutes is derived server-side to two decimals. |
+| Request / spatial behavior | Optional nullable GeoJSON landing Point, non-negative two-decimal average altitude and trimmed notes follow omitted-versus-explicit-null semantics. PostgreSQL stores landing as `POINT(4326)` and timestamp instants remain offset-safe. |
+| Transaction / audit / privileges | Lifecycle, end time, duration and optional summary updates share one transaction with immutable `flight.complete` old/new evidence. Existing API UPDATE privilege is sufficient; reporting stays read-only. |
+| Tests / status | `FlightCompleteTest` covers full/minimal/null summaries, lifecycle/time ordering, validation, PostGIS geometry, tenant hiding, rollback, local/foreign RBAC and throttling. Done - full SQLite passes 213 tests / 1188 assertions and PostgreSQL 18/PostGIS passes 213 / 1191; route, Pint, DCL and diff gates pass. |
 
 ## **Mobile offline synchronization**
 
