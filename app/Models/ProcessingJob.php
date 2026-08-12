@@ -19,31 +19,24 @@ class ProcessingJob extends Model
     protected $fillable = [
         'mission_id',
         'flight_session_id',
-        'requested_by_user_id',
         'job_type',
         'job_status',
-        'parameters',
-        'progress_percent',
-        'attempt_count',
-        'queued_at',
+        'input_summary',
+        'output_summary',
         'started_at',
         'completed_at',
-        'error_code',
         'error_message',
-        'output_summary',
+        'created_by',
     ];
 
     /** @return array<string, string> */
     protected function casts(): array
     {
         return [
-            'parameters' => 'array',
-            'progress_percent' => 'integer',
-            'attempt_count' => 'integer',
-            'queued_at' => 'datetime',
+            'input_summary' => 'array',
+            'output_summary' => 'array',
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
-            'output_summary' => 'array',
         ];
     }
 
@@ -59,6 +52,6 @@ class ProcessingJob extends Model
 
     public function requester(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'requested_by_user_id', 'user_id');
+        return $this->belongsTo(User::class, 'created_by', 'user_id');
     }
 }

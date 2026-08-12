@@ -51,7 +51,7 @@ class ProcessingJobIndexController extends Controller
         }
 
         $jobs = $query
-            ->orderByDesc('queued_at')
+            ->orderByDesc('created_at')
             ->orderByDesc('processing_job_id')
             ->paginate((int) ($validated['per_page'] ?? 25));
 

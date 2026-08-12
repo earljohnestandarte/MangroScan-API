@@ -19,8 +19,8 @@ class ProcessingJobIndexRequest extends FormRequest
         return [
             'mission_id' => ['sometimes', 'nullable', 'uuid'],
             'flight_id' => ['sometimes', 'nullable', 'uuid'],
-            'status' => ['sometimes', 'nullable', 'string', Rule::in(['queued', 'running', 'succeeded', 'failed', 'cancelled'])],
-            'type' => ['sometimes', 'nullable', 'string', Rule::in(['tree_detection', 'species_classification', 'full_pipeline'])],
+            'status' => ['sometimes', 'nullable', 'string', Rule::in(['queued', 'running', 'completed', 'failed'])],
+            'type' => ['sometimes', 'nullable', 'string', Rule::in(['image_quality', 'detection', 'classification', 'photogrammetry', 'full_pipeline'])],
             'page' => ['sometimes', 'integer', 'min:1'],
             'per_page' => [
                 'sometimes',

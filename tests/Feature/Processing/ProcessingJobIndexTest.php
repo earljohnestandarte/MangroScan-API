@@ -25,13 +25,12 @@ class ProcessingJobIndexTest extends TestCase
             ->assertJsonPath('meta', ['request_id' => 'req_job_01', 'page' => 1, 'per_page' => 2, 'total' => 3, 'last_page' => 2])
             ->assertJsonCount(2, 'data')->assertJsonPath('data.0.processing_job_id', $graph['latest_job_id'])
             ->assertJsonPath('data.0.job_type', 'full_pipeline')->assertJsonPath('data.0.job_status', 'running')
-            ->assertJsonPath('data.0.parameters.confidence', 0.25)->assertJsonPath('data.0.progress_percent', 40);
+            ->assertJsonPath('data.0.input_summary.media_count', 3);
 
         $this->assertSame([
-            'processing_job_id', 'mission_id', 'flight_session_id', 'requested_by_user_id',
-            'job_type', 'job_status', 'parameters', 'progress_percent', 'attempt_count',
-            'queued_at', 'started_at', 'completed_at', 'error_code', 'error_message',
-            'output_summary', 'created_at', 'updated_at',
+            'processing_job_id', 'mission_id', 'flight_session_id', 'job_type', 'job_status',
+            'input_summary', 'output_summary', 'started_at', 'completed_at', 'error_message',
+            'created_by', 'created_at', 'updated_at',
         ], array_keys($response->json('data.0')));
         $this->assertDatabaseCount('audit_logs', 0);
     }
@@ -40,7 +39,7 @@ class ProcessingJobIndexTest extends TestCase
     public function test_it_filters_processing_jobs(): void
     {
         $g = $this->createGraph();
-        $this->withToken($g['token'])->getJson('/api/v1/processing-jobs?mission_id='.$g['mission_id'].'&flight_id='.$g['flight_id'].'&status= FAILED &type=TREE_DETECTION')
+        $this->withToken($g['token'])->getJson('/api/v1/processing-jobs?mission_id='.$g['mission_id'].'&flight_id='.$g['flight_id'].'&status= FAILED &type=DETECTION')
             ->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.processing_job_id', $g['failed_job_id']);
     }
 
@@ -88,7 +87,7 @@ class ProcessingJobIndexTest extends TestCase
         $migration = file_get_contents(database_path('migrations/2026_08_12_064100_create_processing_jobs_table.php'));
         $dcl = file_get_contents(database_path('sql/dcl/013_processing_job_grants.sql'));
         $this->assertIsString($migration);
-        foreach (['processing_jobs_type_check', 'processing_jobs_status_check', 'processing_jobs_progress_check', 'processing_jobs_timestamps_check'] as $guard) {
+        foreach (['processing_jobs_type_check', 'processing_jobs_status_check', 'processing_jobs_timestamps_check'] as $guard) {
             $this->assertStringContainsString($guard, $migration);
         }
         $this->assertIsString($dcl);
@@ -101,7 +100,7 @@ class ProcessingJobIndexTest extends TestCase
         }
         $g = $this->createGraph('constraint-');
         $this->expectException(QueryException::class);
-        DB::table('processing_jobs')->where('processing_job_id', $g['latest_job_id'])->update(['progress_percent' => 101]);
+        DB::table('processing_jobs')->where('processing_job_id', $g['latest_job_id'])->update(['job_type' => 'unsupported']);
     }
 
     /** @return array<string, string> */
@@ -143,8 +142,8 @@ class ProcessingJobIndexTest extends TestCase
         $this->flight($foreignFlight, $foreignMission, $foreignDrone, $foreignUser, $prefix.'FOREIGN-JOB-FLIGHT');
         $latest = (string) Str::uuid();
         $failed = (string) Str::uuid();
-        $this->job((string) Str::uuid(), $mission, null, $actor, 'species_classification', 'succeeded', '2026-08-12T01:00:00+00:00');
-        $this->job($failed, $mission, $flight, $actor, 'tree_detection', 'failed', '2026-08-12T02:00:00+00:00');
+        $this->job((string) Str::uuid(), $mission, null, $actor, 'classification', 'completed', '2026-08-12T01:00:00+00:00');
+        $this->job($failed, $mission, $flight, $actor, 'detection', 'failed', '2026-08-12T02:00:00+00:00');
         $this->job($latest, $mission, $flight, $actor, 'full_pipeline', 'running', '2026-08-12T03:00:00+00:00', true);
         $this->job((string) Str::uuid(), $foreignMission, $foreignFlight, $foreignUser, 'full_pipeline', 'queued', '2026-08-12T04:00:00+00:00');
 
@@ -178,6 +177,6 @@ class ProcessingJobIndexTest extends TestCase
 
     private function job(string $id, string $mission, ?string $flight, string $actor, string $type, string $status, string $queuedAt, bool $details = false): void
     {
-        DB::table('processing_jobs')->insert(['processing_job_id' => $id, 'mission_id' => $mission, 'flight_session_id' => $flight, 'requested_by_user_id' => $actor, 'job_type' => $type, 'job_status' => $status, 'parameters' => $details ? json_encode(['confidence' => 0.25], JSON_THROW_ON_ERROR) : null, 'progress_percent' => $details ? 40 : ($status === 'succeeded' ? 100 : 0), 'attempt_count' => 1, 'queued_at' => $queuedAt, 'started_at' => $status === 'queued' ? null : $queuedAt, 'completed_at' => in_array($status, ['succeeded', 'failed'], true) ? $queuedAt : null, 'error_code' => $status === 'failed' ? 'INFERENCE_FAILED' : null, 'error_message' => $status === 'failed' ? 'Model failed.' : null, 'output_summary' => $status === 'succeeded' ? json_encode(['detections' => 4], JSON_THROW_ON_ERROR) : null, 'created_at' => $queuedAt, 'updated_at' => $queuedAt]);
+        DB::table('processing_jobs')->insert(['processing_job_id' => $id, 'mission_id' => $mission, 'flight_session_id' => $flight, 'job_type' => $type, 'job_status' => $status, 'input_summary' => $details ? json_encode(['media_count' => 3], JSON_THROW_ON_ERROR) : null, 'output_summary' => $status === 'completed' ? json_encode(['detections' => 4], JSON_THROW_ON_ERROR) : null, 'started_at' => $status === 'queued' ? null : $queuedAt, 'completed_at' => in_array($status, ['completed', 'failed'], true) ? $queuedAt : null, 'error_message' => $status === 'failed' ? 'Model failed.' : null, 'created_by' => $actor, 'created_at' => $queuedAt, 'updated_at' => $queuedAt]);
     }
 }
