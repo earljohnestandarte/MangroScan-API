@@ -384,7 +384,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| SITE-01 | GET /sitesList sites visible to user. | Query: search,status,province,page | 200 {data:\[Site\],meta} | AUTH-08 | **P0** | TBD \- GIS/API | **Blocked** |
+| SITE-01 | GET /sitesList sites visible to user. | Query: search,status,province,page | 200 {data:\[Site\],meta} | AUTH-08 | **P0** | Codex \- GIS/API | **Done** |
 | SITE-02 | POST /sitesRegister monitoring site. | {site\_name,site\_code,description?,province,city\_municipality,barangay?,center\_point:GeoJSON?,area\_hectares?,environment\_type,access\_notes?} | 201 {data:Site} | SITE-01 | **P0** | TBD \- GIS/API | **Blocked** |
 | SITE-03 | GET /sites/{id}Site detail with summary counts. | Path: id | 200 {data:{site,counts}} | SITE-01 | **P0** | TBD \- GIS/API | **Blocked** |
 | SITE-04 | PATCH /sites/{id}Update site metadata. | Partial Site fields | 200 {data:Site} | SITE-03 | **P1** | TBD \- GIS/API | **Blocked** |
@@ -397,6 +397,25 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | PLOT-03 | PATCH /plots/{id}Update/soft archive plot. | Partial Plot fields | 200 {data:Plot} | PLOT-02 | **P2** | TBD \- GIS/API | Backlog |
 | PERMIT-01 | GET /sites/{id}/access-permissionsList permit/access records. | Path: site id | 200 {data:\[AccessPermission\]} | SITE-03 | **P2** | TBD \- Backend/API | Backlog |
 | PERMIT-02 | POST /sites/{id}/access-permissionsRecord field-access permit. | {permit\_title,issuing\_agency,permit\_number?,valid\_from?,valid\_until?,document\_path?,status} | 201 {data:AccessPermission} | PERMIT-01 | **P2** | TBD \- Backend/API | Backlog |
+
+### **SITE-01 - GET /api/v1/sites**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | SITE-01 / P0 |
+| Purpose | Return a stable, paginated catalog of survey sites visible to the authenticated caller. |
+| Required permission | `sites.read`, enforced after Sanctum authentication and active user/organization checks by the shared tenant-aware permission middleware. |
+| Dependencies | AUTH-08, organizations, users, tenant-scoped RBAC, survey-site persistence, PostGIS and standard pagination. |
+| Request / validation | Optional trimmed `search`, normalized `status` (`active` or `archived`), case-insensitive exact `province`, positive `page`, and `per_page` from 1 through 100. |
+| Success | `200` standard envelope containing safe Site resources plus exact `request_id`, `page`, `per_page`, `total`, and `last_page` metadata. Nullable center points are emitted as RFC 7946-style GeoJSON objects. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected database failures remain `500`. The endpoint has no target identifier requiring a normal `404`. |
+| Workflow / tenant scope | Every query is pinned to the caller's `organization_id`; there is no cross-tenant override in the endpoint contract. Soft-deleted sites and all foreign-organization rows are excluded before filtering or pagination. |
+| Query behavior | Search covers site name, code, description, city/municipality and barangay. Filters compose, and results sort by site name then UUID for stable pages. |
+| Spatial persistence | PostgreSQL stores nullable `geometry(Point,4326)` with a GiST spatial index and projects it with `ST_AsGeoJSON`. SQLite uses a JSON column only as a fast compatibility-test substitute. Public resources never expose WKB/EWKB. |
+| Database privileges | `database/sql/dcl/003_survey_site_grants.sql` grants `SELECT` only to API and reporting roles; worker and auditor roles receive no implicit access. PostgreSQL verification confirms the intended privilege matrix. |
+| Side effects / audit / notifications | Read-only catalog lookup. No business audit event or notification is created. |
+| Tests | `tests/Feature/Site/SiteIndexTest.php` covers exact resource/metadata shape, PostGIS-to-GeoJSON projection, organization and soft-delete isolation, composed filters, validation, authentication, inactive identity, missing/foreign-role permission rejection, no audit side effect and throttling. |
+| Implementation status | Done - focused and complete SQLite plus PostgreSQL 18/PostGIS suites pass at 87 tests / 493 assertions; touched PHP files pass Pint, Composer metadata validates, the route is registered, DCL scripts execute, and diff checks are clean. |
 
 ## **Drone, sensor and hardware registry**
 

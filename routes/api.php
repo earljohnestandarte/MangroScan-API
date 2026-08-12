@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
+use App\Http\Controllers\Api\V1\Site\SiteIndexController;
 use App\Http\Controllers\Api\V1\User\UserIndexController;
 use App\Http\Controllers\Api\V1\User\UserShowController;
 use App\Http\Controllers\Api\V1\User\UserStoreController;
@@ -96,4 +97,12 @@ Route::prefix('v1')->group(function () {
             'permission:roles.manage',
             'throttle:auth.authenticated',
         ]);
+
+    // [SITE-01] GET /api/v1/sites
+    Route::get('/sites', SiteIndexController::class)->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:sites.read',
+        'throttle:auth.authenticated',
+    ]);
 });

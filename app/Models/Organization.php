@@ -21,4 +21,9 @@ class Organization extends Model
     {
         return $this->hasMany(User::class, 'organization_id', 'organization_id');
     }
+
+    public function surveySites(): HasMany
+    {
+        return $this->hasMany(SurveySite::class, 'organization_id', 'organization_id');
+    }
 }
