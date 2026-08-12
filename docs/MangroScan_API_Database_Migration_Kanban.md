@@ -523,12 +523,21 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | SITE-05 | DELETE /sites/{id}Soft archive site after dependency checks. | Path: id | 204 | SITE-03 | **P2** | TBD \- GIS/API | Backlog |
 | BOUND-01 | GET /sites/{id}/boundariesList site polygons. | Path: site id | 200 {data:\[Boundary\]} | SITE-03 | **P0** | Codex \- GIS/API | **Done** |
 | BOUND-02 | POST /sites/{id}/boundariesCreate survey/no-fly/restoration polygon. | {boundary\_name,boundary\_type,boundary\_geom:GeoJSON,source?} | 201 {data:Boundary} | BOUND-01 | **P0** | Codex \- GIS/API | **Done** |
-| BOUND-03 | PATCH /boundaries/{id}Update boundary metadata/geometry. | Partial boundary fields | 200 {data:Boundary} | BOUND-02 | **P1** | TBD \- GIS/API | **Blocked** |
+| BOUND-03 | PATCH /boundaries/{id}Update boundary metadata/geometry. | Partial boundary fields | 200 {data:Boundary} | BOUND-02 | **P1** | Codex \- GIS/API | **Done** |
 | PLOT-01 | GET /sites/{id}/plotsList monitoring plots. | Path: site id | 200 {data:\[Plot\]} | SITE-03 | **P1** | Codex \- GIS/API | **Done** |
 | PLOT-02 | POST /sites/{id}/plotsCreate validation plot. | {plot\_code,plot\_name?,plot\_geom:GeoJSON,area\_square\_meters?,description?} | 201 {data:Plot} | PLOT-01 | **P1** | Codex \- GIS/API | **Done** |
 | PLOT-03 | PATCH /plots/{id}Update/soft archive plot. | Partial Plot fields | 200 {data:Plot} | PLOT-02 | **P2** | TBD \- GIS/API | Backlog |
 | PERMIT-01 | GET /sites/{id}/access-permissionsList permit/access records. | Path: site id | 200 {data:\[AccessPermission\]} | SITE-03 | **P2** | TBD \- Backend/API | Backlog |
 | PERMIT-02 | POST /sites/{id}/access-permissionsRecord field-access permit. | {permit\_title,issuing\_agency,permit\_number?,valid\_from?,valid\_until?,document\_path?,status} | 201 {data:AccessPermission} | PERMIT-01 | **P2** | TBD \- Backend/API | Backlog |
+
+### **BOUND-03 — PATCH /api/v1/boundaries/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Partially update tenant-owned boundary metadata or Polygon(4326); requires `boundaries.manage` from a valid current/global role. |
+| Validation / success | At least one normalized BOUND-02 field; strict documented name/type/source domains and valid Polygon GeoJSON. Returns `200` safe Boundary plus request ID while site/creator remain fixed. |
+| Scope / transaction | Foreign/missing/malformed boundaries are hidden. The target is row-locked; metadata/parameterized geometry and immutable `boundary.update` before/after evidence share one rollback-safe transaction. |
+| DCL / tests | `018_site_boundary_update_grants.sql` adds API UPDATE only; API DELETE stays denied, reporting remains SELECT-only and worker UPDATE is denied. Done — full SQLite passes 374 tests / 2104 assertions and PostgreSQL 18/PostGIS passes 374 / 2111; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
 
 ### **PLOT-01 - GET /api/v1/sites/{id}/plots**
 

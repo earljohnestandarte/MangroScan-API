@@ -37,6 +37,7 @@ use App\Http\Controllers\Api\V1\Rbac\RolePermissionReplaceController;
 use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
 use App\Http\Controllers\Api\V1\Site\SiteBoundaryIndexController;
 use App\Http\Controllers\Api\V1\Site\SiteBoundaryStoreController;
+use App\Http\Controllers\Api\V1\Site\SiteBoundaryUpdateController;
 use App\Http\Controllers\Api\V1\Site\SiteIndexController;
 use App\Http\Controllers\Api\V1\Site\SitePlotIndexController;
 use App\Http\Controllers\Api\V1\Site\SitePlotStoreController;
@@ -308,6 +309,12 @@ Route::prefix('v1')->group(function () {
             'permission:boundaries.manage',
             'throttle:auth.authenticated',
         ]);
+
+    // [BOUND-03] PATCH /api/v1/boundaries/{id}
+    Route::patch('/boundaries/{boundary}', SiteBoundaryUpdateController::class)->whereUuid('boundary')->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:boundaries.manage', 'throttle:auth.authenticated',
+    ]);
 
     // [MSN-01] GET /api/v1/missions
     Route::get('/missions', MissionIndexController::class)->middleware([
