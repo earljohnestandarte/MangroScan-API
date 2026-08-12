@@ -1053,8 +1053,8 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | MODEL-03 | POST /ai-models/{id}/versions/{versionId}/deployMark model version deployed after validation. | {release\_notes?} | 200 {data:AiModelVersion} | MODEL-02 | **P2** | TBD \- AI/API | Backlog |
 | JOB-01 | GET /processing-jobsList processing jobs. | Query: mission\_id,flight\_id,status,type,page | 200 {data:\[ProcessingJob\],meta} | AUTH \+ processing\_jobs | **P0** | Codex \- AI/API | **Done** |
 | JOB-02 | POST /processing-jobsQueue detector/classifier/combined processing. | {mission\_id,flight\_session\_id?,job\_type,media\_ids:\[uuid\],parameters?} | 202 {data:{processing\_job\_id,job\_status:"queued"}} | MEDIA-03 \+ AISVC-04 \+ MODEL-01 | **P0** | Codex \- AI/API | **Done** |
-| JOB-03 | GET /processing-jobs/{id}Job status, runs, outputs and errors. | Path: id | 200 {data:{job,model\_runs,output\_summary}} | JOB-02 | **P0** | TBD \- AI/API | **Ready** |
-| JOB-04 | POST /processing-jobs/{id}/retryRetry failed job idempotently. | {reason?} | 202 {data:ProcessingJob} | JOB-03 failed | **P1** | TBD \- AI/API | **Blocked** |
+| JOB-03 | GET /processing-jobs/{id}Job status, runs, outputs and errors. | Path: id | 200 {data:{job,model\_runs,output\_summary}} | JOB-02 | **P0** | Codex \- AI/API | **Done** |
+| JOB-04 | POST /processing-jobs/{id}/retryRetry failed job idempotently. | {reason?} | 202 {data:ProcessingJob} | JOB-03 failed | **P1** | TBD \- AI/API | **Ready** |
 | JOB-05 | POST /processing-jobs/{id}/cancelCancel queued/running job when supported. | {reason?} | 200 {data:ProcessingJob} | JOB-03 | **P2** | TBD \- AI/API | Backlog |
 
 ### **AISVC-01 — GET /api/v1/admin/ai-services**
@@ -1122,6 +1122,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Transaction / provenance / idempotency | One transaction locks the mission, flight, media and user/key identity; inserts the queued processing job, creates one queued immutable-provenance model run per media and required model version, marks inputs queued, and emits secret-free `processing.create` audit evidence. Canonical media order and recursively sorted parameter maps make equivalent retries return the same job with no duplicate runs/audit; changed payload returns 409. Audit failure rolls back all state. The authoritative `processing_jobs`/`model_runs` rows are the durable worker queue; inference is not performed synchronously. |
 | Schema / DCL / tests | Adds user-scoped creation idempotency to processing jobs and the documented UUID `model_runs` table with job/model/media lineage, JSONB parameters and PostgreSQL type/status/timestamp checks. `033_processing_job_creation_grants.sql` gives API selected-column job/run inserts and media-status update only; worker can read inputs/service metadata and update only lifecycle/output columns, including controlled credential-function execution, while reporting remains read-only. `ProcessingJobStoreTest` covers exact success/provenance, canonical retry/conflict, tenant/hierarchy hiding, workflow conflicts, capability 503, auth/RBAC/inactivity, validation/size bound, rollback, throttling and DCL. Done — focused SQLite/PostgreSQL pass 10 tests / 91 assertions; full SQLite passes 556 / 3364 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 556 / 3380; route, Pint and live privilege gates pass. |
 
+### **JOB-03 — GET /api/v1/processing-jobs/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | JOB-03 / P0 |
+| Purpose / permission | Return one durable processing workflow, all execution runs, current output summary and safe error evidence. Requires active Sanctum authentication and tenant-valid `processing_jobs.manage`; lookup is constrained through job → mission → non-deleted site → caller organization. Foreign, missing, malformed and soft-deleted-lineage IDs remain non-enumerable 404s. |
+| Exact response / ordering | Returns exact `200 {data:{job,model_runs,output_summary}}` plus request ID. `job` uses the established ProcessingJob resource including safe `error_message`; `model_runs` exposes run/job/version/media identifiers, type, parameters, lifecycle timestamps/status and creation time. Runs order by creation time then UUID. Queued jobs may legitimately return `model_runs:[]` and `output_summary:null`. |
+| Security / side effects / DCL | Model version provenance is exposed by UUID only; private `model_file_path`, service topology and encrypted credentials never cross the API. This read makes no FastAPI call and creates no audit, notification or mutation. It reuses JOB-01 processing-job SELECT and JOB-02 model-run SELECT; reporting remains read-only and no new DCL is needed. |
+| Tests / status | `ProcessingJobShowTest` covers exact nested fields/order and output, safe error/provenance boundaries, empty queued state, tenant/missing/malformed/deleted-lineage hiding, authentication, RBAC, inactivity, throttling, no audit and read-only DCL. Done — focused SQLite and PostgreSQL pass 6 tests / 42 assertions; Processing module passes 23 tests / 176 SQLite and 177 PostgreSQL assertions; full SQLite passes 562 / 3406 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 562 / 3422; route, Pint and diff gates pass. |
+
 ### **MODEL-01 — GET /api/v1/ai-models**
 
 | Implementation field | Detail |
@@ -1148,14 +1158,14 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| TREE-01 | GET /tree-observationsFilter canonical tree observations. | Query: mission\_id,flight\_id,species\_id,validation\_status,min\_confidence,page | 200 {data:\[TreeObservation\],meta} | JOB-03 completed | **P0** | TBD \- Results/API | **Blocked** |
+| TREE-01 | GET /tree-observationsFilter canonical tree observations. | Query: mission\_id,flight\_id,species\_id,validation\_status,min\_confidence,page | 200 {data:\[TreeObservation\],meta} | JOB-03 completed | **P0** | TBD \- Results/API | **Ready** |
 | TREE-02 | GET /tree-observations/{id}Tree detail with model provenance/results. | Path: id | 200 {data:{tree,species\_predictions,height\_estimations,age\_estimations,source\_media,model\_run}} | TREE-01 | **P0** | TBD \- Results/API | **Blocked** |
 | TREE-03 | GET /missions/{id}/trees.geojsonMap-ready tree features. | Query: species\_id?,validated\_only? | 200 GeoJSON FeatureCollection | TREE-01 \+ PostGIS | **P0** | TBD \- GIS/API | **Blocked** |
 | COUNT-01 | GET /missions/{id}/tree-countsMission/species count summary. | Query: species\_id? | 200 {data:\[TreeCountSummary\]} | TREE-01 \+ count routine | **P0** | TBD \- Results/API | **Blocked** |
 | RESULT-01 | GET /tree-observations/{id}/speciesSpecies prediction history. | Path: id | 200 {data:\[ClassificationResult\]} | TREE-02 | **P1** | TBD \- Results/API | **Blocked** |
 | RESULT-02 | GET /tree-observations/{id}/heightsHeight estimates. | Path: id | 200 {data:\[HeightEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Blocked** |
 | RESULT-03 | GET /tree-observations/{id}/agesAge estimates \+ assumptions. | Path: id | 200 {data:\[AgeEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Blocked** |
-| LAYER-01 | GET /missions/{id}/layersList geospatial/photogrammetry outputs. | Query: type? | 200 {data:\[Layer\]} | JOB-03 | **P1** | TBD \- GIS/API | **Blocked** |
+| LAYER-01 | GET /missions/{id}/layersList geospatial/photogrammetry outputs. | Query: type? | 200 {data:\[Layer\]} | JOB-03 | **P1** | TBD \- GIS/API | **Ready** |
 | LAYER-02 | POST /missions/{id}/layers/buildQueue map layer build/refresh. | {layer\_types:\[...\],parameters?} | 202 {data:{job\_id}} | TREE-01 \+ photogrammetry inputs | **P1** | TBD \- GIS/API | **Blocked** |
 
 ## **Confidence review and field validation**

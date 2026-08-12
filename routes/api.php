@@ -51,6 +51,7 @@ use App\Http\Controllers\Api\V1\Organization\OrganizationUpdateController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobIndexController;
+use App\Http\Controllers\Api\V1\Processing\ProcessingJobShowController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobStoreController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
@@ -506,6 +507,14 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:processing_jobs.create', 'throttle:auth.authenticated',
     ]);
+
+    // [JOB-03] GET /api/v1/processing-jobs/{id}
+    Route::get('/processing-jobs/{job}', ProcessingJobShowController::class)
+        ->whereUuid('job')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:processing_jobs.manage', 'throttle:auth.authenticated',
+        ]);
 
     // [AUD-01] GET /api/v1/audit-logs
     Route::get('/audit-logs', AuditLogIndexController::class)->middleware([
