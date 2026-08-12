@@ -144,6 +144,8 @@ Each row is an implementation card. Request/response fields are intentionally ex
 
 ## **Platform & authentication**
 
+Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party token guard for SPA and mobile clients. `personal_access_tokens` stores only SHA-256 token hashes, uses UUID keys and UUID polymorphic user references, supports per-token expiry, and never exposes stored token material. The custom token model is registered in `AppServiceProvider`; protected endpoint groups use the `auth:sanctum` guard. Environment configuration may set a non-secret token prefix for automated secret scanning, but raw access tokens remain one-time response values.
+
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | SYS-01 | GET /healthLiveness/readiness for API, DB, storage and queue. | No body | 200 {status,db,storage,queue,time} | DB config | **P0** | TBD \- DevOps/API | **Ready** |
