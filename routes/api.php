@@ -59,6 +59,7 @@ use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RolePermissionReplaceController;
 use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
 use App\Http\Controllers\Api\V1\Report\ReportIndexController;
+use App\Http\Controllers\Api\V1\Sensor\SensorDatasetUploadInitiateController;
 use App\Http\Controllers\Api\V1\Site\SiteBoundaryIndexController;
 use App\Http\Controllers\Api\V1\Site\SiteBoundaryStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteBoundaryUpdateController;
@@ -589,6 +590,10 @@ Route::prefix('v1')->group(function () {
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:results.read', 'throttle:auth.authenticated',
         ]);
+
+    // [SDS-01] POST /api/v1/flights/{id}/sensor-datasets/uploads
+    Route::post('/flights/{flight}/sensor-datasets/uploads', SensorDatasetUploadInitiateController::class)
+        ->whereUuid('flight')->middleware(['auth:sanctum', EnsureActiveIdentity::class, 'permission:media.upload', 'throttle:auth.authenticated']);
 
     // [AUD-01] GET /api/v1/audit-logs
     Route::get('/audit-logs', AuditLogIndexController::class)->middleware([

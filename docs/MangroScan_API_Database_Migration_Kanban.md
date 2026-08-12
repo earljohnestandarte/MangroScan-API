@@ -1004,8 +1004,8 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | MEDIA-05 | POST /media/{id}/downloadIssue temporary private download URL or stream token. | No body | 200 {data:{url,expires\_at}} or streamed file | MEDIA-04 | **P1** | TBD \- Storage/API | **Blocked** |
 | MEDIA-06 | PATCH /media/{id}/qualitySet QC result. | {quality\_score?,quality\_status,notes?} | 200 {data:MediaAsset} | MEDIA-04 | **P0** | TBD \- Backend/API | **Blocked** |
 | MEDIA-07 | DELETE /media/{id}Soft-delete unneeded media after dependency check. | Path: id | 204 | MEDIA-04 | **P2** | TBD \- Storage/API | Backlog |
-| SDS-01 | POST /flights/{id}/sensor-datasets/uploadsUpload LiDAR/depth/GPS/IMU dataset. | {file\_name,dataset\_type,file\_format,sensor\_id,file\_size\_bytes,spatial\_reference?,metadata?} | 201 {data:{upload\_id,...}} | FLT-03 \+ storage | **P1** | TBD \- Storage/API | **Blocked** |
-| SDS-02 | POST /sensor-datasets/uploads/{uploadId}/completeFinalize sensor dataset. | {checksum\_sha256?} | 201 {data:SensorDataset} | SDS-01 | **P1** | TBD \- Storage/API | **Blocked** |
+| SDS-01 | POST /flights/{id}/sensor-datasets/uploadsUpload LiDAR/depth/GPS/IMU dataset. | {file\_name,dataset\_type,file\_format,sensor\_id,file\_size\_bytes,spatial\_reference?,metadata?} | 201 {data:{upload\_id,...}} | FLT-03 \+ storage | **P1** | Codex \- Storage/API | **Done** |
+| SDS-02 | POST /sensor-datasets/uploads/{uploadId}/completeFinalize sensor dataset. | {checksum\_sha256?} | 201 {data:SensorDataset} | SDS-01 | **P1** | TBD \- Storage/API | **Ready** |
 
 ### **MEDIA-01 - GET /api/v1/flights/{id}/media**
 
@@ -1038,6 +1038,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Transaction / response / spatial | After out-of-transaction object inspection, a second locked transaction rechecks lifecycle and expiry, creates exactly one MediaAsset, copies PostGIS Point(4326), capture time and JSON metadata, marks the session completed, and emits immutable `media.upload.complete` evidence. PostgreSQL uses a single `INSERT … SELECT` so no broad asset update privilege is needed. `201` returns the exact private-storage-safe MediaAsset resource plus request ID; `storage_key` is never projected. |
 | Idempotency / concurrency | Completion keys are serialized per user with a PostgreSQL transaction advisory lock and protected by a unique user/key constraint. Same upload + key + canonical payload returns the original asset without storage reinspection, duplicate asset or duplicate audit. Changed completion evidence, another key after completion, or reuse of the key for another upload returns 409. Parts are sorted by part number before fingerprinting so equivalent orderings retry safely. |
 | DCL / tests / status | `032_media_upload_completion_grants.sql` adds only selected completion-column UPDATE on upload sessions and selected-column MediaAsset INSERT; API has no full asset INSERT, UPDATE or DELETE, and report/worker roles receive no writes. `MediaUploadCompleteTest` covers exact safe success, real private-object size/hash verification, PostGIS copy, idempotent retry/key conflicts, lifecycle/tenant/RBAC/inactivity, validation, missing/mismatched objects, 503, throttling, schema and DCL. Done — focused SQLite and PostgreSQL pass 11 tests / 85 assertions; full SQLite passes 546 / 3273 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 546 / 3289; route, Pint and live privilege gates pass. |
+
+### **SDS-01 — POST /api/v1/flights/{id}/sensor-datasets/uploads**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | SDS-01 / P1 |
+| Purpose / permission | Initiate a private direct upload for LiDAR, depth, GPS or IMU data on a tenant-visible flying/completed flight. Requires active authentication and tenant-valid `media.upload`; the sensor must belong to that flight's drone. Foreign/missing/malformed flights and unrelated sensors remain 404. |
+| Request / exact response | Requires `Idempotency-Key` (1–100 chars), safe base filename, documented dataset type/format/sensor/positive bounded size, and optional bounded spatial reference/object metadata. Returns exact `201 {data:{upload_id,storage_key,upload_url}}` plus request ID using the proven private temporary-PUT transport. Storage keys are opaque mission/flight/upload UUID paths. |
+| Idempotency / audit / storage | Actor/key and canonical flight/payload are transactionally locked. Identical retries reuse the session and issue a fresh target without duplicate audit; changed/unusable/expired replay returns 409. Durable initiation and secret-free `sensor_dataset.upload.initiate` evidence share a transaction; transport failure leaves the retryable session intact, matching MEDIA-02 semantics. |
+| Schema / DCL / tests | Adds durable sensor-upload sessions with UUID flight/sensor/user lineage, fingerprint, private storage metadata, expiry/lifecycle indexes and PostgreSQL type/status/expiry constraints. API receives SELECT/INSERT only; update/completion and report/worker access await SDS-02. `SensorDatasetUploadInitiateTest` covers exact response/persistence, sensor binding, idempotency/conflict, validation, workflow/tenant boundaries, authentication/RBAC/inactivity, throttling, schema and DCL. Done — focused SQLite/PostgreSQL pass 4 tests / 31 assertions each; full SQLite passes 615 / 3766 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 615 / 3786; live privilege gates pass. |
 
 ## **AI service, model registry and processing jobs**
 
