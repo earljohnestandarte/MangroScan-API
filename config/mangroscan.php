@@ -3,6 +3,8 @@
 return [
     'api_version' => 'v1',
 
+    'web_url' => env('MANGROSCAN_WEB_URL', 'http://localhost:5173'),
+
     'features' => [
         'health_checks' => true,
         'request_ids' => true,

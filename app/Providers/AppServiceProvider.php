@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\PersonalAccessToken;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -26,6 +27,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+
+        ResetPassword::createUrlUsing(static function (object $notifiable, string $token): string {
+            return rtrim((string) config('mangroscan.web_url'), '/')
+                .'/reset-password?token='.rawurlencode($token)
+                .'&email='.rawurlencode((string) $notifiable->getEmailForPasswordReset());
+        });
 
         RateLimiter::for('auth.login', function (Request $request): Limit {
             $email = Str::lower((string) $request->input('email'));

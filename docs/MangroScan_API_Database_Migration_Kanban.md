@@ -155,7 +155,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | AUTH-03 | POST /auth/logoutRevoke current token/session. | Bearer token | 204 | AUTH-01 | **P0** | TBD \- Backend/Security | **Blocked** |
 | AUTH-04 | POST /auth/refreshRotate expiring mobile access credential when refresh-token design is used. | {refresh\_token} | 200 {access\_token,expires\_at,refresh\_token?} | AUTH-01 | **P1** | TBD \- Backend/Security | **Blocked** |
 | AUTH-05 | PUT /auth/passwordAuthenticated password change. | {current\_password,new\_password,new\_password\_confirmation} | 204 | AUTH-01 | **P1** | Codex \- Backend/Security | **Done** |
-| AUTH-06 | POST /auth/password/forgotIssue password-reset workflow. | {email} | 202 {message} | users \+ mail config | **P1** | TBD \- Backend/Security | **Blocked** |
+| AUTH-06 | POST /auth/password/forgotIssue password-reset workflow. | {email} | 202 {message} | users \+ mail config | **P1** | Codex \- Backend/Security | **Done** |
 | AUTH-07 | POST /auth/password/resetComplete password reset. | {token,email,password,password\_confirmation} | 204 | AUTH-06 | **P1** | TBD \- Backend/Security | **Blocked** |
 | AUTH-08 | GET /auth/permissionsLightweight permission refresh for UI. | No body | 200 {roles:\[...\],permissions:\[...\]} | AUTH-02 | **P1** | TBD \- Backend/Security | **Blocked** |
 
@@ -252,6 +252,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Success / security behavior | Returns exact empty `204 No Content`. The password is rehashed through Laravel and all of the user's active access credentials are revoked, requiring fresh login on every device. Password and token material never enter response or audit data. |
 | Transaction / audit / DCL | Password update, credential revocation and immutable `auth.password.changed` evidence share one transaction; audit failure restores both old hash and tokens. Existing identity DCL already provides API UPDATE/DELETE while audit remains append-only. No notification is required. |
 | Tests / status | `PasswordChangeTest` covers exact 204, new hash, all-token revocation, secret-free audit, incorrect current password, strength/confirmation, authentication, inactive identity, rollback, throttling and DCL. Done - full SQLite passes 271 tests / 1528 assertions and PostgreSQL 18/PostGIS passes 271 / 1535; route, Pint, live privilege and diff gates pass. |
+
+### **AUTH-06 - POST /api/v1/auth/password/forgot**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / request | Accept one normalized email address and issue reset instructions only for an active, non-deleted user in an active organization. Unknown/inactive accounts use the documented generic resource 404 response. |
+| Success / delivery | Returns `202` with exact message data and request metadata. Laravel's password broker stores only a slow-hashed reset token and sends the one-time raw token through the reset notification. A configurable `MANGROSCAN_WEB_URL` creates the existing web client's reset link without exposing the API host or secrets. |
+| Throttling / workflow | The public credential limiter constrains abusive requests by normalized email/IP. The password repository separately prevents rapid valid-account reissue with documented 409 while retaining the original token. |
+| Transaction / audit / DCL | Token creation, immutable `auth.password.reset.requested` evidence and notification dispatch execute in one database transaction; audit/mail failure rolls back persisted evidence. Audit contains delivery method only, never email token material. API alone receives reset-token CRUD; reporting and worker receive no access. |
+| Tests / status | `PasswordForgotTest` covers exact 202, normalized active lookup, notification/reset URL, hashed persistence, 404s, duplicate 409, validation, rollback-before-delivery, rate limiting and DCL. Done - full SQLite passes 278 tests / 1567 assertions and PostgreSQL 18/PostGIS passes 278 / 1574; route, Pint, live privilege and diff gates pass. |
 
 ### **AUTH-08 — GET /api/v1/auth/permissions**
 

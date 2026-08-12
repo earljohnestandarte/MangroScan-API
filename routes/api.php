@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\PasswordChangeController;
+use App\Http\Controllers\Api\V1\Auth\PasswordForgotController;
 use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Flight\FlightChecklistStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightCompleteController;
@@ -70,6 +71,10 @@ Route::prefix('v1')->group(function () {
         EnsureActiveIdentity::class,
         'throttle:auth.authenticated',
     ]);
+
+    // [AUTH-06] POST /api/v1/auth/password/forgot
+    Route::post('/auth/password/forgot', PasswordForgotController::class)
+        ->middleware('throttle:auth.login');
 
     // [AUTH-08] GET /api/v1/auth/permissions
     Route::get('/auth/permissions', EffectivePermissionsController::class)->middleware([
