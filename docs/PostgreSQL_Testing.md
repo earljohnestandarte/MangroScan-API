@@ -4,9 +4,9 @@ The default `phpunit.xml` always uses an isolated SQLite in-memory database. Pos
 
 ## One-time provisioning
 
-1. Copy `.env.testing.example` to `.env.testing` and provide only dedicated test credentials.
-2. As a PostgreSQL administrator, create the `mangroscan_test` database and install `pgcrypto` and PostGIS, or grant its dedicated owner enough privilege for the extension migration.
-3. Ensure the dedicated test user owns the database or may create the `app` schema. Normal production credentials must not be placed in `.env.testing`.
+1. As a PostgreSQL administrator, run `psql -f database/sql/testing/001_create_test_database.sql`. Optional `-v test_database=... -v test_owner=...` values may select a different dedicated owner, but the PHPUnit profile intentionally remains pinned to `mangroscan_test`.
+2. Assign the dedicated test owner a local password through your normal secret-management process when password authentication is required. The provisioning script intentionally contains no password.
+3. Copy `.env.testing.example` to `.env.testing` and provide only the dedicated test credentials. Normal production credentials must not be placed in `.env.testing`.
 
 The PostgreSQL migration creates `app` automatically only while `APP_ENV=testing`; production continues to require `database/sql/dcl/001_roles_and_schema.sql` so the schema has the documented `mangroscan_owner` ownership.
 

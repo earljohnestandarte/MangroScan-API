@@ -73,4 +73,16 @@ class DatabaseFoundationTest extends TestCase
         $this->assertStringNotContainsString('DB_DATABASE" value="mangroscan"', $profile);
         $this->assertStringContainsString('.env.testing', file_get_contents(base_path('.gitignore')));
     }
+
+    public function test_postgresql_test_provisioning_has_safe_passwordless_defaults(): void
+    {
+        $sql = file_get_contents(database_path('sql/testing/001_create_test_database.sql'));
+
+        $this->assertIsString($sql);
+        $this->assertStringContainsString('\\set test_database mangroscan_test', $sql);
+        $this->assertStringContainsString('\\set test_owner mangroscan_test', $sql);
+        $this->assertStringContainsString('CREATE EXTENSION IF NOT EXISTS postgis;', $sql);
+        $this->assertStringNotContainsString('PASSWORD', strtoupper($sql));
+        $this->assertStringNotContainsString('mangroscan;', $sql);
+    }
 }
