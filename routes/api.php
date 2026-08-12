@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
+use App\Http\Controllers\Api\V1\Flight\MissionFlightIndexController;
 use App\Http\Controllers\Api\V1\Mission\MissionApprovalController;
 use App\Http\Controllers\Api\V1\Mission\MissionIndexController;
 use App\Http\Controllers\Api\V1\Mission\MissionShowController;
@@ -193,4 +194,12 @@ Route::prefix('v1')->group(function () {
     Route::get('/drones', DroneIndexController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'throttle:auth.authenticated',
     ]);
+
+    // [FLT-01] GET /api/v1/missions/{id}/flights
+    Route::get('/missions/{mission}/flights', MissionFlightIndexController::class)
+        ->whereUuid('mission')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:flights.read', 'throttle:auth.authenticated',
+        ]);
 });

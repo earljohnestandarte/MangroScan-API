@@ -80,6 +80,11 @@ class User extends Authenticatable
         return $this->hasMany(SurveySite::class, 'created_by', 'user_id');
     }
 
+    public function pilotedFlightSessions(): HasMany
+    {
+        return $this->hasMany(FlightSession::class, 'pilot_user_id', 'user_id');
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active' && $this->deleted_at === null;

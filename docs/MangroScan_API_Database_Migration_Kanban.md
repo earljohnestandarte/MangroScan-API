@@ -611,7 +611,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| FLT-01 | GET /missions/{id}/flightsList mission sorties. | Query: status,quality\_status,page | 200 {data:\[Flight\],meta} | MSN-03 | **P0** | TBD \- Backend/API | **Blocked** |
+| FLT-01 | GET /missions/{id}/flightsList mission sorties. | Query: status,quality\_status,page | 200 {data:\[Flight\],meta} | MSN-03 | **P0** | Codex \- Backend/API | **Done** |
 | FLT-02 | POST /missions/{id}/flightsCreate flight sortie. | {drone\_id,pilot\_user\_id,flight\_code,planned\_altitude\_meters?,notes?} | 201 {data:Flight} | MSN-06 \+ DRONE-01 | **P0** | TBD \- Backend/API | **Blocked** |
 | FLT-03 | GET /flights/{id}Flight detail/readiness summary. | Path: id | 200 {data:{flight,checklists,waypoint\_count,media\_count}} | FLT-01 | **P0** | TBD \- Backend/API | **Blocked** |
 | FLT-04 | PATCH /flights/{id}Update planned flight metadata. | Partial Flight fields | 200 {data:Flight} | FLT-03 | **P1** | TBD \- Backend/API | **Blocked** |
@@ -622,6 +622,19 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | WPT-01 | PUT /flights/{id}/waypointsBatch replace ordered route waypoints. | {waypoints:\[{sequence\_no,location:GeoJSON,altitude\_meters?,speed\_mps?,action?}\]} | 200 {data:{count}} | FLT-03 | **P1** | TBD \- GIS/API | **Blocked** |
 | ENV-01 | POST /flights/{id}/environment-logsAppend environment observation. | {recorded\_at,weather\_condition,wind\_speed\_mps?,temperature\_celsius?,humidity\_percent?,visibility\_status?,notes?} | 201 {data:EnvironmentLog} | FLT-03 | **P2** | TBD \- Mobile/API | Backlog |
 | BAT-03 | POST /flights/{id}/battery-usageRecord battery use for sortie. | {battery\_id,start\_percentage,end\_percentage,usage\_minutes?,notes?} | 201 {data:BatteryUsage} | FLT-03 \+ BAT-01 | **P2** | TBD \- Mobile/API | Backlog |
+
+### **FLT-01 - GET /api/v1/missions/{id}/flights**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Return a stable paginated sortie list for one mission; requires tenant-valid `flights.read` after Sanctum and active-identity checks. |
+| Tenant / anti-enumeration | Parent resolution uses the shared mission scope through non-deleted site organization lineage. Foreign, deleted, missing, and malformed mission identifiers all return the standard 404 without exposing flight counts. |
+| Request / response | Optional normalized `status`, `quality_status`, positive `page`, and `per_page` 1 through 100. Success contains exact safe Flight resources plus `request_id`, `page`, `per_page`, `total`, and `last_page`; physical `flight_status` is projected as public `status`. |
+| Filters / ordering | Flight lifecycle accepts `planned`, `flying`, `completed`, `aborted`, or `failed`; quality accepts `pending`, `acceptable`, `rejected`, or `needs_recapture`. Filters compose and output sorts by code then UUID. |
+| Database schema | Adds authoritative UUID `flight_sessions` with mission, drone and optional pilot FKs, globally unique code, timing/altitude/duration/notes fields, indexes for mission lifecycle/quality and FK navigation, and both PostgreSQL state constraints. |
+| Spatial behavior | Takeoff and landing are genuine PostGIS `POINT(4326)` columns with GiST indexes and GeoJSON API projection. SQLite JSON exists only as a fast compatibility-test substitute. |
+| Side effects / privileges | Read-only; no audit event or notification. `008_flight_session_grants.sql` gives API and reporting roles SELECT only. This schema also activates MSN-03's real flight-summary query. |
+| Tests / status | `MissionFlightIndexTest` covers exact fields/meta/GeoJSON, filters, validation, anti-enumeration, authentication, tenant-scoped RBAC, no audit, throttling, constraints and DCL. Done - full SQLite passes 170 tests / 928 assertions and PostgreSQL 18/PostGIS passes 170 / 930; route, Pint, Composer, DCL and diff gates pass. |
 
 ## **Mobile offline synchronization**
 

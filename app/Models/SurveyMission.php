@@ -66,4 +66,9 @@ class SurveyMission extends Model
     {
         return $this->hasMany(MissionTeamMember::class, 'mission_id', 'mission_id');
     }
+
+    public function flightSessions(): HasMany
+    {
+        return $this->hasMany(FlightSession::class, 'mission_id', 'mission_id');
+    }
 }
