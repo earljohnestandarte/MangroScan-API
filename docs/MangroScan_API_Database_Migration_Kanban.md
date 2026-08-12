@@ -668,7 +668,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | DRONE-01 | GET /dronesList drone units. | Query: status,search,page | 200 {data:\[Drone\],meta} | AUTH-08 | **P1** | Codex \- Backend/API | **Done** |
-| DRONE-02 | POST /dronesRegister drone. | {drone\_name,model?,serial\_number?,firmware\_version?,max\_flight\_minutes?,payload\_capacity\_grams?,status} | 201 {data:Drone} | DRONE-01 | **P1** | TBD \- Backend/API | **Blocked** |
+| DRONE-02 | POST /dronesRegister drone. | {drone\_name,model?,serial\_number?,firmware\_version?,max\_flight\_minutes?,payload\_capacity\_grams?,status} | 201 {data:Drone} | DRONE-01 | **P1** | Codex \- Backend/API | **Done** |
 | DRONE-03 | GET /drones/{id}Drone detail \+ attached sensors. | Path: id | 200 {data:{drone,sensors}} | DRONE-01 | **P1** | TBD \- Backend/API | **Blocked** |
 | DRONE-04 | PATCH /drones/{id}Update drone status/metadata. | Partial Drone fields | 200 {data:Drone} | DRONE-03 | **P2** | TBD \- Backend/API | Backlog |
 | SENSOR-01 | POST /drones/{id}/sensorsAttach/register sensor. | {sensor\_name,sensor\_type,manufacturer?,model?,serial\_number?,resolution?,range\_meters?,calibration\_required,status} | 201 {data:Sensor} | DRONE-03 | **P1** | TBD \- Backend/API | **Blocked** |
@@ -688,6 +688,15 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Database schema | Adds UUID-backed `drones`, organization FK, documented metadata and numeric capacities, globally unique nullable serial number, soft deletion, organization/status index, and a PostgreSQL lifecycle check constraint. |
 | Side effects / privileges | Read-only; no audit event or notification. `007_drone_grants.sql` gives API and reporting roles SELECT only and denies INSERT, UPDATE, and DELETE until corresponding write cards land. |
 | Tests / status | `DroneIndexTest` covers exact fields/meta/order, tenant and soft-delete isolation, filters, validation, authentication without an undocumented permission, inactive identities, no audit, throttling, constraint and DCL. Done - full SQLite passes 162 tests / 874 assertions and PostgreSQL 18/PostGIS passes 162 / 875; route, Pint, Composer, DCL and diff gates pass. |
+
+### **DRONE-02 — POST /api/v1/drones**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Register a drone owned by the active authenticated caller's organization. No undocumented hardware permission is invented, matching DRONE-01 and Appendix B. |
+| Request / success | Required normalized name/status; optional model, uppercased serial, firmware and positive bounded flight/payload decimals. Returns `201` exact safe Drone plus request ID with server-owned tenant UUID. |
+| Conflicts / transaction | Serial numbers are globally reserved by active and soft-deleted units. PostgreSQL advisory locking prevents concurrent duplicate registration. Drone insert and immutable `drone.create` evidence share one rollback-safe transaction. |
+| DCL / tests | `019_drone_write_grants.sql` adds API INSERT only; API update/delete remain denied, reporting remains SELECT-only and worker insert is denied. Done — full SQLite passes 382 tests / 2148 assertions and PostgreSQL 18/PostGIS passes 382 / 2155; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
 
 ## **Mission planning and lifecycle**
 

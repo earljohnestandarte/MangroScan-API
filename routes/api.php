@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Auth\PasswordChangeController;
 use App\Http\Controllers\Api\V1\Auth\PasswordForgotController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
+use App\Http\Controllers\Api\V1\Drone\DroneStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightChecklistStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightCompleteController;
 use App\Http\Controllers\Api\V1\Flight\FlightShowController;
@@ -352,6 +353,11 @@ Route::prefix('v1')->group(function () {
 
     // [DRONE-01] GET /api/v1/drones
     Route::get('/drones', DroneIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class, 'throttle:auth.authenticated',
+    ]);
+
+    // [DRONE-02] POST /api/v1/drones
+    Route::post('/drones', DroneStoreController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'throttle:auth.authenticated',
     ]);
 
