@@ -277,6 +277,23 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RBAC-03 | PUT /users/{id}/rolesReplace a user role assignment set. | {role\_ids:\[uuid\]} | 200 {data:{user\_id,roles}} | USR-03 \+ RBAC-01 | **P0** | TBD \- Backend/Security | **Blocked** |
 | RBAC-04 | PUT /roles/{id}/permissionsReplace role permission set. | {permission\_ids:\[uuid\]} | 200 {data:{role\_id,permissions}} | RBAC-01 \+ RBAC-02 | **P1** | TBD \- Backend/Security | **Blocked** |
 
+### **RBAC-01 — GET /api/v1/roles**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | RBAC-01 / P0 |
+| Purpose | Return the role catalog available for current-tenant user and assignment workflows. |
+| Required permission | `roles.manage`, enforced through the reusable `permission:` middleware after Sanctum and active-identity checks. |
+| Dependencies | AUTH-08, roles, permissions, role/permission joins and the shared effective-access service. |
+| Request / validation | No body or query parameters. |
+| Success | `200` standard envelope containing sorted safe role resources (`role_id`, `organization_id`, `role_name`, `role_code`, `description`, `is_system_role`) and request ID metadata. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `429 RATE_LIMITED`; unexpected database failures remain `500`. |
+| Workflow / tenant scope | Returns global roles and roles belonging to the authenticated user's organization only. Foreign-organization roles are excluded even when maliciously assigned to the caller. |
+| Authorization isolation | A permission inherited only through a foreign-organization role is ignored and cannot authorize the endpoint. The standard 403 includes the required permission code without exposing catalog data. |
+| Side effects / audit / notifications | Read-only catalog lookup. No business audit event or notification is created. |
+| Tests | `tests/Feature/Rbac/RoleIndexTest.php` covers exact resource shape/order, global/current-tenant scope, authentication, missing permission, foreign-role privilege rejection, inactive organization state, no audit side effect and throttling. |
+| Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
+
 ## **Survey sites, boundaries, plots and permits**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |

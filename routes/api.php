@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
+use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Middleware\EnsureActiveIdentity;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,14 @@ Route::prefix('v1')->group(function () {
     Route::get('/auth/permissions', EffectivePermissionsController::class)->middleware([
         'auth:sanctum',
         EnsureActiveIdentity::class,
+        'throttle:auth.authenticated',
+    ]);
+
+    // [RBAC-01] GET /api/v1/roles
+    Route::get('/roles', RoleIndexController::class)->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:roles.manage',
         'throttle:auth.authenticated',
     ]);
 });
