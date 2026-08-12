@@ -1158,15 +1158,26 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| TREE-01 | GET /tree-observationsFilter canonical tree observations. | Query: mission\_id,flight\_id,species\_id,validation\_status,min\_confidence,page | 200 {data:\[TreeObservation\],meta} | JOB-03 completed | **P0** | TBD \- Results/API | **Ready** |
-| TREE-02 | GET /tree-observations/{id}Tree detail with model provenance/results. | Path: id | 200 {data:{tree,species\_predictions,height\_estimations,age\_estimations,source\_media,model\_run}} | TREE-01 | **P0** | TBD \- Results/API | **Blocked** |
-| TREE-03 | GET /missions/{id}/trees.geojsonMap-ready tree features. | Query: species\_id?,validated\_only? | 200 GeoJSON FeatureCollection | TREE-01 \+ PostGIS | **P0** | TBD \- GIS/API | **Blocked** |
-| COUNT-01 | GET /missions/{id}/tree-countsMission/species count summary. | Query: species\_id? | 200 {data:\[TreeCountSummary\]} | TREE-01 \+ count routine | **P0** | TBD \- Results/API | **Blocked** |
+| TREE-01 | GET /tree-observationsFilter canonical tree observations. | Query: mission\_id,flight\_id,species\_id,validation\_status,min\_confidence,page | 200 {data:\[TreeObservation\],meta} | JOB-03 completed | **P0** | Codex \- Results/API | **Done** |
+| TREE-02 | GET /tree-observations/{id}Tree detail with model provenance/results. | Path: id | 200 {data:{tree,species\_predictions,height\_estimations,age\_estimations,source\_media,model\_run}} | TREE-01 | **P0** | TBD \- Results/API | **Ready** |
+| TREE-03 | GET /missions/{id}/trees.geojsonMap-ready tree features. | Query: species\_id?,validated\_only? | 200 GeoJSON FeatureCollection | TREE-01 \+ PostGIS | **P0** | TBD \- GIS/API | **Ready** |
+| COUNT-01 | GET /missions/{id}/tree-countsMission/species count summary. | Query: species\_id? | 200 {data:\[TreeCountSummary\]} | TREE-01 \+ count routine | **P0** | TBD \- Results/API | **Ready** |
 | RESULT-01 | GET /tree-observations/{id}/speciesSpecies prediction history. | Path: id | 200 {data:\[ClassificationResult\]} | TREE-02 | **P1** | TBD \- Results/API | **Blocked** |
 | RESULT-02 | GET /tree-observations/{id}/heightsHeight estimates. | Path: id | 200 {data:\[HeightEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Blocked** |
 | RESULT-03 | GET /tree-observations/{id}/agesAge estimates \+ assumptions. | Path: id | 200 {data:\[AgeEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Blocked** |
 | LAYER-01 | GET /missions/{id}/layersList geospatial/photogrammetry outputs. | Query: type? | 200 {data:\[Layer\]} | JOB-03 | **P1** | TBD \- GIS/API | **Ready** |
 | LAYER-02 | POST /missions/{id}/layers/buildQueue map layer build/refresh. | {layer\_types:\[...\],parameters?} | 202 {data:{job\_id}} | TREE-01 \+ photogrammetry inputs | **P1** | TBD \- GIS/API | **Blocked** |
+
+### **TREE-01 — GET /api/v1/tree-observations**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | TREE-01 / P0 |
+| Purpose / permission | Return paginated canonical tree observations visible through the authenticated user's organization. Requires active Sanctum authentication and tenant-valid `results.read`; every row is constrained through observation → mission → non-deleted site → caller organization. |
+| Request / exact response | Supports normalized UUID `mission_id`, `flight_id`, and `species_id`; documented validation status; confidence from 0 through 1; positive page; and `per_page` from 1 through 100. Mission and flight filters use tenant-scoped lookup, while species is a global reference. Returns exact `200 {data:[TreeObservation],meta}` with stable newest-first pagination. |
+| Resource / geospatial boundary | The base TreeObservation projection includes lineage IDs, tree code, GeoJSON point/crown geometry, bounding box, confidence, canonical species/height/age values, validation status, and UTC timestamps. PostgreSQL reads geometries with `ST_AsGeoJSON`; storage internals and unrelated model/service details are not exposed. Reads create no audit or notification. |
+| Schema / DCL | Adds the documented mangrove species, persistent tree entity, and canonical observation foundations with UUID lineage, PostGIS Point/Polygon SRID 4326 columns, spatial/query indexes, uniqueness, soft deletion, and PostgreSQL domain/range checks. API/report roles receive SELECT only. The worker receives only the selected INSERT/UPDATE inference-result columns and cannot set validation state or delete rows. |
+| Tests / status | `TreeObservationIndexTest` covers exact shape/order/pagination, composed filters, GeoJSON, validation, inaccessible filters and deleted lineage, authentication/RBAC/inactivity, tenant isolation, no audit, throttling, schema constraints and DCL. Done — focused SQLite passes 7 tests / 59 assertions and PostgreSQL passes 7 / 60; full SQLite passes 569 / 3465 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 569 / 3482; live privilege checks pass. |
 
 ## **Confidence review and field validation**
 
