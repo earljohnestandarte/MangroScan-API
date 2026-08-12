@@ -20,6 +20,8 @@ class MediaUploadSession extends Model
         'flight_session_id',
         'initiated_by_user_id',
         'idempotency_key',
+        'completion_idempotency_key',
+        'completion_fingerprint',
         'request_fingerprint',
         'storage_disk',
         'storage_key',

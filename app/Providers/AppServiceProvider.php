@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Contracts\Ai\AiInferenceClient;
+use App\Contracts\Media\PrivateObjectInspector;
 use App\Contracts\Media\PrivateUploadUrlIssuer;
 use App\Models\PersonalAccessToken;
 use App\Services\Ai\HttpAiInferenceClient;
+use App\Services\Media\FilesystemPrivateObjectInspector;
 use App\Services\Media\FilesystemPrivateUploadUrlIssuer;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -24,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(AiInferenceClient::class, HttpAiInferenceClient::class);
         $this->app->bind(PrivateUploadUrlIssuer::class, FilesystemPrivateUploadUrlIssuer::class);
+        $this->app->bind(PrivateObjectInspector::class, FilesystemPrivateObjectInspector::class);
     }
 
     /**

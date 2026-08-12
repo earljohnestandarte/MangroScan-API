@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\V1\Flight\FlightWaypointReplaceController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightIndexController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightStoreController;
 use App\Http\Controllers\Api\V1\Media\FlightMediaIndexController;
+use App\Http\Controllers\Api\V1\Media\MediaUploadCompleteController;
 use App\Http\Controllers\Api\V1\Media\MediaUploadInitiateController;
 use App\Http\Controllers\Api\V1\Mission\MissionApprovalController;
 use App\Http\Controllers\Api\V1\Mission\MissionCompleteController;
@@ -480,6 +481,14 @@ Route::prefix('v1')->group(function () {
     // [MEDIA-02] POST /api/v1/flights/{id}/media/uploads
     Route::post('/flights/{flight}/media/uploads', MediaUploadInitiateController::class)
         ->whereUuid('flight')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:media.upload', 'throttle:auth.authenticated',
+        ]);
+
+    // [MEDIA-03] POST /api/v1/media/uploads/{uploadId}/complete
+    Route::post('/media/uploads/{upload}/complete', MediaUploadCompleteController::class)
+        ->whereUuid('upload')
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:media.upload', 'throttle:auth.authenticated',
