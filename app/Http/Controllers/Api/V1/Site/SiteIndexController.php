@@ -9,7 +9,6 @@ use App\Models\SurveySite;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 
 class SiteIndexController extends Controller
 {
@@ -22,13 +21,8 @@ class SiteIndexController extends Controller
         $perPage = (int) ($validated['per_page'] ?? 25);
 
         $query = SurveySite::query()
+            ->withCenterPointGeoJson()
             ->where('organization_id', $actor->organization_id);
-
-        if (DB::getDriverName() === 'pgsql') {
-            $query
-                ->select('survey_sites.*')
-                ->selectRaw('ST_AsGeoJSON(center_point)::json AS center_point_geojson');
-        }
 
         if (! empty($validated['search'])) {
             $search = '%'.$validated['search'].'%';

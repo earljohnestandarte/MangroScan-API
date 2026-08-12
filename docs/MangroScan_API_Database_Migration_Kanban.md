@@ -385,7 +385,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | SITE-01 | GET /sitesList sites visible to user. | Query: search,status,province,page | 200 {data:\[Site\],meta} | AUTH-08 | **P0** | Codex \- GIS/API | **Done** |
-| SITE-02 | POST /sitesRegister monitoring site. | {site\_name,site\_code,description?,province,city\_municipality,barangay?,center\_point:GeoJSON?,area\_hectares?,environment\_type,access\_notes?} | 201 {data:Site} | SITE-01 | **P0** | TBD \- GIS/API | **Blocked** |
+| SITE-02 | POST /sitesRegister monitoring site. | {site\_name,site\_code,description?,province,city\_municipality,barangay?,center\_point:GeoJSON?,area\_hectares?,environment\_type,access\_notes?} | 201 {data:Site} | SITE-01 | **P0** | Codex \- GIS/API | **Done** |
 | SITE-03 | GET /sites/{id}Site detail with summary counts. | Path: id | 200 {data:{site,counts}} | SITE-01 | **P0** | TBD \- GIS/API | **Blocked** |
 | SITE-04 | PATCH /sites/{id}Update site metadata. | Partial Site fields | 200 {data:Site} | SITE-03 | **P1** | TBD \- GIS/API | **Blocked** |
 | SITE-05 | DELETE /sites/{id}Soft archive site after dependency checks. | Path: id | 204 | SITE-03 | **P2** | TBD \- GIS/API | Backlog |
@@ -416,6 +416,25 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Side effects / audit / notifications | Read-only catalog lookup. No business audit event or notification is created. |
 | Tests | `tests/Feature/Site/SiteIndexTest.php` covers exact resource/metadata shape, PostGIS-to-GeoJSON projection, organization and soft-delete isolation, composed filters, validation, authentication, inactive identity, missing/foreign-role permission rejection, no audit side effect and throttling. |
 | Implementation status | Done - focused and complete SQLite plus PostgreSQL 18/PostGIS suites pass at 87 tests / 493 assertions; touched PHP files pass Pint, Composer metadata validates, the route is registered, DCL scripts execute, and diff checks are clean. |
+
+### **SITE-02 - POST /api/v1/sites**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | SITE-02 / P0 |
+| Purpose | Register a new monitoring site owned by the authenticated caller's organization. |
+| Required permission | `sites.manage`, enforced after Sanctum and active-identity checks. The permission must derive from a global or current-organization role. |
+| Dependencies | SITE-01, survey-site persistence/resource projection, organizations, users, PostGIS, tenant-scoped RBAC and immutable audit storage. |
+| Request / validation | Required normalized name/code, province, city/municipality and environment type (`coastal`, `riverine`, `estuarine`); optional nullable description, barangay, access notes, area (non-negative `NUMERIC(12,4)`) and GeoJSON Point. Longitude/latitude are bounded to -180..180 and -90..90. Site codes normalize to uppercase and remain globally unique as documented. |
+| Success | `201` standard envelope containing the complete safe Site resource and request ID metadata. New sites always start `active`, carry the caller as `created_by`, and return the center point as GeoJSON rather than WKB/EWKB. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `422 VALIDATION_FAILED` for malformed/duplicate input; `429 RATE_LIMITED`; unexpected persistence failures remain `500`. No client-selected target reference requires a normal `404`. |
+| Workflow / tenant scope | Organization ownership is derived exclusively from the authenticated user. Extra client-supplied organization fields are excluded from validated data, preventing cross-tenant creation. Foreign-role permission assignments cannot authorize the write. |
+| Spatial persistence | PostgreSQL uses a parameterized `ST_SetSRID(ST_GeomFromGeoJSON(?),4326)` insert into `geometry(Point,4326)`; SQLite stores the equivalent JSON only in compatibility tests. Numeric coordinate strings are normalized to numbers before encoding. |
+| Transaction / concurrency | Site insertion and mandatory audit persistence share one database transaction. The database unique constraint remains the final site-code concurrency guard. Audit failure rolls back the inserted site. |
+| Audit / notifications | One immutable `site.create` event records actor, site UUID, tenant-owned normalized fields, GeoJSON, request ID, IP and user agent; timestamps are omitted from the change payload. No notification is required. |
+| Database privileges | The site DCL grants API `SELECT, INSERT` only and reporting `SELECT` only. API `UPDATE`, worker access and auditor access remain denied until a later endpoint explicitly requires them. |
+| Tests | `tests/Feature/Site/SiteStoreTest.php` covers normalized PostGIS creation and GeoJSON output, forced caller tenancy, optional null fields, bounds/precision/uniqueness validation, exact audit evidence, rollback, authentication, local/foreign permission scope and throttling. |
+| Implementation status | Done - focused and complete SQLite plus PostgreSQL 18/PostGIS suites pass at 94 tests / 558 assertions; touched PHP files pass Pint, Composer metadata validates, both site routes are registered, DCL executes with the intended matrix, and diff checks are clean. |
 
 ## **Drone, sensor and hardware registry**
 

@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class SurveySite extends Model
 {
@@ -41,6 +43,17 @@ class SurveySite extends Model
         return [
             'area_hectares' => 'decimal:4',
         ];
+    }
+
+    public function scopeWithCenterPointGeoJson(Builder $query): Builder
+    {
+        if (DB::getDriverName() === 'pgsql') {
+            $query
+                ->select('survey_sites.*')
+                ->selectRaw('ST_AsGeoJSON(center_point)::json AS center_point_geojson');
+        }
+
+        return $query;
     }
 
     public function organization(): BelongsTo
