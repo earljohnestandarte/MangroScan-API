@@ -173,6 +173,22 @@ Each row is an implementation card. Request/response fields are intentionally ex
 | Tests | `tests/Feature/Platform/HealthTest.php` covers success shape/status, dependency failure, request-ID traceability and API versioning. |
 | Implementation status | Done. |
 
+### **SYS-02 — GET /api/v1/meta/capabilities**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | SYS-02 / P1 |
+| Purpose | Public discovery of the API version, enabled client-facing platform features and stable API limits. |
+| Required permission | None; clients may inspect compatibility before login. |
+| Dependencies | SYS-01 readiness checks must pass. |
+| Request / validation | No body. An optional valid `X-Request-ID` is echoed; otherwise the API generates one. |
+| Success | `200` standard envelope with `api_version: v1`, `features: {health_checks: true, request_ids: true}` and `limits: {pagination_per_page_max: 100}`. |
+| Errors | `503 SERVICE_UNAVAILABLE` when a SYS-01 dependency is unavailable; unexpected framework/configuration errors remain `500`. |
+| Workflow / tenant scope | No authentication or organization data is required or returned. |
+| Side effects / audit / notifications | Read-only platform metadata; no audit event or notification is created. |
+| Tests | `tests/Feature/Platform/MetaCapabilitiesTest.php` covers the exact success payload, request ID and dependency failure. |
+| Implementation status | Done. |
+
 ## **Organizations, users and RBAC**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
