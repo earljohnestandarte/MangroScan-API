@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\V1\Media\FlightMediaIndexController;
 use App\Http\Controllers\Api\V1\Mission\MissionApprovalController;
 use App\Http\Controllers\Api\V1\Mission\MissionIndexController;
 use App\Http\Controllers\Api\V1\Mission\MissionShowController;
+use App\Http\Controllers\Api\V1\Mission\MissionStartController;
 use App\Http\Controllers\Api\V1\Mission\MissionStoreController;
 use App\Http\Controllers\Api\V1\Mission\MissionTeamReplaceController;
 use App\Http\Controllers\Api\V1\Mission\MissionUpdateController;
@@ -351,6 +352,11 @@ Route::prefix('v1')->group(function () {
     // [MSN-06] POST /api/v1/missions/{id}/approve
     Route::post('/missions/{mission}/approve', MissionApprovalController::class)->whereUuid('mission')->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.approve', 'throttle:auth.authenticated',
+    ]);
+
+    // [MSN-07] POST /api/v1/missions/{id}/start
+    Route::post('/missions/{mission}/start', MissionStartController::class)->whereUuid('mission')->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.update', 'throttle:auth.authenticated',
     ]);
 
     // [DRONE-01] GET /api/v1/drones

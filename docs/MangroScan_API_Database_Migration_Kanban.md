@@ -729,7 +729,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | MSN-05 | DELETE /missions/{id}Soft archive allowed mission. | Path: id | 204 | MSN-03 | **P2** | TBD \- Backend/API | Backlog |
 | TEAM-01 | PUT /missions/{id}/teamReplace mission team assignments atomically. | {members:\[{user\_id,team\_role}\]} | 200 {data:\[MissionTeamMember\]} | MSN-03 \+ USR-01 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-06 | POST /missions/{id}/approveApprove mission and record approver. | {decision:"approved"|"rejected",notes?} | 200 {data:Mission} | MSN-03 \+ AUTH-08 | **P0** | Codex \- Backend/API | **Done** |
-| MSN-07 | POST /missions/{id}/startTransition mission to in\_progress. | {started\_at?} | 200 {data:Mission} | MSN-06 | **P1** | TBD \- Backend/API | **Blocked** |
+| MSN-07 | POST /missions/{id}/startTransition mission to in\_progress. | {started\_at?} | 200 {data:Mission} | MSN-06 | **P1** | Codex \- Backend/API | **Done** |
 | MSN-08 | POST /missions/{id}/completeFinalize mission operations. | {ended\_at?,completion\_notes?} | 200 {data:Mission} | Flights completed | **P1** | TBD \- Backend/API | **Blocked** |
 
 ### **MSN-01 - GET /api/v1/missions**
@@ -809,6 +809,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Workflow / concurrency | Tenant-scoped mission resolution plus transaction row lock; only undecided planned missions are eligible. Repeated or later-state decisions return 409. |
 | Transaction / audit | State/approver update and `mission.approval` old/new decision evidence share one transaction and roll back together. Existing mission UPDATE privilege is sufficient. |
 | Tests / status | `MissionApprovalTest` covers both decisions, mapping, duplicate conflict, validation, tenant hiding, rollback, auth and throttling. Complete SQLite suite passes 155 tests / 832 assertions; full/focused PostgreSQL, Pint, Composer and diff gates pass. |
+
+### **MSN-07 - POST /api/v1/missions/{id}/start**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Transition an approved tenant mission from `planned` to `in_progress`. Appendix B defines no `missions.start` permission, so the endpoint uses tenant-valid `missions.update` after Sanctum and active-identity checks. |
+| Request / success | Accepts optional nullable `started_at`; omission/null uses server time. A supplied offset-aware instant is normalized to UTC. Returns the complete safe Mission resource plus request ID, with mission lifecycle timestamps serialized consistently in UTC on SQLite and PostgreSQL. |
+| Workflow / tenant | The mission must remain planned and have `approved_by`; unapproved or already transitioned missions return `409 CONFLICT`. Foreign, deleted, missing, and malformed IDs use the existing tenant anti-enumeration `404`. |
+| Transaction / audit / DCL | The row is locked, status/time update and immutable `mission.start` before/after evidence share one transaction, and audit failure restores the planned state. Existing survey-mission UPDATE and audit INSERT grants are sufficient; no DCL expansion or notification is required. |
+| Tests / status | `MissionStartTest` covers explicit/default time, approval/state gates, validation, anti-enumeration, rollback, local/foreign RBAC, inactive identity and throttling. Done - full SQLite passes 407 tests / 2289 assertions and PostgreSQL 18/PostGIS passes 407 / 2299; focused suites, route, Pint, Composer, DCL and diff gates pass. |
 
 ## **Flight operations and field readiness**
 
