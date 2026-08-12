@@ -26,6 +26,7 @@ class AiService extends Model
         'service_version',
         'capabilities',
         'last_health_checked_at',
+        'last_health_latency_ms',
         'last_synchronized_at',
         'created_by',
     ];
@@ -39,6 +40,7 @@ class AiService extends Model
             'enabled' => 'boolean',
             'capabilities' => 'array',
             'last_health_checked_at' => 'datetime',
+            'last_health_latency_ms' => 'integer',
             'last_synchronized_at' => 'datetime',
         ];
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\DownstreamServiceException;
 use App\Exceptions\WorkflowConflictException;
 use App\Http\Middleware\AddRequestId;
 use App\Http\Middleware\RequirePermission;
@@ -28,6 +29,20 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (DownstreamServiceException $exception, Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+            $requestId = AddRequestId::resolve($request);
+
+            return response()->json(['error' => [
+                'code' => $exception->errorCode,
+                'message' => $exception->getMessage(),
+                'details' => (object) [],
+                'request_id' => $requestId,
+            ]], $exception->httpStatus, ['X-Request-ID' => $requestId]);
+        });
+
         $exceptions->render(function (BadRequestHttpException $exception, Request $request) {
             if (! $request->is('api/*')) {
                 return null;

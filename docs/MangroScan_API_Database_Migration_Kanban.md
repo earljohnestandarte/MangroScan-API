@@ -1023,7 +1023,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | AISVC-01 | GET /admin/ai-servicesAI backend overview for administrator. | No body | 200 {data:{services,models,jobs}} | schema extension \+ AUTH | **P1** | Codex \- AI/API | **Done** |
 | AISVC-02 | POST /admin/ai-servicesRegister trusted FastAPI backend. | {service\_name,base\_url,api\_key,environment,enabled} | 201 {data:AiService}; key never returned | AISVC schema \+ secret encryption | **P1** | Codex \- AI/API | **Done** |
-| AISVC-03 | POST /admin/ai-services/{id}/testHealth-test FastAPI service. | No body | 200 {data:{status,version,latency\_ms}} | AISVC-02 | **P1** | TBD \- AI/API | **Blocked** |
+| AISVC-03 | POST /admin/ai-services/{id}/testHealth-test FastAPI service. | No body | 200 {data:{status,version,latency\_ms}} | AISVC-02 | **P1** | Codex \- AI/API | **Done** |
 | AISVC-04 | POST /admin/ai-services/{id}/synchronizePull authoritative /models metadata. | No body | 200 {data:{models\_synced,capabilities}} | AISVC-03 | **P1** | TBD \- AI/API | **Blocked** |
 | AISVC-05 | POST /admin/ai-services/{id}/credentialsRotate encrypted FastAPI key. | {api\_key} | 204 | AISVC-02 | **P2** | TBD \- AI/API | Backlog |
 | MODEL-01 | GET /ai-modelsList model registry and deployment versions. | Query: type,deployed | 200 {data:\[AiModel\]} | AUTH \+ ai\_models | **P1** | Codex \- AI/API | **Done** |
@@ -1056,6 +1056,17 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Secret / response boundary | The API key is encrypted through Laravel's authenticated application encryption before persistence. `201` returns the safe AiService resource and request ID; neither plaintext nor encrypted credential appears in the response, exception details, HTTP calls, or audit values. Initial health state is `unknown` with no version, capabilities, or health/sync timestamps. |
 | Transaction / audit / DCL | Service creation and immutable `ai_service.create` evidence commit in one transaction. The audit includes only safe registry fields. `028_ai_service_registration_grants.sql` adds column-level API INSERT (including encrypted credential persistence) while retaining AISVC-01's safe-column-only SELECT; no UPDATE/DELETE or report/worker privilege is added. |
 | Tests / status | `AiServiceStoreTest` covers normalized safe success, decryption-at-rest proof, secret-free response/audit, no downstream request, required/type/URL validation, both conflicts, authentication, local/foreign RBAC, inactive identity, throttling, and DCL. Done — focused SQLite/PostgreSQL pass 7 tests / 65 assertions each; full SQLite passes 508 / 2957 (five PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 508 / 2971. |
+
+### **AISVC-03 — POST /api/v1/admin/ai-services/{id}/test**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | AISVC-03 / P1 |
+| Purpose / permission | Health-test one enabled registered FastAPI backend as an active administrator with tenant-valid `ai_services.manage`. Missing/malformed UUIDs return the standard non-enumerating 404; disabled services return 409 without making a request. |
+| Downstream protocol / response | Calls `GET {base_url}/health` with JSON accept and the decrypted key only in server-side `X-API-Key`, using configurable connect/overall timeouts. A successful downstream body must contain status `ok`/`healthy` and a non-empty version. Returns exact `200 {data:{status:"healthy",version,latency_ms}}` plus request ID. Invalid successful payloads map to `502 BAD_GATEWAY`; transport or non-success responses map to `503 SERVICE_UNAVAILABLE`, never forwarding downstream bodies or exception secrets. |
+| Persistence / audit | Each actual probe persists health state, version, check time, and measured latency; failures persist `unavailable` evidence. The state change and immutable `ai_service.health_test` audit commit together, and audit values contain health evidence only. A disabled/missing/unauthorized/rate-limited call causes neither HTTP traffic nor audit. |
+| Secret / DCL boundary | The pluggable `AiInferenceClient` keeps FastAPI behavior out of controllers. PostgreSQL exposes the encrypted value only through a one-ID, owner-defined function with a fixed search path; `029_ai_service_health_grants.sql` grants only that function plus safe latency SELECT and health-column UPDATE to the API. Direct secret SELECT/UPDATE and every report/worker privilege remain denied. |
+| Tests / status | `AiServiceHealthTest` covers exact success, header/path use, health evidence/audit, secret hygiene, disabled/missing/malformed IDs, auth/local/foreign RBAC, inactive identity, 502/503 mapping, failure evidence, throttling, migration/function, and DCL. Done — focused SQLite and PostgreSQL pass 8 tests / 64 assertions each; full SQLite passes 516 / 3021 (five PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 516 / 3035. |
 
 ### **JOB-01 - GET /api/v1/processing-jobs**
 

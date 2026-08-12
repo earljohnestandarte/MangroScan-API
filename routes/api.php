@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Ai\AiModelIndexController;
 use App\Http\Controllers\Api\V1\Ai\AiModelShowController;
+use App\Http\Controllers\Api\V1\Ai\AiServiceHealthTestController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceOverviewController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceStoreController;
 use App\Http\Controllers\Api\V1\Audit\AuditLogIndexController;
@@ -537,4 +538,12 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:ai_services.manage', 'throttle:auth.authenticated',
     ]);
+
+    // [AISVC-03] POST /api/v1/admin/ai-services/{id}/test
+    Route::post('/admin/ai-services/{service}/test', AiServiceHealthTestController::class)
+        ->whereUuid('service')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_services.manage', 'throttle:auth.authenticated',
+        ]);
 });

@@ -20,4 +20,9 @@ return [
         'login_attempts_per_minute' => (int) env('AUTH_LOGIN_ATTEMPTS_PER_MINUTE', 5),
         'authenticated_requests_per_minute' => (int) env('AUTHENTICATED_REQUESTS_PER_MINUTE', 60),
     ],
+
+    'ai_services' => [
+        'connect_timeout_seconds' => (int) env('AI_SERVICE_CONNECT_TIMEOUT_SECONDS', 3),
+        'timeout_seconds' => (int) env('AI_SERVICE_TIMEOUT_SECONDS', 10),
+    ],
 ];
