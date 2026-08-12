@@ -51,6 +51,7 @@ use App\Http\Controllers\Api\V1\Organization\OrganizationUpdateController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobIndexController;
+use App\Http\Controllers\Api\V1\Processing\ProcessingJobStoreController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RolePermissionReplaceController;
@@ -498,6 +499,12 @@ Route::prefix('v1')->group(function () {
     Route::get('/processing-jobs', ProcessingJobIndexController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:processing_jobs.manage', 'throttle:auth.authenticated',
+    ]);
+
+    // [JOB-02] POST /api/v1/processing-jobs
+    Route::post('/processing-jobs', ProcessingJobStoreController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:processing_jobs.create', 'throttle:auth.authenticated',
     ]);
 
     // [AUD-01] GET /api/v1/audit-logs

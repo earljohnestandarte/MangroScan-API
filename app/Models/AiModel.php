@@ -33,6 +33,11 @@ class AiModel extends Model
         return $this->belongsTo(User::class, 'created_by', 'user_id');
     }
 
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(AiService::class, 'ai_service_id', 'ai_service_id');
+    }
+
     public function versions(): HasMany
     {
         return $this->hasMany(AiModelVersion::class, 'model_id', 'model_id');

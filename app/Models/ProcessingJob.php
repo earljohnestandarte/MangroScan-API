@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProcessingJob extends Model
 {
@@ -27,6 +28,8 @@ class ProcessingJob extends Model
         'completed_at',
         'error_message',
         'created_by',
+        'idempotency_key',
+        'request_fingerprint',
     ];
 
     /** @return array<string, string> */
@@ -53,5 +56,10 @@ class ProcessingJob extends Model
     public function requester(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by', 'user_id');
+    }
+
+    public function modelRuns(): HasMany
+    {
+        return $this->hasMany(ModelRun::class, 'processing_job_id', 'processing_job_id');
     }
 }
