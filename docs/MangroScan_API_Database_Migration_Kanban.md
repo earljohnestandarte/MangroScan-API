@@ -612,7 +612,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | FLT-01 | GET /missions/{id}/flightsList mission sorties. | Query: status,quality\_status,page | 200 {data:\[Flight\],meta} | MSN-03 | **P0** | Codex \- Backend/API | **Done** |
-| FLT-02 | POST /missions/{id}/flightsCreate flight sortie. | {drone\_id,pilot\_user\_id,flight\_code,planned\_altitude\_meters?,notes?} | 201 {data:Flight} | MSN-06 \+ DRONE-01 | **P0** | TBD \- Backend/API | **Blocked** |
+| FLT-02 | POST /missions/{id}/flightsCreate flight sortie. | {drone\_id,pilot\_user\_id,flight\_code,planned\_altitude\_meters?,notes?} | 201 {data:Flight} | MSN-06 \+ DRONE-01 | **P0** | Codex \- Backend/API | **Done** |
 | FLT-03 | GET /flights/{id}Flight detail/readiness summary. | Path: id | 200 {data:{flight,checklists,waypoint\_count,media\_count}} | FLT-01 | **P0** | TBD \- Backend/API | **Blocked** |
 | FLT-04 | PATCH /flights/{id}Update planned flight metadata. | Partial Flight fields | 200 {data:Flight} | FLT-03 | **P1** | TBD \- Backend/API | **Blocked** |
 | CHK-01 | POST /flights/{id}/checklistsSubmit pre/post-flight checklist. | {checklist\_type,battery\_ok,weather\_ok,gps\_ok,camera\_ok,lidar\_depth\_ok,storage\_ok,overall\_status,remarks?} | 201 {data:Checklist} | FLT-03 | **P0** | TBD \- Mobile/API | **Blocked** |
@@ -633,8 +633,20 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Filters / ordering | Flight lifecycle accepts `planned`, `flying`, `completed`, `aborted`, or `failed`; quality accepts `pending`, `acceptable`, `rejected`, or `needs_recapture`. Filters compose and output sorts by code then UUID. |
 | Database schema | Adds authoritative UUID `flight_sessions` with mission, drone and optional pilot FKs, globally unique code, timing/altitude/duration/notes fields, indexes for mission lifecycle/quality and FK navigation, and both PostgreSQL state constraints. |
 | Spatial behavior | Takeoff and landing are genuine PostGIS `POINT(4326)` columns with GiST indexes and GeoJSON API projection. SQLite JSON exists only as a fast compatibility-test substitute. |
-| Side effects / privileges | Read-only; no audit event or notification. `008_flight_session_grants.sql` gives API and reporting roles SELECT only. This schema also activates MSN-03's real flight-summary query. |
+| Side effects / privileges | Read-only; no audit event or notification. The initial DCL granted API/reporting SELECT only; FLT-02 subsequently adds API INSERT while reporting remains read-only. This schema also activates MSN-03's real flight-summary query. |
 | Tests / status | `MissionFlightIndexTest` covers exact fields/meta/GeoJSON, filters, validation, anti-enumeration, authentication, tenant-scoped RBAC, no audit, throttling, constraints and DCL. Done - full SQLite passes 170 tests / 928 assertions and PostgreSQL 18/PostGIS passes 170 / 930; route, Pint, Composer, DCL and diff gates pass. |
+
+### **FLT-02 - POST /api/v1/missions/{id}/flights**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Create one planned sortie; requires tenant-valid `flights.create` after Sanctum and active-identity checks. |
+| Request / response | Required tenant-owned drone UUID, active pilot UUID and normalized globally unique flight code; optional non-negative `NUMERIC(8,2)` planned altitude and notes. Success is `201 {data:Flight}` plus request ID with server-controlled `planned` flight and `pending` quality states. |
+| Mission workflow | The explicit MSN-06 dependency is enforced: only an approved mission still in `planned` state accepts new sorties. Unapproved, rejected/cancelled or later-state missions return standard 409 conflict. Mission lookup retains tenant anti-enumeration. |
+| Resource workflow | Drone and pilot are resolved inside the caller's organization under transaction locks. Foreign/missing/deleted identifiers return 404; a maintenance/retired drone or inactive pilot returns 409. The contract does not require pilot team membership, so no undocumented TEAM-01 dependency is added. |
+| Transaction / audit | Mission, drone and pilot state are locked and rechecked; flight insertion and immutable `flight.create` evidence share one transaction. Audit failure rolls back the sortie. No notification is required at planning time. |
+| Database privileges | Flight DCL grants API `SELECT, INSERT`, reporting `SELECT`, and continues to deny UPDATE and DELETE. |
+| Tests / status | `MissionFlightStoreTest` covers exact normalized persistence/audit, validation/uniqueness, approval and resource conflicts, tenant hiding, audit rollback, local/foreign RBAC and throttling. Done - full SQLite passes 179 tests / 989 assertions and PostgreSQL 18/PostGIS passes 179 / 991; route, Pint, Composer, DCL and diff gates pass. |
 
 ## **Mobile offline synchronization**
 

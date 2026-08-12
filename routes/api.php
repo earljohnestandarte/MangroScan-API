@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightIndexController;
+use App\Http\Controllers\Api\V1\Flight\MissionFlightStoreController;
 use App\Http\Controllers\Api\V1\Mission\MissionApprovalController;
 use App\Http\Controllers\Api\V1\Mission\MissionIndexController;
 use App\Http\Controllers\Api\V1\Mission\MissionShowController;
@@ -201,5 +202,13 @@ Route::prefix('v1')->group(function () {
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:flights.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [FLT-02] POST /api/v1/missions/{id}/flights
+    Route::post('/missions/{mission}/flights', MissionFlightStoreController::class)
+        ->whereUuid('mission')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:flights.create', 'throttle:auth.authenticated',
         ]);
 });
