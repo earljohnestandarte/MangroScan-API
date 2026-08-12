@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthenticatedProfileController;
 use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
+use App\Http\Controllers\Api\V1\Mission\MissionApprovalController;
 use App\Http\Controllers\Api\V1\Mission\MissionIndexController;
 use App\Http\Controllers\Api\V1\Mission\MissionShowController;
 use App\Http\Controllers\Api\V1\Mission\MissionStoreController;
@@ -180,5 +181,10 @@ Route::prefix('v1')->group(function () {
     // [TEAM-01] PUT /api/v1/missions/{id}/team
     Route::put('/missions/{mission}/team', MissionTeamReplaceController::class)->whereUuid('mission')->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:mission_team.manage', 'throttle:auth.authenticated',
+    ]);
+
+    // [MSN-06] POST /api/v1/missions/{id}/approve
+    Route::post('/missions/{mission}/approve', MissionApprovalController::class)->whereUuid('mission')->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.approve', 'throttle:auth.authenticated',
     ]);
 });

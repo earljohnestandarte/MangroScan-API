@@ -513,7 +513,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | MSN-04 | PATCH /missions/{id}Update planning fields before finalization. | Partial Mission fields | 200 {data:Mission} | MSN-03 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-05 | DELETE /missions/{id}Soft archive allowed mission. | Path: id | 204 | MSN-03 | **P2** | TBD \- Backend/API | Backlog |
 | TEAM-01 | PUT /missions/{id}/teamReplace mission team assignments atomically. | {members:\[{user\_id,team\_role}\]} | 200 {data:\[MissionTeamMember\]} | MSN-03 \+ USR-01 | **P0** | Codex \- Backend/API | **Done** |
-| MSN-06 | POST /missions/{id}/approveApprove mission and record approver. | {decision:"approved"|"rejected",notes?} | 200 {data:Mission} | MSN-03 \+ AUTH-08 | **P0** | TBD \- Backend/API | **Blocked** |
+| MSN-06 | POST /missions/{id}/approveApprove mission and record approver. | {decision:"approved"|"rejected",notes?} | 200 {data:Mission} | MSN-03 \+ AUTH-08 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-07 | POST /missions/{id}/startTransition mission to in\_progress. | {started\_at?} | 200 {data:Mission} | MSN-06 | **P1** | TBD \- Backend/API | **Blocked** |
 | MSN-08 | POST /missions/{id}/completeFinalize mission operations. | {ended\_at?,completion\_notes?} | 200 {data:Mission} | Flights completed | **P1** | TBD \- Backend/API | **Blocked** |
 
@@ -584,6 +584,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Workflow / response | Changes are allowed only while planned and unapproved; otherwise 409. Returns sorted safe MissionTeamMember resources plus request ID. |
 | Transaction / audit | Delete/insert replacement and immutable `mission.team.replace` before/after evidence share one transaction and roll back together. |
 | DCL / tests | API receives team `SELECT,INSERT,DELETE` but no update; reporting remains read-only. `MissionTeamReplaceTest` covers full/empty sets, scope, duplicates, conflict, rollback, access and throttling. Complete suites pass at 147 tests / 806 assertions with PostgreSQL, Pint, Composer, DCL and diff gates green. |
+
+### **MSN-06 - POST /api/v1/missions/{id}/approve**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Record one final approved/rejected decision; requires tenant-valid `missions.approve`. |
+| Schema reconciliation | The documented schema has `approved_by` and lifecycle `cancelled`, not approval-status/notes columns. Approval preserves `planned` and records approver; rejection transitions to `cancelled`; decision/notes persist in immutable audit evidence. |
+| Workflow / concurrency | Tenant-scoped mission resolution plus transaction row lock; only undecided planned missions are eligible. Repeated or later-state decisions return 409. |
+| Transaction / audit | State/approver update and `mission.approval` old/new decision evidence share one transaction and roll back together. Existing mission UPDATE privilege is sufficient. |
+| Tests / status | `MissionApprovalTest` covers both decisions, mapping, duplicate conflict, validation, tenant hiding, rollback, auth and throttling. Complete SQLite suite passes 155 tests / 832 assertions; full/focused PostgreSQL, Pint, Composer and diff gates pass. |
 
 ## **Flight operations and field readiness**
 
