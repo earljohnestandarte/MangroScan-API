@@ -1098,7 +1098,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| NOTIF-01 | GET /notificationsList durable notifications for current user. | Query: unread\_only?,type?,page | 200 {data:\[Notification\],meta} | AUTH \+ notification\_logs | **P1** | TBD \- Backend/API | **Blocked** |
+| NOTIF-01 | GET /notificationsList durable notifications for current user. | Query: unread\_only?,type?,page | 200 {data:\[Notification\],meta} | AUTH \+ notification\_logs | **P1** | Codex \- Backend/API | **Done** |
 | NOTIF-02 | GET /notifications/unread-countLightweight badge count. | No body | 200 {data:{unread\_count}} | NOTIF-01 | **P1** | TBD \- Backend/API | **Blocked** |
 | NOTIF-03 | POST /notifications/{id}/readMark one notification read. | No body | 200 {data:Notification} | NOTIF-01 | **P1** | TBD \- Backend/API | **Blocked** |
 | NOTIF-04 | POST /notifications/read-allMark caller notifications read. | No body | 204 | NOTIF-01 | **P2** | TBD \- Backend/API | Backlog |
@@ -1106,6 +1106,18 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | SET-02 | PUT /settings/{key}Update managed setting. | {setting\_value,description?} | 200 {data:Setting} | SET-01 \+ admin permission | **P2** | TBD \- Backend/API | Backlog |
 | AUD-01 | GET /audit-logsSearch immutable audit trail. | Query: user\_id?,action?,table\_name?,record\_id?,from?,to?,page | 200 {data:\[AuditLog\],meta} | AUTH \+ audit trigger | **P1** | Codex \- Security/API | **Done** |
 | AUD-02 | GET /audit-logs/{id}Audit event detail. | Path: id | 200 {data:AuditLog} | AUD-01 | **P2** | TBD \- Security/API | Backlog |
+
+### **NOTIF-01 — GET /api/v1/notifications**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | NOTIF-01 / P1 |
+| Purpose / permission | Return durable notifications belonging exclusively to the authenticated user. Requires active Sanctum authentication and tenant-valid `notifications.read`; a foreign-organization role assignment cannot authorize the endpoint. |
+| Request / validation | Optional boolean `unread_only`, normalized exact `type` up to the schema's 80-character limit, positive `page`, and optional `per_page` from 1 through 100 under the common pagination standard. Notification types remain extensible strings as defined by the authoritative schema rather than an invented closed enum. |
+| Success / scope | `200` standard envelope with exact Notification resources (`notification_id`, `user_id`, `notification_type`, `title`, `message`, `is_read`, UTC `created_at`) and request ID/page metadata. Queries are pinned to the caller's `user_id`, excluding both same-organization colleagues and foreign tenants. Results sort newest first by timestamp then UUID. |
+| Database / DCL | Adds the documented UUID `notification_logs` table with required user lineage, durable message fields, unread default and user/read/time plus user/type/time indexes. `023_notification_log_grants.sql` gives only `mangroscan_api_rw` SELECT; INSERT and UPDATE remain withheld until notification-producing workflows and NOTIF-03 explicitly require them. Worker, reporting and auditor roles receive no access. |
+| Side effects / errors | Read-only polling creates no audit event and does not mutate read state. Errors are `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected failures remain `500`. No target identifier exists for a normal 404 response. |
+| Tests / status | `NotificationIndexTest` covers exact shape/pages/order, user/tenant isolation, unread/type composition, validation, authentication, local/foreign RBAC, inactive identity, no audit, throttling, durable FK/index schema and DCL. Done — full SQLite passes 457 tests / 2625 assertions (two PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 457 / 2636; focused suites, route, Pint, Composer, migration, index and live privilege gates pass. |
 
 ### **AUD-01 — GET /api/v1/audit-logs**
 

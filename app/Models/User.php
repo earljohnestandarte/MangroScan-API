@@ -90,6 +90,11 @@ class User extends Authenticatable
         return $this->hasMany(SyncDevice::class, 'user_id', 'user_id');
     }
 
+    public function notificationLogs(): HasMany
+    {
+        return $this->hasMany(NotificationLog::class, 'user_id', 'user_id');
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active' && $this->deleted_at === null;
