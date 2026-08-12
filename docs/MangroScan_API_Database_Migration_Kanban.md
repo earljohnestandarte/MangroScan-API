@@ -386,7 +386,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | SITE-01 | GET /sitesList sites visible to user. | Query: search,status,province,page | 200 {data:\[Site\],meta} | AUTH-08 | **P0** | Codex \- GIS/API | **Done** |
 | SITE-02 | POST /sitesRegister monitoring site. | {site\_name,site\_code,description?,province,city\_municipality,barangay?,center\_point:GeoJSON?,area\_hectares?,environment\_type,access\_notes?} | 201 {data:Site} | SITE-01 | **P0** | Codex \- GIS/API | **Done** |
-| SITE-03 | GET /sites/{id}Site detail with summary counts. | Path: id | 200 {data:{site,counts}} | SITE-01 | **P0** | TBD \- GIS/API | **Blocked** |
+| SITE-03 | GET /sites/{id}Site detail with summary counts. | Path: id | 200 {data:{site,counts}} | SITE-01 | **P0** | Codex \- GIS/API | **Done** |
 | SITE-04 | PATCH /sites/{id}Update site metadata. | Partial Site fields | 200 {data:Site} | SITE-03 | **P1** | TBD \- GIS/API | **Blocked** |
 | SITE-05 | DELETE /sites/{id}Soft archive site after dependency checks. | Path: id | 204 | SITE-03 | **P2** | TBD \- GIS/API | Backlog |
 | BOUND-01 | GET /sites/{id}/boundariesList site polygons. | Path: site id | 200 {data:\[Boundary\]} | SITE-03 | **P0** | TBD \- GIS/API | **Blocked** |
@@ -435,6 +435,23 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Database privileges | The site DCL grants API `SELECT, INSERT` only and reporting `SELECT` only. API `UPDATE`, worker access and auditor access remain denied until a later endpoint explicitly requires them. |
 | Tests | `tests/Feature/Site/SiteStoreTest.php` covers normalized PostGIS creation and GeoJSON output, forced caller tenancy, optional null fields, bounds/precision/uniqueness validation, exact audit evidence, rollback, authentication, local/foreign permission scope and throttling. |
 | Implementation status | Done - focused and complete SQLite plus PostgreSQL 18/PostGIS suites pass at 94 tests / 558 assertions; touched PHP files pass Pint, Composer metadata validates, both site routes are registered, DCL executes with the intended matrix, and diff checks are clean. |
+
+### **SITE-03 - GET /api/v1/sites/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | SITE-03 / P0 |
+| Purpose | Return one visible survey site together with stable summary counts for its direct operational children. |
+| Required permission | `sites.read`, enforced after Sanctum and active user/organization checks. Foreign-organization role grants are excluded by effective-access scoping. |
+| Dependencies | SITE-01, safe Site/GeoJSON projection, survey-site tenancy and the standard error/throttle stack. Child tables are counted when their dependency migrations exist. |
+| Request / validation | UUID site path parameter constrained at routing. Malformed UUIDs, missing rows, soft-deleted rows and rows outside the caller's organization all resolve to the same standard 404. |
+| Success | `200` standard envelope containing `{site,counts}` and request ID metadata. `counts` always contains integer `boundaries`, `plots`, `access_permissions`, and `missions` keys. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `404 NOT_FOUND`; `429 RATE_LIMITED`; unexpected database failures remain `500`. |
+| Workflow / tenant scope | Lookup is constrained by caller `organization_id` before UUID resolution, preventing foreign-site enumeration even when a valid foreign UUID is supplied. Detail geometry uses the same PostGIS-to-GeoJSON projection as the list endpoint. |
+| Count behavior | Existing child tables are counted by `site_id`; soft-deleted plots and missions are excluded. A child table whose planned dependency migration has not landed yet contributes zero while preserving the response shape, so BOUND/PLOT/MSN migrations require no contract change. |
+| Side effects / audit / notifications | Read-only detail and aggregate lookup. No audit event or notification is created. Existing site DCL `SELECT` access is sufficient; no privilege expansion is introduced. |
+| Tests | `tests/Feature/Site/SiteShowTest.php` covers exact site/count envelope, PostGIS GeoJSON, current-tenant resolution, foreign/missing/deleted/malformed anti-enumeration 404s, authentication, foreign-role rejection, inactive organization, no audit side effect and throttling. |
+| Implementation status | Done - focused and complete SQLite plus PostgreSQL 18/PostGIS suites pass at 100 tests / 586 assertions; touched PHP files pass Pint, Composer metadata validates, all three site routes are registered, and diff checks are clean. |
 
 ## **Drone, sensor and hardware registry**
 

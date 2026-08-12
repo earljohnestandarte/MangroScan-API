@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
 use App\Http\Controllers\Api\V1\Site\SiteIndexController;
+use App\Http\Controllers\Api\V1\Site\SiteShowController;
 use App\Http\Controllers\Api\V1\Site\SiteStoreController;
 use App\Http\Controllers\Api\V1\User\UserIndexController;
 use App\Http\Controllers\Api\V1\User\UserShowController;
@@ -114,4 +115,14 @@ Route::prefix('v1')->group(function () {
         'permission:sites.manage',
         'throttle:auth.authenticated',
     ]);
+
+    // [SITE-03] GET /api/v1/sites/{id}
+    Route::get('/sites/{site}', SiteShowController::class)
+        ->whereUuid('site')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:sites.read',
+            'throttle:auth.authenticated',
+        ]);
 });
