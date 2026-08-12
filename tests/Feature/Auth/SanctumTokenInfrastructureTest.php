@@ -14,12 +14,6 @@ class SanctumTokenInfrastructureTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function defineEnvironment($app): void
-    {
-        $app['config']->set('database.default', 'sqlite');
-        $app['config']->set('database.connections.sqlite.database', ':memory:');
-    }
-
     public function test_it_issues_hashed_uuid_backed_bearer_tokens_for_uuid_users(): void
     {
         $organizationId = (string) Str::uuid();

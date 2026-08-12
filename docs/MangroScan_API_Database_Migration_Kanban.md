@@ -602,6 +602,8 @@ The PHP API should expose application-level processing endpoints and hide the in
 
 # **16\. Mandatory audit events**
 
+Audit storage is implemented by `2026_08_12_062300_create_audit_logs_table.php`. Audit IDs and affected record IDs are UUIDs; JSON snapshots, request ID, IP address and user agent preserve request evidence. PostgreSQL rejects UPDATE and DELETE through `trg_audit_logs_append_only`, the Eloquent model rejects those mutations in application code, and `database/sql/dcl/002_identity_and_audit_grants.sql` revokes UPDATE, DELETE and TRUNCATE from runtime roles. `record_id` is nullable only for system/security events where no canonical resource UUID exists.
+
 | Event | Audit action | Minimum context |
 | :---- | :---- | :---- |
 | Login / logout / failed login | auth.login / auth.logout / auth.failed | user/email hash, IP, user agent, request ID |
