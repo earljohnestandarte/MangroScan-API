@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Ai\AiModelIndexController;
+use App\Http\Controllers\Api\V1\Ai\AiModelShowController;
 use App\Http\Controllers\Api\V1\Audit\AuditLogIndexController;
 use App\Http\Controllers\Api\V1\Auth\AuthenticatedProfileController;
 use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
@@ -514,4 +515,12 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:ai_models.read', 'throttle:auth.authenticated',
     ]);
+
+    // [MODEL-02] GET /api/v1/ai-models/{id}
+    Route::get('/ai-models/{model}', AiModelShowController::class)
+        ->whereUuid('model')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_models.read', 'throttle:auth.authenticated',
+        ]);
 });
