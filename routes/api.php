@@ -72,6 +72,7 @@ use App\Http\Controllers\Api\V1\Tree\MissionTreeCountController;
 use App\Http\Controllers\Api\V1\Tree\MissionTreeGeoJsonController;
 use App\Http\Controllers\Api\V1\Tree\TreeObservationIndexController;
 use App\Http\Controllers\Api\V1\Tree\TreeObservationShowController;
+use App\Http\Controllers\Api\V1\Tree\TreeSpeciesPredictionIndexController;
 use App\Http\Controllers\Api\V1\User\UserActivationController;
 use App\Http\Controllers\Api\V1\User\UserIndexController;
 use App\Http\Controllers\Api\V1\User\UserShowController;
@@ -538,6 +539,13 @@ Route::prefix('v1')->group(function () {
     Route::get('/tree-observations/{tree}', TreeObservationShowController::class)
         ->whereUuid('tree')
         ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:results.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [RESULT-01] GET /api/v1/tree-observations/{id}/species
+    Route::get('/tree-observations/{tree}/species', TreeSpeciesPredictionIndexController::class)
+        ->whereUuid('tree')->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:results.read', 'throttle:auth.authenticated',
         ]);

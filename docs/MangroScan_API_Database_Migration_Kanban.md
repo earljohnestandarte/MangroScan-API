@@ -1172,7 +1172,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | TREE-02 | GET /tree-observations/{id}Tree detail with model provenance/results. | Path: id | 200 {data:{tree,species\_predictions,height\_estimations,age\_estimations,source\_media,model\_run}} | TREE-01 | **P0** | Codex \- Results/API | **Done** |
 | TREE-03 | GET /missions/{id}/trees.geojsonMap-ready tree features. | Query: species\_id?,validated\_only? | 200 GeoJSON FeatureCollection | TREE-01 \+ PostGIS | **P0** | Codex \- GIS/API | **Done** |
 | COUNT-01 | GET /missions/{id}/tree-countsMission/species count summary. | Query: species\_id? | 200 {data:\[TreeCountSummary\]} | TREE-01 \+ count routine | **P0** | Codex \- Results/API | **Done** |
-| RESULT-01 | GET /tree-observations/{id}/speciesSpecies prediction history. | Path: id | 200 {data:\[ClassificationResult\]} | TREE-02 | **P1** | TBD \- Results/API | **Ready** |
+| RESULT-01 | GET /tree-observations/{id}/speciesSpecies prediction history. | Path: id | 200 {data:\[ClassificationResult\]} | TREE-02 | **P1** | Codex \- Results/API | **Done** |
 | RESULT-02 | GET /tree-observations/{id}/heightsHeight estimates. | Path: id | 200 {data:\[HeightEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Ready** |
 | RESULT-03 | GET /tree-observations/{id}/agesAge estimates \+ assumptions. | Path: id | 200 {data:\[AgeEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Ready** |
 | LAYER-01 | GET /missions/{id}/layersList geospatial/photogrammetry outputs. | Query: type? | 200 {data:\[Layer\]} | JOB-03 | **P1** | TBD \- GIS/API | **Ready** |
@@ -1218,6 +1218,15 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Exact response / semantics | Returns exact `200 {data:[TreeCountSummary]}`. Without a species filter, the first row is the overall mission summary (`species_id:null`) followed by UUID-ordered classified-species rows; unclassified trees contribute only to the overall row. A species filter returns its row when observations exist, otherwise `[]`. Validated totals include `validated` and `corrected`; soft-deleted observations never count. |
 | Freshness / side effects | Counts are derived transaction-free from current canonical observations, preventing stale materialized totals and creating no summary, audit, notification or other mutation. Live rows use the documented summary projection with nullable persisted-summary/provenance/density/confidence/timestamp fields. |
 | Schema / routine / DCL / tests | Adds the documented `tree_count_summaries` foundation with UUID lineage, indexes and PostgreSQL non-negative/range checks plus stable `app.mission_tree_counts(uuid,uuid)`. API/report roles receive summary SELECT and routine execution only; worker receives SELECT/INSERT/UPDATE and routine execution but no DELETE. `MissionTreeCountTest` covers exact overall/species math and shape, filtering, deleted/unclassified/empty behavior, validation, tenant/path hiding, authentication/RBAC/inactivity, no side effects, throttling, constraints and DCL. Done — focused SQLite passes 6 tests / 43 assertions and PostgreSQL passes 6 / 44; full SQLite passes 587 / 3595 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 587 / 3614; live privilege gates pass. |
+
+### **RESULT-01 — GET /api/v1/tree-observations/{id}/species**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | RESULT-01 / P1 |
+| Purpose / permission | Return the complete species-prediction history for one tenant-visible canonical tree. Requires active Sanctum authentication and tenant-valid `results.read`; lookup follows tree → mission → non-deleted site → caller organization and returns anti-enumerable 404s. |
+| Exact response / ordering | Returns exact `200 {data:[ClassificationResult]}`. Final evidence sorts first, then rank, newest evidence and UUID for deterministic ties; no predictions returns `[]`. Each safe result contains only observation/run/species provenance, confidence, rank, bounded classification basis, final flag and UTC creation time. |
+| Security / DCL / tests | Model file paths, service topology and credentials are absent; the read creates no audit, notification or mutation. Reuses TREE-02's API SELECT-only result DCL while reporting remains read-only. `TreeSpeciesPredictionIndexTest` covers exact fields/order, JSON basis, empty history, tenant/missing/malformed/deleted-lineage hiding, authentication/RBAC/inactivity, throttling, no audit, secret exclusion and DCL. Done — focused SQLite/PostgreSQL pass 5 tests / 24 assertions each; full SQLite passes 599 / 3662 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 599 / 3681. |
 
 ## **Confidence review and field validation**
 
