@@ -1175,7 +1175,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RESULT-01 | GET /tree-observations/{id}/speciesSpecies prediction history. | Path: id | 200 {data:\[ClassificationResult\]} | TREE-02 | **P1** | Codex \- Results/API | **Done** |
 | RESULT-02 | GET /tree-observations/{id}/heightsHeight estimates. | Path: id | 200 {data:\[HeightEstimation\]} | TREE-02 | **P1** | Codex \- Results/API | **Done** |
 | RESULT-03 | GET /tree-observations/{id}/agesAge estimates \+ assumptions. | Path: id | 200 {data:\[AgeEstimation\]} | TREE-02 | **P1** | Codex \- Results/API | **Done** |
-| LAYER-01 | GET /missions/{id}/layersList geospatial/photogrammetry outputs. | Query: type? | 200 {data:\[Layer\]} | JOB-03 | **P1** | TBD \- GIS/API | **Ready** |
+| LAYER-01 | GET /missions/{id}/layersList geospatial/photogrammetry outputs. | Query: type? | 200 {data:\[Layer\]} | JOB-03 | **P1** | Codex \- GIS/API | **Done** |
 | LAYER-02 | POST /missions/{id}/layers/buildQueue map layer build/refresh. | {layer\_types:\[...\],parameters?} | 202 {data:{job\_id}} | TREE-01 \+ photogrammetry inputs | **P1** | TBD \- GIS/API | **Blocked** |
 
 ### **TREE-01 — GET /api/v1/tree-observations**
@@ -1245,6 +1245,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Purpose / permission | Return the complete age-estimation history and assumptions for one tenant-visible canonical tree. Requires active Sanctum authentication and tenant-valid `results.read`, with the established tree/mission/site organization boundary. |
 | Exact response / ordering | Returns exact `200 {data:[AgeEstimation]}`. Final evidence sorts first, then newest time and UUID; no estimates returns `[]`. The projection preserves growth-model and height-estimation provenance, point/range estimates, confidence, assumptions, final flag and UTC creation time. |
 | DCL / side effects / tests | Reuses TREE-02 API SELECT-only age-result privileges; reference/model formula internals are not expanded into the response, and the read has no side effects. `TreeAgeEstimationIndexTest` covers exact fields/order, range/confidence/assumption evidence, empty history, tenant/missing/malformed/deleted-lineage hiding, authentication/RBAC/inactivity, throttling, no audit and DCL. Done — focused SQLite/PostgreSQL pass 4 tests / 24 assertions each; full SQLite passes 607 / 3708 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 607 / 3727. |
+
+### **LAYER-01 — GET /api/v1/missions/{id}/layers**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | LAYER-01 / P1 |
+| Purpose / permission | List generated geospatial layer metadata for one tenant-visible mission. Requires active Sanctum authentication and tenant-valid `results.read`; shared mission scoping hides foreign, missing, malformed and deleted-site lineage. |
+| Request / exact response | Supports optional normalized documented type (`tree_points`, `species_map`, `canopy_height`, `orthomosaic`). Returns exact `200 {data:[Layer]}` ordered by type, name and UUID. Each layer exposes identifier/mission/name/type, style configuration, default visibility, creator and UTC timestamps; private storage keys are intentionally excluded. |
+| Schema / DCL / side effects | Adds documented `photogrammetry_products` and `geospatial_layers` foundations with UUID lineage, storage-key uniqueness, PostGIS Polygon(4326) bounds, indexes and PostgreSQL product/layer/range constraints. API/report/worker roles receive SELECT only; build/write grants await LAYER-02. Reads create no audit, notification or mutation. |
+| Tests / status | `MissionLayerIndexTest` covers safe exact projection/order, storage-key exclusion, normalized filtering, validation, tenant/missing/malformed/deleted-lineage hiding, authentication/RBAC/inactivity, throttling, no audit, PostGIS schema constraints and read-only DCL. Done — focused SQLite passes 4 tests / 27 assertions and PostgreSQL passes 4 / 28; full SQLite passes 611 / 3735 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 611 / 3755; live privilege gates pass. |
 
 ## **Confidence review and field validation**
 

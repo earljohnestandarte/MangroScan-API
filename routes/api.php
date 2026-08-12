@@ -68,6 +68,7 @@ use App\Http\Controllers\Api\V1\Site\SitePlotStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteShowController;
 use App\Http\Controllers\Api\V1\Site\SiteStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteUpdateController;
+use App\Http\Controllers\Api\V1\Tree\MissionLayerIndexController;
 use App\Http\Controllers\Api\V1\Tree\MissionTreeCountController;
 use App\Http\Controllers\Api\V1\Tree\MissionTreeGeoJsonController;
 use App\Http\Controllers\Api\V1\Tree\TreeAgeEstimationIndexController;
@@ -578,6 +579,13 @@ Route::prefix('v1')->group(function () {
     Route::get('/missions/{mission}/tree-counts', MissionTreeCountController::class)
         ->whereUuid('mission')
         ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:results.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [LAYER-01] GET /api/v1/missions/{id}/layers
+    Route::get('/missions/{mission}/layers', MissionLayerIndexController::class)
+        ->whereUuid('mission')->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:results.read', 'throttle:auth.authenticated',
         ]);
