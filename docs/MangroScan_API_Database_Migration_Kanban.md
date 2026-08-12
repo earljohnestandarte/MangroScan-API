@@ -226,6 +226,23 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Implementation compatibility | Uses the current identity columns and a shared effective-access service also consumed by AUTH-01, preventing role/permission projection drift. |
 | Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
 
+### **AUTH-03 — POST /api/v1/auth/logout**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | AUTH-03 / P0 |
+| Purpose | End the current web/mobile device session without affecting the user's other active devices. |
+| Required permission | Any valid, unexpired Sanctum Bearer token. Inactive users or organizations may still revoke a valid token to reduce risk. |
+| Dependencies | AUTH-01, UUID Sanctum tokens and immutable audit storage. |
+| Request / validation | No body. The current opaque token is supplied through `Authorization: Bearer ...`. |
+| Success | Empty `204 No Content`; no response envelope or token material is returned. |
+| Errors | `401 UNAUTHENTICATED` for missing, invalid, expired or already-revoked tokens; `429 RATE_LIMITED`; audit/persistence failures remain `500` and preserve the token through rollback. |
+| Workflow / tenant scope | Revokes only the presented token. Other device/browser tokens owned by the same user remain valid. No organization resource data is queried or exposed. |
+| Side effects | Token deletion and audit insertion share one database transaction. If audit persistence fails, deletion rolls back. |
+| Audit / notifications | Writes `auth.logout` with user ID, revoked token row ID, safe device name, revocation time, request ID, IP and user agent. Raw or hashed token material is never copied into audit JSON. No notification is required. |
+| Tests | `tests/Feature/Auth/LogoutTest.php` covers exact 204 semantics, current-token-only revocation, follow-up token validity, standard 401/429 errors, inactive-identity logout, safe audit evidence and transactional rollback. |
+| Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
+
 ## **Organizations, users and RBAC**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |

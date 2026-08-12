@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Auth\AuthenticatedProfileController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
+use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Middleware\EnsureActiveIdentity;
@@ -21,6 +22,12 @@ Route::prefix('v1')->group(function () {
     Route::get('/auth/me', AuthenticatedProfileController::class)->middleware([
         'auth:sanctum',
         EnsureActiveIdentity::class,
+        'throttle:auth.authenticated',
+    ]);
+
+    // [AUTH-03] POST /api/v1/auth/logout
+    Route::post('/auth/logout', LogoutController::class)->middleware([
+        'auth:sanctum',
         'throttle:auth.authenticated',
     ]);
 });
