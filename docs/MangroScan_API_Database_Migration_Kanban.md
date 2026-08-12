@@ -294,8 +294,8 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | ORG-01 | GET /organizationsList organizations for system admin. | Query: page,per\_page,search,status | 200 {data:\[Organization\],meta} | AUTH-08 | **P1** | Backend/API | **Done** |
 | ORG-02 | POST /organizationsCreate tenant/owner organization. | {organization\_name,organization\_type,contact\_email?,contact\_number?,address?} | 201 {data:Organization} | ORG-01 | **P1** | Backend/API | **Done** |
-| ORG-03 | GET /organizations/{id}Organization detail. | Path: id | 200 {data:Organization} | ORG-01 | **P1** | TBD \- Backend/API | **Ready** |
-| ORG-04 | PATCH /organizations/{id}Update/archive organization metadata. | Partial Organization fields | 200 {data:Organization} | ORG-03 | **P1** | TBD \- Backend/API | **Blocked** |
+| ORG-03 | GET /organizations/{id}Organization detail. | Path: id | 200 {data:Organization} | ORG-01 | **P1** | Backend/API | **Done** |
+| ORG-04 | PATCH /organizations/{id}Update/archive organization metadata. | Partial Organization fields | 200 {data:Organization} | ORG-03 | **P1** | TBD \- Backend/API | **Ready** |
 | USR-01 | GET /usersList users inside authorized org scope. | Query: org\_id?,role?,active?,search,page | 200 {data:\[User\],meta} | AUTH-08 | **P0** | TBD \- Backend/API | **Blocked** |
 | USR-02 | POST /usersCreate managed user account. | {organization\_id,first\_name,last\_name,email,position\_title?,roles:\[role\_id\]} | 201 {data:User} | USR-01 \+ RBAC-01 | **P0** | TBD \- Backend/API | **Blocked** |
 | USR-03 | GET /users/{id}User detail \+ roles. | Path: id | 200 {data:{user,roles}} | USR-01 | **P1** | TBD \- Backend/API | **Blocked** |
@@ -336,6 +336,20 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Concurrency / conflict policy | Organization names are normalized before comparison and remain reserved by soft-deleted rows. PostgreSQL uses a transaction-scoped advisory lock keyed by the normalized name so concurrent same-name requests cannot both pass the absence check. |
 | Transaction / audit | Organization persistence and immutable `organization.create` evidence share one transaction. Audit failure rolls back the tenant; evidence records normalized public metadata, actor and request context without timestamps or secrets. |
 | DCL / tests | Existing identity DCL grants API organization INSERT and audit INSERT while audit UPDATE and report/worker organization INSERT remain denied. `OrganizationStoreTest` covers normalized success, null optionals, validation, active/archived duplicates, rollback, authentication, local/foreign RBAC, inactive identity, throttling and DCL. Done — full SQLite passes 304 tests / 1714 assertions and PostgreSQL 18/PostGIS passes 304 / 1721; route, Pint, Composer, live privilege and diff gates pass. |
+
+### **ORG-03 — GET /api/v1/organizations/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | ORG-03 / P1 |
+| Purpose | Return one organization's documented metadata for system-administration detail and edit workflows. |
+| Required permission | `organizations.manage`, enforced after Sanctum and active-identity checks. Only permissions from global or caller-organization roles are effective. |
+| Dependencies | ORG-01, organizations, the shared Organization resource, request IDs, standard errors and authenticated throttling. |
+| Request / lookup | UUID path identifier constrained at routing. Malformed, missing and soft-deleted identifiers all resolve to the same standard 404 without exposing archived metadata. |
+| Success | `200` standard envelope containing the exact safe Organization resource and request ID metadata. The system-admin scope intentionally permits foreign-tenant detail. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `404 NOT_FOUND`; `429 RATE_LIMITED`; unexpected database failures remain `500`. |
+| Side effects / DCL | Read-only detail lookup with no business audit event or notification. Existing identity DCL permits API SELECT while report, worker and auditor organization SELECT remain denied. |
+| Tests / status | `OrganizationShowTest` covers exact fields, foreign-tenant detail, missing/malformed/archived 404s, authentication, local/foreign RBAC, inactive identity, no audit, throttling and DCL. Done — full SQLite passes 311 tests / 1752 assertions and PostgreSQL 18/PostGIS passes 311 / 1759; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
 
 ### **RBAC-01 — GET /api/v1/roles**
 

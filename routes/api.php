@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\V1\Mobile\MobileBootstrapController;
 use App\Http\Controllers\Api\V1\Mobile\MobileMissionBundleController;
 use App\Http\Controllers\Api\V1\Mobile\SyncDeviceRegisterController;
 use App\Http\Controllers\Api\V1\Organization\OrganizationIndexController;
+use App\Http\Controllers\Api\V1\Organization\OrganizationShowController;
 use App\Http\Controllers\Api\V1\Organization\OrganizationStoreController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
@@ -105,6 +106,16 @@ Route::prefix('v1')->group(function () {
         'permission:organizations.manage',
         'throttle:auth.authenticated',
     ]);
+
+    // [ORG-03] GET /api/v1/organizations/{id}
+    Route::get('/organizations/{organization}', OrganizationShowController::class)
+        ->whereUuid('organization')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:organizations.manage',
+            'throttle:auth.authenticated',
+        ]);
 
     // [SYNC-01] POST /api/v1/mobile/devices/register
     Route::post('/mobile/devices/register', SyncDeviceRegisterController::class)->middleware([
