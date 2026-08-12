@@ -493,7 +493,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| DRONE-01 | GET /dronesList drone units. | Query: status,search,page | 200 {data:\[Drone\],meta} | AUTH-08 | **P1** | TBD \- Backend/API | **Blocked** |
+| DRONE-01 | GET /dronesList drone units. | Query: status,search,page | 200 {data:\[Drone\],meta} | AUTH-08 | **P1** | Codex \- Backend/API | **Done** |
 | DRONE-02 | POST /dronesRegister drone. | {drone\_name,model?,serial\_number?,firmware\_version?,max\_flight\_minutes?,payload\_capacity\_grams?,status} | 201 {data:Drone} | DRONE-01 | **P1** | TBD \- Backend/API | **Blocked** |
 | DRONE-03 | GET /drones/{id}Drone detail \+ attached sensors. | Path: id | 200 {data:{drone,sensors}} | DRONE-01 | **P1** | TBD \- Backend/API | **Blocked** |
 | DRONE-04 | PATCH /drones/{id}Update drone status/metadata. | Partial Drone fields | 200 {data:Drone} | DRONE-03 | **P2** | TBD \- Backend/API | Backlog |
@@ -502,6 +502,18 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | CAL-01 | POST /sensors/{id}/calibrationsRecord sensor calibration. | {calibration\_date,calibration\_method,calibration\_file\_path?,calibration\_notes?,is\_valid} | 201 {data:Calibration} | SENSOR-01 | **P2** | TBD \- Backend/API | Backlog |
 | BAT-01 | GET /batteriesList battery packs. | Query: status,type,page | 200 {data:\[Battery\],meta} | AUTH-08 | **P2** | TBD \- Backend/API | Backlog |
 | BAT-02 | POST /batteriesRegister battery. | {battery\_code,battery\_type,capacity\_mah?,voltage?,status} | 201 {data:Battery} | BAT-01 | **P2** | TBD \- Backend/API | Backlog |
+
+### **DRONE-01 - GET /api/v1/drones**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / dependency | Return the caller's tenant-owned drone catalog. Although P1, DRONE-01 was pulled before FLT-01 because the authoritative `flight_sessions.drone_id` foreign key requires the drone table. |
+| Authentication / authorization | Sanctum and active user/organization checks are mandatory. Appendix B defines no drone/hardware permission, so the endpoint does not invent one; every query is still constrained by the authenticated user's `organization_id`. |
+| Request / response | Optional normalized `status`, case-insensitive `search`, positive `page`, and `per_page` 1 through 100. Success is exact safe Drone resources plus `request_id`, `page`, `per_page`, `total`, and `last_page`. |
+| Tenant / lifecycle behavior | Records from other organizations and soft-deleted drones never affect output or pagination. Search covers name, model, and serial number; status accepts only `available`, `maintenance`, or `retired`. |
+| Database schema | Adds UUID-backed `drones`, organization FK, documented metadata and numeric capacities, globally unique nullable serial number, soft deletion, organization/status index, and a PostgreSQL lifecycle check constraint. |
+| Side effects / privileges | Read-only; no audit event or notification. `007_drone_grants.sql` gives API and reporting roles SELECT only and denies INSERT, UPDATE, and DELETE until corresponding write cards land. |
+| Tests / status | `DroneIndexTest` covers exact fields/meta/order, tenant and soft-delete isolation, filters, validation, authentication without an undocumented permission, inactive identities, no audit, throttling, constraint and DCL. Done - full SQLite passes 162 tests / 874 assertions and PostgreSQL 18/PostGIS passes 162 / 875; route, Pint, Composer, DCL and diff gates pass. |
 
 ## **Mission planning and lifecycle**
 
