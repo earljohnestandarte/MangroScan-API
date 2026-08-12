@@ -310,6 +310,24 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Tests | `tests/Feature/Rbac/PermissionIndexTest.php` covers exact resource shape/order, authentication, missing permission, foreign-role privilege rejection, inactive user state, no audit side effect and throttling. |
 | Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
 
+### **USR-01 — GET /api/v1/users**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | USR-01 / P0 |
+| Purpose | Return a paginated, searchable user directory inside an explicitly authorized organization scope. |
+| Required permission | `users.manage`. A foreign `org_id` additionally requires `organizations.manage`; both permissions must come from global/current-organization roles. |
+| Dependencies | AUTH-08, users, organizations, roles, user/role joins, standard pagination and the shared organization-scope service. |
+| Request / validation | Optional UUID `org_id`, normalized role code, boolean `active`, case-insensitive `search`, positive `page`, and `per_page` from 1 through 100. |
+| Success | `200` standard envelope containing safe user resources and exact `request_id`, `page`, `per_page`, `total`, `last_page` metadata. Passwords, tokens and soft-deleted users are never projected. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `404 NOT_FOUND` for an elevated unknown organization; `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected database failures remain `500`. |
+| Workflow / tenant scope | Defaults to the caller's organization. A cross-tenant query is allowed only for callers with `organizations.manage` and remains pinned to the single requested organization. Role filters accept only global or target-organization roles, so malicious foreign assignments cannot affect results. |
+| Query behavior | Search covers first, middle and last name plus email. Role, activity and search filters compose. Results sort by last name, first name and UUID for stable pages. |
+| Implementation compatibility | The current physical `status` column remains unchanged and maps to the public `is_active` boolean. Missing profile-extension fields are not invented or leaked. |
+| Side effects / audit / notifications | Read-only directory lookup. No business audit event or notification is created. |
+| Tests | `tests/Feature/User/UserIndexTest.php` covers exact safe fields and pagination, current/cross-tenant isolation, elevated scope, unknown organizations, search/activity/role filters, foreign-role rejection, validation, authentication, permission checks, no audit side effect and throttling. |
+| Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
+
 ## **Survey sites, boundaries, plots and permits**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
