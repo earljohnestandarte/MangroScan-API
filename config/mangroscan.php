@@ -25,4 +25,10 @@ return [
         'connect_timeout_seconds' => (int) env('AI_SERVICE_CONNECT_TIMEOUT_SECONDS', 3),
         'timeout_seconds' => (int) env('AI_SERVICE_TIMEOUT_SECONDS', 10),
     ],
+
+    'media' => [
+        'disk' => env('MEDIA_UPLOAD_DISK', env('FILESYSTEM_DISK', 'local')),
+        'upload_url_ttl_minutes' => (int) env('MEDIA_UPLOAD_URL_TTL_MINUTES', 30),
+        'max_upload_bytes' => (int) env('MEDIA_MAX_UPLOAD_BYTES', 5_368_709_120),
+    ],
 ];

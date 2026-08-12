@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Contracts\Ai\AiInferenceClient;
+use App\Contracts\Media\PrivateUploadUrlIssuer;
 use App\Models\PersonalAccessToken;
 use App\Services\Ai\HttpAiInferenceClient;
+use App\Services\Media\FilesystemPrivateUploadUrlIssuer;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -21,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(AiInferenceClient::class, HttpAiInferenceClient::class);
+        $this->app->bind(PrivateUploadUrlIssuer::class, FilesystemPrivateUploadUrlIssuer::class);
     }
 
     /**
