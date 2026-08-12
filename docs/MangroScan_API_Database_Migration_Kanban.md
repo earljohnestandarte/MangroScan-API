@@ -304,7 +304,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RBAC-01 | GET /rolesList roles. | No body | 200 {data:\[Role\]} | AUTH-08 | **P0** | TBD \- Backend/Security | **Blocked** |
 | RBAC-02 | GET /permissionsList permission catalog. | No body | 200 {data:\[Permission\]} | AUTH-08 | **P0** | TBD \- Backend/Security | **Blocked** |
 | RBAC-03 | PUT /users/{id}/rolesReplace a user role assignment set. | {role\_ids:\[uuid\]} | 200 {data:{user\_id,roles}} | USR-03 \+ RBAC-01 | **P0** | TBD \- Backend/Security | **Blocked** |
-| RBAC-04 | PUT /roles/{id}/permissionsReplace role permission set. | {permission\_ids:\[uuid\]} | 200 {data:{role\_id,permissions}} | RBAC-01 \+ RBAC-02 | **P1** | TBD \- Backend/Security | **Blocked** |
+| RBAC-04 | PUT /roles/{id}/permissionsReplace role permission set. | {permission\_ids:\[uuid\]} | 200 {data:{role\_id,permissions}} | RBAC-01 \+ RBAC-02 | **P1** | Backend/Security | **Done** |
 
 ### **ORG-01 — GET /api/v1/organizations**
 
@@ -496,6 +496,21 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Audit / notifications | Audit evidence stores actor, target UUID, sorted old/new role UUID sets, request ID, IP and user agent. No notification is required. |
 | Tests | `tests/Feature/Rbac/UserRoleReplaceTest.php` covers exact full/empty replacement, tenant scope, elevated cross-tenant access, unavailable-role rejection, old/new audit evidence, rollback, authentication, permission and validation errors, and throttling. |
 | Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
+
+### **RBAC-04 — PUT /api/v1/roles/{id}/permissions**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | RBAC-04 / P1 |
+| Purpose | Atomically replace a non-system role's complete permission assignment set. |
+| Required permission | Both `roles.manage` and `permissions.manage`. A non-system global role additionally requires `organizations.manage`; all authority must derive from global/current-organization assignments. |
+| Dependencies | RBAC-01, RBAC-02, roles, permissions, role/permission joins, effective access, immutable audit storage and authenticated throttling. |
+| Request / validation | A present array of at most 100 distinct permission UUIDs. Empty intentionally removes all permissions. Every non-empty identifier must exist in the global permission catalog. |
+| Success | `200` standard envelope containing target `role_id`, permission resources sorted by code/UUID and request ID metadata. |
+| Scope / conflicts | Current-tenant roles are editable. Foreign-tenant roles are hidden. Non-system global roles require explicit organization elevation. System roles are visible only to elevated callers but immutable and return `409 CONFLICT`. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or missing authority; hidden/missing role `404 NOT_FOUND`; immutable system role `409 CONFLICT`; malformed/unknown permissions `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected failures remain `500`. |
+| Transaction / audit | The role is row-locked; full pivot synchronization and immutable `role.permissions.replace` sorted before/after UUID evidence share one transaction. Audit failure restores the previous set. |
+| DCL / tests | Existing identity DCL grants API role-permission INSERT/DELETE and audit INSERT while audit UPDATE and reporting pivot writes remain denied. `RolePermissionReplaceTest` covers exact/empty sets, validation, system protection, tenant/global/foreign scope, dual authority, foreign-role rejection, rollback, throttling and DCL. Done — full SQLite passes 356 tests / 2014 assertions and PostgreSQL 18/PostGIS passes 356 / 2021; route, Pint, Composer, live privilege and diff gates pass. |
 
 ## **Survey sites, boundaries, plots and permits**
 

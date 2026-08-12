@@ -33,6 +33,7 @@ use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobIndexController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
+use App\Http\Controllers\Api\V1\Rbac\RolePermissionReplaceController;
 use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
 use App\Http\Controllers\Api\V1\Site\SiteBoundaryIndexController;
 use App\Http\Controllers\Api\V1\Site\SiteBoundaryStoreController;
@@ -173,6 +174,15 @@ Route::prefix('v1')->group(function () {
         'permission:permissions.manage',
         'throttle:auth.authenticated',
     ]);
+
+    // [RBAC-04] PUT /api/v1/roles/{id}/permissions
+    Route::put('/roles/{role}/permissions', RolePermissionReplaceController::class)
+        ->whereUuid('role')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:roles.manage', 'permission:permissions.manage',
+            'throttle:auth.authenticated',
+        ]);
 
     // [USR-01] GET /api/v1/users
     Route::get('/users', UserIndexController::class)->middleware([
