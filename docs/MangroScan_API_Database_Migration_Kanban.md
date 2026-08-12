@@ -613,7 +613,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | FLT-01 | GET /missions/{id}/flightsList mission sorties. | Query: status,quality\_status,page | 200 {data:\[Flight\],meta} | MSN-03 | **P0** | Codex \- Backend/API | **Done** |
 | FLT-02 | POST /missions/{id}/flightsCreate flight sortie. | {drone\_id,pilot\_user\_id,flight\_code,planned\_altitude\_meters?,notes?} | 201 {data:Flight} | MSN-06 \+ DRONE-01 | **P0** | Codex \- Backend/API | **Done** |
-| FLT-03 | GET /flights/{id}Flight detail/readiness summary. | Path: id | 200 {data:{flight,checklists,waypoint\_count,media\_count}} | FLT-01 | **P0** | TBD \- Backend/API | **Blocked** |
+| FLT-03 | GET /flights/{id}Flight detail/readiness summary. | Path: id | 200 {data:{flight,checklists,waypoint\_count,media\_count}} | FLT-01 | **P0** | Codex \- Backend/API | **Done** |
 | FLT-04 | PATCH /flights/{id}Update planned flight metadata. | Partial Flight fields | 200 {data:Flight} | FLT-03 | **P1** | TBD \- Backend/API | **Blocked** |
 | CHK-01 | POST /flights/{id}/checklistsSubmit pre/post-flight checklist. | {checklist\_type,battery\_ok,weather\_ok,gps\_ok,camera\_ok,lidar\_depth\_ok,storage\_ok,overall\_status,remarks?} | 201 {data:Checklist} | FLT-03 | **P0** | TBD \- Mobile/API | **Blocked** |
 | FLT-05 | POST /flights/{id}/startStart flight only after required preflight gate. | {started\_at,takeoff\_location?:GeoJSON} | 200 {data:Flight} | CHK-01 passed | **P0** | TBD \- Mobile/API | **Blocked** |
@@ -647,6 +647,17 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Transaction / audit | Mission, drone and pilot state are locked and rechecked; flight insertion and immutable `flight.create` evidence share one transaction. Audit failure rolls back the sortie. No notification is required at planning time. |
 | Database privileges | Flight DCL grants API `SELECT, INSERT`, reporting `SELECT`, and continues to deny UPDATE and DELETE. |
 | Tests / status | `MissionFlightStoreTest` covers exact normalized persistence/audit, validation/uniqueness, approval and resource conflicts, tenant hiding, audit rollback, local/foreign RBAC and throttling. Done - full SQLite passes 179 tests / 989 assertions and PostgreSQL 18/PostGIS passes 179 / 991; route, Pint, Composer, DCL and diff gates pass. |
+
+### **FLT-03 - GET /api/v1/flights/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Return one sortie with ordered checklist readiness evidence and stable waypoint/media child counts; requires tenant-valid `flights.read`. |
+| Tenant / anti-enumeration | Flight resolution follows mission -> non-deleted site -> organization lineage. Foreign flights and flights below soft-deleted missions, plus missing/malformed UUIDs, return the same standard 404. |
+| Response | Exact `data:{flight,checklists,waypoint_count,media_count}` plus request ID. Checklists sort by evidence time then UUID. Media count remains zero until the `media_assets` schema lands, then counts only non-deleted rows without changing the response contract. |
+| Child schema | Adds authoritative `flight_waypoints` with unique per-flight sequence, optional motion/action metadata and PostGIS `POINT(4326)` + GiST; adds `flight_checklists` with checker FK, documented boolean evidence and type/status domains. These shared tables are physical prerequisites for CHK-01 and WPT-01 but those write cards are not claimed here. |
+| Side effects / privileges | Read-only; no audit or notification. API/reporting roles receive SELECT only on both child tables. |
+| Tests / status | `FlightShowTest` covers exact detail/checklist fields/order, GeoJSON, real waypoint count, forward-compatible media count, tenant/deleted-lineage hiding, local/foreign RBAC, no audit, throttling, domains and DCL. Done - full SQLite passes 185 tests / 1028 assertions and PostgreSQL 18/PostGIS passes 185 / 1031; route, Pint, Composer, DCL and diff gates pass. |
 
 ## **Mobile offline synchronization**
 

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 class FlightSession extends Model
@@ -72,5 +73,10 @@ class FlightSession extends Model
     public function pilot(): BelongsTo
     {
         return $this->belongsTo(User::class, 'pilot_user_id', 'user_id');
+    }
+
+    public function checklists(): HasMany
+    {
+        return $this->hasMany(FlightChecklist::class, 'flight_session_id', 'flight_session_id');
     }
 }
