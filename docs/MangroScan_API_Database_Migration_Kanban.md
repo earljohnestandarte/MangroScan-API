@@ -519,7 +519,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | SITE-01 | GET /sitesList sites visible to user. | Query: search,status,province,page | 200 {data:\[Site\],meta} | AUTH-08 | **P0** | Codex \- GIS/API | **Done** |
 | SITE-02 | POST /sitesRegister monitoring site. | {site\_name,site\_code,description?,province,city\_municipality,barangay?,center\_point:GeoJSON?,area\_hectares?,environment\_type,access\_notes?} | 201 {data:Site} | SITE-01 | **P0** | Codex \- GIS/API | **Done** |
 | SITE-03 | GET /sites/{id}Site detail with summary counts. | Path: id | 200 {data:{site,counts}} | SITE-01 | **P0** | Codex \- GIS/API | **Done** |
-| SITE-04 | PATCH /sites/{id}Update site metadata. | Partial Site fields | 200 {data:Site} | SITE-03 | **P1** | TBD \- GIS/API | **Blocked** |
+| SITE-04 | PATCH /sites/{id}Update site metadata. | Partial Site fields | 200 {data:Site} | SITE-03 | **P1** | Codex \- GIS/API | **Done** |
 | SITE-05 | DELETE /sites/{id}Soft archive site after dependency checks. | Path: id | 204 | SITE-03 | **P2** | TBD \- GIS/API | Backlog |
 | BOUND-01 | GET /sites/{id}/boundariesList site polygons. | Path: site id | 200 {data:\[Boundary\]} | SITE-03 | **P0** | Codex \- GIS/API | **Done** |
 | BOUND-02 | POST /sites/{id}/boundariesCreate survey/no-fly/restoration polygon. | {boundary\_name,boundary\_type,boundary\_geom:GeoJSON,source?} | 201 {data:Boundary} | BOUND-01 | **P0** | Codex \- GIS/API | **Done** |
@@ -603,6 +603,20 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Side effects / audit / notifications | Read-only detail and aggregate lookup. No audit event or notification is created. Existing site DCL `SELECT` access is sufficient; no privilege expansion is introduced. |
 | Tests | `tests/Feature/Site/SiteShowTest.php` covers exact site/count envelope, PostGIS GeoJSON, current-tenant resolution, foreign/missing/deleted/malformed anti-enumeration 404s, authentication, foreign-role rejection, inactive organization, no audit side effect and throttling. |
 | Implementation status | Done - focused and complete SQLite plus PostgreSQL 18/PostGIS suites pass at 100 tests / 586 assertions; touched PHP files pass Pint, Composer metadata validates, all three site routes are registered, and diff checks are clean. |
+
+### **SITE-04 — PATCH /api/v1/sites/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | SITE-04 / P1 |
+| Purpose | Partially update a tenant-owned site's documented metadata and optional Point(4326) without changing ownership, creator or lifecycle. |
+| Required permission | `sites.manage`, enforced after Sanctum and active-identity checks through tenant-aware effective permissions. |
+| Dependencies | SITE-03, survey sites, PostGIS, safe Site resource, scoped-site resolution, immutable audit storage and authenticated throttling. |
+| Request / validation | At least one SITE-02 metadata field. Required-on-present name/code/location/environment fields, nullable description/barangay/point/area/access notes, storage limits, documented environment domain and strict longitude/latitude point bounds. Codes normalize uppercase. Status is excluded because SITE-05 owns archival. |
+| Success | `200` standard envelope containing the updated safe Site resource and request ID. Organization, creator and status remain server-owned and unchanged. Point output is GeoJSON only. |
+| Errors / conflicts | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; foreign/missing/deleted target `404 NOT_FOUND`; active/deleted global code reservation `409 CONFLICT`; `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected failures remain `500`. |
+| Concurrency / transaction | The target is row-locked. Code changes use a PostgreSQL transaction advisory lock. Metadata and parameterized Point(4326) mutation plus immutable `site.update` full before/after evidence share one transaction and roll back together. |
+| DCL / tests | `017_survey_site_update_grants.sql` adds API UPDATE only; API DELETE stays denied, reporting remains SELECT-only and worker UPDATE is denied. `SiteUpdateTest` covers metadata/geometry updates and clearing, fixed ownership/lifecycle, validation, code conflict, tenant hiding, rollback, local/foreign RBAC, throttling and DCL. Done — full SQLite passes 366 tests / 2069 assertions and PostgreSQL 18/PostGIS passes 366 / 2076; route, Pint, Composer, live privilege and diff gates pass. |
 
 ### **BOUND-01 - GET /api/v1/sites/{id}/boundaries**
 

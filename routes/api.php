@@ -42,6 +42,7 @@ use App\Http\Controllers\Api\V1\Site\SitePlotIndexController;
 use App\Http\Controllers\Api\V1\Site\SitePlotStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteShowController;
 use App\Http\Controllers\Api\V1\Site\SiteStoreController;
+use App\Http\Controllers\Api\V1\Site\SiteUpdateController;
 use App\Http\Controllers\Api\V1\User\UserActivationController;
 use App\Http\Controllers\Api\V1\User\UserIndexController;
 use App\Http\Controllers\Api\V1\User\UserShowController;
@@ -265,6 +266,12 @@ Route::prefix('v1')->group(function () {
             'permission:sites.read',
             'throttle:auth.authenticated',
         ]);
+
+    // [SITE-04] PATCH /api/v1/sites/{id}
+    Route::patch('/sites/{site}', SiteUpdateController::class)->whereUuid('site')->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:sites.manage', 'throttle:auth.authenticated',
+    ]);
 
     // [BOUND-01] GET /api/v1/sites/{id}/boundaries
     Route::get('/sites/{site}/boundaries', SiteBoundaryIndexController::class)
