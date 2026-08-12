@@ -67,6 +67,7 @@ use App\Http\Controllers\Api\V1\Site\SitePlotStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteShowController;
 use App\Http\Controllers\Api\V1\Site\SiteStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteUpdateController;
+use App\Http\Controllers\Api\V1\Tree\MissionTreeGeoJsonController;
 use App\Http\Controllers\Api\V1\Tree\TreeObservationIndexController;
 use App\Http\Controllers\Api\V1\Tree\TreeObservationShowController;
 use App\Http\Controllers\Api\V1\User\UserActivationController;
@@ -527,6 +528,14 @@ Route::prefix('v1')->group(function () {
     // [TREE-02] GET /api/v1/tree-observations/{id}
     Route::get('/tree-observations/{tree}', TreeObservationShowController::class)
         ->whereUuid('tree')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:results.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [TREE-03] GET /api/v1/missions/{id}/trees.geojson
+    Route::get('/missions/{mission}/trees.geojson', MissionTreeGeoJsonController::class)
+        ->whereUuid('mission')
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:results.read', 'throttle:auth.authenticated',

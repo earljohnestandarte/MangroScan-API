@@ -1160,7 +1160,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | TREE-01 | GET /tree-observationsFilter canonical tree observations. | Query: mission\_id,flight\_id,species\_id,validation\_status,min\_confidence,page | 200 {data:\[TreeObservation\],meta} | JOB-03 completed | **P0** | Codex \- Results/API | **Done** |
 | TREE-02 | GET /tree-observations/{id}Tree detail with model provenance/results. | Path: id | 200 {data:{tree,species\_predictions,height\_estimations,age\_estimations,source\_media,model\_run}} | TREE-01 | **P0** | Codex \- Results/API | **Done** |
-| TREE-03 | GET /missions/{id}/trees.geojsonMap-ready tree features. | Query: species\_id?,validated\_only? | 200 GeoJSON FeatureCollection | TREE-01 \+ PostGIS | **P0** | TBD \- GIS/API | **Ready** |
+| TREE-03 | GET /missions/{id}/trees.geojsonMap-ready tree features. | Query: species\_id?,validated\_only? | 200 GeoJSON FeatureCollection | TREE-01 \+ PostGIS | **P0** | Codex \- GIS/API | **Done** |
 | COUNT-01 | GET /missions/{id}/tree-countsMission/species count summary. | Query: species\_id? | 200 {data:\[TreeCountSummary\]} | TREE-01 \+ count routine | **P0** | TBD \- Results/API | **Ready** |
 | RESULT-01 | GET /tree-observations/{id}/speciesSpecies prediction history. | Path: id | 200 {data:\[ClassificationResult\]} | TREE-02 | **P1** | TBD \- Results/API | **Ready** |
 | RESULT-02 | GET /tree-observations/{id}/heightsHeight estimates. | Path: id | 200 {data:\[HeightEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Ready** |
@@ -1188,6 +1188,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Exact response / ordering | Returns exact `200 {data:{tree,species_predictions,height_estimations,age_estimations,source_media,model_run}}` plus request ID. Result histories place final evidence first with deterministic rank/time/UUID tie-breakers. Empty histories are arrays and optional media/run provenance is null. |
 | Security / response boundary | Reuses safe TreeObservation, MediaAsset and ModelRun projections. Private storage keys, model artifact paths, service topology and encrypted credentials never cross the API. Source-media and model-run lookups are independently tenant-constrained as defense in depth. This read creates no audit, notification, or downstream call. |
 | Schema / DCL / tests | Adds documented sensor-dataset, species-growth-model, species-classification, canopy-height and age-estimation foundations with UUID provenance, indexes, uniqueness and PostgreSQL domain/range checks. API receives result SELECT only; reporting receives reference/result SELECT; worker receives result INSERT/SELECT but no update/delete. `TreeObservationShowTest` covers exact shape/order, empty/null state, tenant/path/deleted-lineage hiding, authentication/RBAC/inactivity, throttling, safe provenance, constraints and DCL. Done — focused SQLite passes 6 tests / 49 assertions and PostgreSQL passes 6 / 50; full SQLite passes 575 / 3514 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 575 / 3532; live privilege gates pass. |
+
+### **TREE-03 — GET /api/v1/missions/{id}/trees.geojson**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | TREE-03 / P0 |
+| Purpose / permission | Return map-ready canonical tree points for one tenant-visible mission. Requires active Sanctum authentication and tenant-valid `results.read`; mission lookup uses the shared organization scope and hides foreign, missing, malformed and deleted-site lineage. |
+| Request / exact response | Supports optional global species UUID and boolean `validated_only`; validated-only includes accepted `validated` and `corrected` canonical states. Returns a raw RFC 7946-style `{type:"FeatureCollection",features:[...]}` with `application/geo+json`, not the standard data/meta envelope, because the endpoint contract explicitly requires a GeoJSON FeatureCollection. |
+| Features / ordering / security | Each deterministic tree-code/UUID-ordered feature contains its observation UUID, GeoJSON Point, and map-safe canonical properties (lineage, confidence, species, height, age and validation state). Soft-deleted observations are excluded. The response exposes no storage/model/service secrets and creates no audit, notification or mutation. Empty missions return a valid empty collection. |
+| DCL / tests / status | Reuses TREE-01's API/report SELECT-only observation/species privileges; no new database grant is necessary. `MissionTreeGeoJsonTest` covers exact media type/top-level/feature shape, PostGIS-safe coordinates, ordering, composed filters, empty/deleted state, validation, anti-enumerable mission/species lookup, authentication/RBAC/inactivity, no audit and throttling. Done — focused SQLite/PostgreSQL pass 6 tests / 38 assertions each; full SQLite passes 581 / 3552 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 581 / 3570. |
 
 ## **Confidence review and field validation**
 
