@@ -44,6 +44,7 @@ use App\Http\Controllers\Api\V1\Site\SiteStoreController;
 use App\Http\Controllers\Api\V1\User\UserIndexController;
 use App\Http\Controllers\Api\V1\User\UserShowController;
 use App\Http\Controllers\Api\V1\User\UserStoreController;
+use App\Http\Controllers\Api\V1\User\UserUpdateController;
 use App\Http\Middleware\EnsureActiveIdentity;
 use Illuminate\Support\Facades\Route;
 
@@ -190,6 +191,16 @@ Route::prefix('v1')->group(function () {
 
     // [USR-03] GET /api/v1/users/{id}
     Route::get('/users/{user}', UserShowController::class)
+        ->whereUuid('user')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:users.manage',
+            'throttle:auth.authenticated',
+        ]);
+
+    // [USR-04] PATCH /api/v1/users/{id}
+    Route::patch('/users/{user}', UserUpdateController::class)
         ->whereUuid('user')
         ->middleware([
             'auth:sanctum',

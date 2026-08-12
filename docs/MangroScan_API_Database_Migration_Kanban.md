@@ -299,7 +299,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | USR-01 | GET /usersList users inside authorized org scope. | Query: org\_id?,role?,active?,search,page | 200 {data:\[User\],meta} | AUTH-08 | **P0** | TBD \- Backend/API | **Blocked** |
 | USR-02 | POST /usersCreate managed user account. | {organization\_id,first\_name,last\_name,email,position\_title?,roles:\[role\_id\]} | 201 {data:User} | USR-01 \+ RBAC-01 | **P0** | TBD \- Backend/API | **Blocked** |
 | USR-03 | GET /users/{id}User detail \+ roles. | Path: id | 200 {data:{user,roles}} | USR-01 | **P1** | TBD \- Backend/API | **Blocked** |
-| USR-04 | PATCH /users/{id}Update profile/role-relevant account fields. | Partial user fields | 200 {data:User} | USR-03 | **P1** | TBD \- Backend/API | **Blocked** |
+| USR-04 | PATCH /users/{id}Update profile/role-relevant account fields. | Partial user fields | 200 {data:User} | USR-03 | **P1** | Backend/API | **Done** |
 | USR-05 | POST /users/{id}/activationActivate/deactivate account without hard delete. | {is\_active:boolean,reason?} | 200 {data:User} | USR-03 | **P1** | TBD \- Backend/API | **Blocked** |
 | RBAC-01 | GET /rolesList roles. | No body | 200 {data:\[Role\]} | AUTH-08 | **P0** | TBD \- Backend/Security | **Blocked** |
 | RBAC-02 | GET /permissionsList permission catalog. | No body | 200 {data:\[Permission\]} | AUTH-08 | **P0** | TBD \- Backend/Security | **Blocked** |
@@ -451,6 +451,20 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Side effects / audit / notifications | Read-only detail lookup. No business audit event or notification is created. |
 | Tests | `tests/Feature/User/UserShowTest.php` covers safe profile/role shape, foreign-role exclusion, hidden/elevated cross-tenant access, malformed/missing/deleted targets, authentication, permission checks, no audit side effect and throttling. |
 | Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
+
+### **USR-04 — PATCH /api/v1/users/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | USR-04 / P1 |
+| Purpose | Partially update a managed user's safe physical profile fields without conflating organization membership, roles, activation or credentials. |
+| Required permission | `users.manage`; cross-organization targets additionally require `organizations.manage`. Both permissions must derive from global/current-organization roles. |
+| Dependencies | USR-03, users, safe User resource, scoped-user resolution, immutable audit storage and standard request controls. |
+| Request / validation | At least one of first, nullable middle, last name, nullable position title or email. Strings are trimmed, email is lowercased/RFC validated, and physical column limits are enforced. Empty or unknown-only requests fail validation. |
+| Success | `200` standard envelope containing the updated safe User resource and request ID metadata. Organization, roles, activation and credential fields cannot be changed through this card. |
+| Errors / conflicts | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; hidden/missing/deleted target `404 NOT_FOUND`; active or soft-deleted case-insensitive email reservation `409 CONFLICT`; `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected failures remain `500`. |
+| Concurrency / transaction | The authorized target is reloaded with a row lock. Email changes use a transaction advisory lock before the case-insensitive reservation check. Profile persistence and immutable `user.update` before/after evidence share one transaction and roll back together. |
+| DCL / tests | Existing identity DCL grants API user UPDATE and audit INSERT while audit UPDATE and report/worker user UPDATE remain denied. `UserUpdateTest` covers normalized/null partial updates, reserved email, hidden/elevated scope, validation, rollback, local/foreign RBAC, throttling and DCL. Done — full SQLite passes 333 tests / 1903 assertions and PostgreSQL 18/PostGIS passes 333 / 1910; route, Pint, Composer, live privilege and diff gates pass. |
 
 ### **RBAC-03 — PUT /api/v1/users/{id}/roles**
 
