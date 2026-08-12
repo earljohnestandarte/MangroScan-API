@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Mission\MissionIndexController;
 use App\Http\Controllers\Api\V1\Mission\MissionShowController;
 use App\Http\Controllers\Api\V1\Mission\MissionStoreController;
+use App\Http\Controllers\Api\V1\Mission\MissionTeamReplaceController;
 use App\Http\Controllers\Api\V1\Mission\MissionUpdateController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
@@ -174,5 +175,10 @@ Route::prefix('v1')->group(function () {
     // [MSN-04] PATCH /api/v1/missions/{id}
     Route::patch('/missions/{mission}', MissionUpdateController::class)->whereUuid('mission')->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.update', 'throttle:auth.authenticated',
+    ]);
+
+    // [TEAM-01] PUT /api/v1/missions/{id}/team
+    Route::put('/missions/{mission}/team', MissionTeamReplaceController::class)->whereUuid('mission')->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class, 'permission:mission_team.manage', 'throttle:auth.authenticated',
     ]);
 });
