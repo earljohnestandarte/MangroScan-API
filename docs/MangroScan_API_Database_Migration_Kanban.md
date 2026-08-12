@@ -730,7 +730,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | TEAM-01 | PUT /missions/{id}/teamReplace mission team assignments atomically. | {members:\[{user\_id,team\_role}\]} | 200 {data:\[MissionTeamMember\]} | MSN-03 \+ USR-01 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-06 | POST /missions/{id}/approveApprove mission and record approver. | {decision:"approved"|"rejected",notes?} | 200 {data:Mission} | MSN-03 \+ AUTH-08 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-07 | POST /missions/{id}/startTransition mission to in\_progress. | {started\_at?} | 200 {data:Mission} | MSN-06 | **P1** | Codex \- Backend/API | **Done** |
-| MSN-08 | POST /missions/{id}/completeFinalize mission operations. | {ended\_at?,completion\_notes?} | 200 {data:Mission} | Flights completed | **P1** | TBD \- Backend/API | **Blocked** |
+| MSN-08 | POST /missions/{id}/completeFinalize mission operations. | {ended\_at?,completion\_notes?} | 200 {data:Mission} | Flights completed | **P1** | Codex \- Backend/API | **Done** |
 
 ### **MSN-01 - GET /api/v1/missions**
 
@@ -819,6 +819,17 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Workflow / tenant | The mission must remain planned and have `approved_by`; unapproved or already transitioned missions return `409 CONFLICT`. Foreign, deleted, missing, and malformed IDs use the existing tenant anti-enumeration `404`. |
 | Transaction / audit / DCL | The row is locked, status/time update and immutable `mission.start` before/after evidence share one transaction, and audit failure restores the planned state. Existing survey-mission UPDATE and audit INSERT grants are sufficient; no DCL expansion or notification is required. |
 | Tests / status | `MissionStartTest` covers explicit/default time, approval/state gates, validation, anti-enumeration, rollback, local/foreign RBAC, inactive identity and throttling. Done - full SQLite passes 407 tests / 2289 assertions and PostgreSQL 18/PostGIS passes 407 / 2299; focused suites, route, Pint, Composer, DCL and diff gates pass. |
+
+### **MSN-08 - POST /api/v1/missions/{id}/complete**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Finalize an active tenant mission after flight operations; requires the documented tenant-valid `missions.complete` permission. |
+| Request / success | Optional nullable `ended_at` defaults to server time and normalizes to UTC; optional trimmed `completion_notes` is bounded to 5000 characters. Returns the safe Mission resource plus request ID with `completed` status and `actual_end_at`. |
+| Workflow gate | The mission must be `in_progress` with an actual start, must contain at least one flight, and every attached flight must be `completed`. Zero-flight and mixed lifecycle sets return `409 CONFLICT` with count/status details. Completion time must be strictly after mission start. |
+| Schema reconciliation | The authoritative mission table has no completion-notes column. Notes therefore persist in immutable audit evidence, matching MSN-06's documented decision-note treatment, without inventing a physical field or exposing an undocumented response property. |
+| Transaction / audit / DCL | Mission and flight rows are locked; transition/time update and `mission.complete` evidence share one transaction. Existing API mission UPDATE and audit INSERT grants suffice; mission DELETE, report/worker mutation and audit UPDATE remain denied. No notification is required. |
+| Tests / status | `MissionCompleteTest` covers explicit/default completion, notes evidence, every lifecycle/flight gate, validation/time order, anti-enumeration, rollback, local/foreign RBAC, inactive identity and throttling. Done - full SQLite passes 416 tests / 2355 assertions and PostgreSQL 18/PostGIS passes 416 / 2365; focused suites, route, Pint, Composer, live DCL and diff gates pass. |
 
 ## **Flight operations and field readiness**
 
