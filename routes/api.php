@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\Flight\FlightChecklistStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightCompleteController;
 use App\Http\Controllers\Api\V1\Flight\FlightShowController;
 use App\Http\Controllers\Api\V1\Flight\FlightStartController;
+use App\Http\Controllers\Api\V1\Flight\FlightUpdateController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightIndexController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightStoreController;
 use App\Http\Controllers\Api\V1\Media\FlightMediaIndexController;
@@ -407,6 +408,14 @@ Route::prefix('v1')->group(function () {
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:flights.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [FLT-04] PATCH /api/v1/flights/{id}
+    Route::patch('/flights/{flight}', FlightUpdateController::class)
+        ->whereUuid('flight')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:flights.update', 'throttle:auth.authenticated',
         ]);
 
     // [CHK-01] POST /api/v1/flights/{id}/checklists

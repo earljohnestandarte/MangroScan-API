@@ -838,7 +838,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | FLT-01 | GET /missions/{id}/flightsList mission sorties. | Query: status,quality\_status,page | 200 {data:\[Flight\],meta} | MSN-03 | **P0** | Codex \- Backend/API | **Done** |
 | FLT-02 | POST /missions/{id}/flightsCreate flight sortie. | {drone\_id,pilot\_user\_id,flight\_code,planned\_altitude\_meters?,notes?} | 201 {data:Flight} | MSN-06 \+ DRONE-01 | **P0** | Codex \- Backend/API | **Done** |
 | FLT-03 | GET /flights/{id}Flight detail/readiness summary. | Path: id | 200 {data:{flight,checklists,waypoint\_count,media\_count}} | FLT-01 | **P0** | Codex \- Backend/API | **Done** |
-| FLT-04 | PATCH /flights/{id}Update planned flight metadata. | Partial Flight fields | 200 {data:Flight} | FLT-03 | **P1** | TBD \- Backend/API | **Blocked** |
+| FLT-04 | PATCH /flights/{id}Update planned flight metadata. | Partial Flight fields | 200 {data:Flight} | FLT-03 | **P1** | Codex \- Backend/API | **Done** |
 | CHK-01 | POST /flights/{id}/checklistsSubmit pre/post-flight checklist. | {checklist\_type,battery\_ok,weather\_ok,gps\_ok,camera\_ok,lidar\_depth\_ok,storage\_ok,overall\_status,remarks?} | 201 {data:Checklist} | FLT-03 | **P0** | Codex \- Mobile/API | **Done** |
 | FLT-05 | POST /flights/{id}/startStart flight only after required preflight gate. | {started\_at,takeoff\_location?:GeoJSON} | 200 {data:Flight} | CHK-01 passed | **P0** | Codex \- Mobile/API | **Done** |
 | FLT-06 | POST /flights/{id}/completeComplete flight and capture landing summary. | {ended\_at,landing\_location?:GeoJSON,actual\_avg\_altitude\_meters?,notes?} | 200 {data:Flight} | FLT-05 | **P0** | Codex \- Mobile/API | **Done** |
@@ -882,6 +882,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Child schema | Adds authoritative `flight_waypoints` with unique per-flight sequence, optional motion/action metadata and PostGIS `POINT(4326)` + GiST; adds `flight_checklists` with checker FK, documented boolean evidence and type/status domains. These shared tables are physical prerequisites for CHK-01 and WPT-01 but those write cards are not claimed here. |
 | Side effects / privileges | Read-only; no audit or notification. API/reporting roles receive SELECT only on both child tables. |
 | Tests / status | `FlightShowTest` covers exact detail/checklist fields/order, GeoJSON, real waypoint count, forward-compatible media count, tenant/deleted-lineage hiding, local/foreign RBAC, no audit, throttling, domains and DCL. Done - full SQLite passes 185 tests / 1028 assertions and PostgreSQL 18/PostGIS passes 185 / 1031; route, Pint, Composer, DCL and diff gates pass. |
+
+### **FLT-04 - PATCH /api/v1/flights/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Partially update planning metadata for one tenant flight; requires tenant-valid `flights.update`. |
+| Request / response | At least one of tenant-owned available `drone_id`, active tenant `pilot_user_id`, normalized globally unique `flight_code`, nullable non-negative two-decimal planned altitude, or nullable trimmed notes. Returns the exact safe Flight resource plus request ID. |
+| Workflow / tenant | Only `planned` flights may change. Mission ownership, lifecycle/quality state, actual timestamps/locations/altitude and duration remain server-controlled. Target flight and replacement resources use tenant anti-enumeration; unavailable drones/inactive pilots return 409. |
+| Concurrency / audit | The flight and replacement resources are row-locked. Changed codes use a PostgreSQL advisory lock before global duplicate recheck. Update and immutable `flight.update` complete before/after evidence share one rollback-safe transaction. |
+| DCL / tests | Existing flight DCL already grants API SELECT/INSERT/UPDATE while denying DELETE; reporting remains SELECT-only and worker UPDATE stays denied. `FlightUpdateTest` covers full/partial/null edits, validation, duplicate/resource conflicts, tenant hiding, lifecycle, rollback, RBAC and throttling. Done - full SQLite passes 426 tests / 2418 assertions and PostgreSQL 18/PostGIS passes 426 / 2428; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
 
 ### **CHK-01 - POST /api/v1/flights/{id}/checklists**
 
