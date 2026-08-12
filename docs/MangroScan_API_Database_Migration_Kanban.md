@@ -743,7 +743,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| MEDIA-01 | GET /flights/{id}/mediaList captured image/video metadata. | Query: type,quality\_status,processing\_status,page | 200 {data:\[MediaAsset\],meta} | FLT-03 | **P0** | TBD \- Backend/API | **Blocked** |
+| MEDIA-01 | GET /flights/{id}/mediaList captured image/video metadata. | Query: type,quality\_status,processing\_status,page | 200 {data:\[MediaAsset\],meta} | FLT-03 | **P0** | Codex \- Backend/API | **Done** |
 | MEDIA-02 | POST /flights/{id}/media/uploadsInitiate resumable/private upload. | {file\_name,file\_type,mime\_type,file\_size\_bytes,checksum\_sha256?,capture\_location?:GeoJSON,captured\_at?,metadata?} | 201 {data:{upload\_id,storage\_key,upload\_url?|parts?}} | FLT-05/06 \+ storage | **P0** | TBD \- Storage/API | **Blocked** |
 | MEDIA-03 | POST /media/uploads/{uploadId}/completeFinalize upload after checksum/size validation. | {parts? ,checksum\_sha256?} | 201 {data:MediaAsset} | MEDIA-02 | **P0** | TBD \- Storage/API | **Blocked** |
 | MEDIA-04 | GET /media/{id}Media metadata \+ authorized preview/download pointer. | Path: id | 200 {data:MediaAsset} | MEDIA-03 | **P0** | TBD \- Storage/API | **Blocked** |
@@ -752,6 +752,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | MEDIA-07 | DELETE /media/{id}Soft-delete unneeded media after dependency check. | Path: id | 204 | MEDIA-04 | **P2** | TBD \- Storage/API | Backlog |
 | SDS-01 | POST /flights/{id}/sensor-datasets/uploadsUpload LiDAR/depth/GPS/IMU dataset. | {file\_name,dataset\_type,file\_format,sensor\_id,file\_size\_bytes,spatial\_reference?,metadata?} | 201 {data:{upload\_id,...}} | FLT-03 \+ storage | **P1** | TBD \- Storage/API | **Blocked** |
 | SDS-02 | POST /sensor-datasets/uploads/{uploadId}/completeFinalize sensor dataset. | {checksum\_sha256?} | 201 {data:SensorDataset} | SDS-01 | **P1** | TBD \- Storage/API | **Blocked** |
+
+### **MEDIA-01 - GET /api/v1/flights/{id}/media**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | List non-deleted image/video metadata for one tenant-visible flight; requires active identity and tenant-valid `media.read`. Foreign, missing and malformed flight identifiers remain non-enumerable 404s. |
+| Request / response | Optional normalized `type`, `quality_status`, `processing_status`, positive `page`, and `per_page` 1 through 100. Returns exact private-storage-safe MediaAsset resources plus standard request/pagination metadata; storage keys are never projected. |
+| Schema / spatial / domains | Adds UUID `media_assets` with flight/uploader lineage, private object metadata, PostGIS Point(4326) capture location, JSONB capture metadata, QC/processing state, sync version and soft deletion. PostgreSQL checks file type, QC state/range, processing state and lowercase SHA-256. |
+| Ordering / side effects / DCL | Stable capture-time/UUID ordering is portable across SQLite and PostgreSQL. The read is audit-free. API and reporting roles receive SELECT only; the worker receives no access until a dependent processing endpoint needs it. |
+| Tests / status | `FlightMediaIndexTest` covers exact safe shape, pagination, composed normalized filters, PostGIS serialization, soft-delete/tenant isolation, validation, authentication, local/foreign RBAC, no audit, throttling, constraints and DCL. Done - full SQLite passes 243 tests / 1374 assertions and PostgreSQL 18/PostGIS passes 243 / 1379; route, Pint, live privilege and diff gates pass. |
 
 ## **AI service, model registry and processing jobs**
 

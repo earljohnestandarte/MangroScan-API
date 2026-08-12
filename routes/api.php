@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\Flight\FlightShowController;
 use App\Http\Controllers\Api\V1\Flight\FlightStartController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightIndexController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightStoreController;
+use App\Http\Controllers\Api\V1\Media\FlightMediaIndexController;
 use App\Http\Controllers\Api\V1\Mission\MissionApprovalController;
 use App\Http\Controllers\Api\V1\Mission\MissionIndexController;
 use App\Http\Controllers\Api\V1\Mission\MissionShowController;
@@ -277,5 +278,13 @@ Route::prefix('v1')->group(function () {
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:flights.complete', 'throttle:auth.authenticated',
+        ]);
+
+    // [MEDIA-01] GET /api/v1/flights/{id}/media
+    Route::get('/flights/{flight}/media', FlightMediaIndexController::class)
+        ->whereUuid('flight')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:media.read', 'throttle:auth.authenticated',
         ]);
 });

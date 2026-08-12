@@ -80,4 +80,9 @@ class FlightSession extends Model
     {
         return $this->hasMany(FlightChecklist::class, 'flight_session_id', 'flight_session_id');
     }
+
+    public function mediaAssets(): HasMany
+    {
+        return $this->hasMany(MediaAsset::class, 'flight_session_id', 'flight_session_id');
+    }
 }
