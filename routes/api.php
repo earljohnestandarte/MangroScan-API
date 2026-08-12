@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Ai\AiModelIndexController;
 use App\Http\Controllers\Api\V1\Ai\AiModelShowController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceOverviewController;
+use App\Http\Controllers\Api\V1\Ai\AiServiceStoreController;
 use App\Http\Controllers\Api\V1\Audit\AuditLogIndexController;
 use App\Http\Controllers\Api\V1\Auth\AuthenticatedProfileController;
 use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
@@ -527,6 +528,12 @@ Route::prefix('v1')->group(function () {
 
     // [AISVC-01] GET /api/v1/admin/ai-services
     Route::get('/admin/ai-services', AiServiceOverviewController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:ai_services.manage', 'throttle:auth.authenticated',
+    ]);
+
+    // [AISVC-02] POST /api/v1/admin/ai-services
+    Route::post('/admin/ai-services', AiServiceStoreController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:ai_services.manage', 'throttle:auth.authenticated',
     ]);

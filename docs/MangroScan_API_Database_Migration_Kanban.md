@@ -1022,7 +1022,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | AISVC-01 | GET /admin/ai-servicesAI backend overview for administrator. | No body | 200 {data:{services,models,jobs}} | schema extension \+ AUTH | **P1** | Codex \- AI/API | **Done** |
-| AISVC-02 | POST /admin/ai-servicesRegister trusted FastAPI backend. | {service\_name,base\_url,api\_key,environment,enabled} | 201 {data:AiService}; key never returned | AISVC schema \+ secret encryption | **P1** | TBD \- AI/API | **Blocked** |
+| AISVC-02 | POST /admin/ai-servicesRegister trusted FastAPI backend. | {service\_name,base\_url,api\_key,environment,enabled} | 201 {data:AiService}; key never returned | AISVC schema \+ secret encryption | **P1** | Codex \- AI/API | **Done** |
 | AISVC-03 | POST /admin/ai-services/{id}/testHealth-test FastAPI service. | No body | 200 {data:{status,version,latency\_ms}} | AISVC-02 | **P1** | TBD \- AI/API | **Blocked** |
 | AISVC-04 | POST /admin/ai-services/{id}/synchronizePull authoritative /models metadata. | No body | 200 {data:{models\_synced,capabilities}} | AISVC-03 | **P1** | TBD \- AI/API | **Blocked** |
 | AISVC-05 | POST /admin/ai-services/{id}/credentialsRotate encrypted FastAPI key. | {api\_key} | 204 | AISVC-02 | **P2** | TBD \- AI/API | Backlog |
@@ -1045,6 +1045,17 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Database foundation | Adds the authoritative UUID `ai_services` registry required by AISVC-02–04: unique URL and name/environment identity, encrypted credential storage, enabled state, constrained health state, version/capabilities, health/sync timestamps, and creator lineage. This foundation does not register, test, or synchronize a service and therefore does not claim dependent routes. |
 | DCL / side effects | `027_ai_service_overview_grants.sql` grants the API role column-level SELECT on safe service fields only. It cannot select the encrypted key or whole row and has no writes; report/worker roles receive nothing. The overview creates no audit/notification and makes no HTTP request. |
 | Tests / status | `AiServiceOverviewTest` covers exact nested shape/order, empty values, global model semantics, tenant-safe job aggregation, credential exclusion, zero outbound calls, authentication, local/foreign RBAC, inactive identity, throttling, PostgreSQL health constraints, and DCL. Done — focused SQLite passes 7 tests / 48 assertions with one PostgreSQL-only skip and focused PostgreSQL passes 7 / 49; full SQLite passes 501 / 2892 (five PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 501 / 2906. |
+
+### **AISVC-02 — POST /api/v1/admin/ai-services**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | AISVC-02 / P1 |
+| Purpose / permission | Register a trusted FastAPI backend as an active administrator with tenant-valid `ai_services.manage`. Registration stores configuration only and makes no health request; AISVC-03 owns downstream verification. |
+| Request / validation | Requires the exact documented `service_name`, `base_url`, `api_key`, `environment`, and boolean `enabled`. Text is trimmed, environment normalized lowercase, and trailing URL slashes removed. Base URLs must be valid HTTP(S) service roots without embedded credentials, query, or fragment. Case-insensitive URL identity and name/environment identity return standard `409 CONFLICT`, including concurrent PostgreSQL submissions protected by advisory locks. |
+| Secret / response boundary | The API key is encrypted through Laravel's authenticated application encryption before persistence. `201` returns the safe AiService resource and request ID; neither plaintext nor encrypted credential appears in the response, exception details, HTTP calls, or audit values. Initial health state is `unknown` with no version, capabilities, or health/sync timestamps. |
+| Transaction / audit / DCL | Service creation and immutable `ai_service.create` evidence commit in one transaction. The audit includes only safe registry fields. `028_ai_service_registration_grants.sql` adds column-level API INSERT (including encrypted credential persistence) while retaining AISVC-01's safe-column-only SELECT; no UPDATE/DELETE or report/worker privilege is added. |
+| Tests / status | `AiServiceStoreTest` covers normalized safe success, decryption-at-rest proof, secret-free response/audit, no downstream request, required/type/URL validation, both conflicts, authentication, local/foreign RBAC, inactive identity, throttling, and DCL. Done — focused SQLite/PostgreSQL pass 7 tests / 65 assertions each; full SQLite passes 508 / 2957 (five PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 508 / 2971. |
 
 ### **JOB-01 - GET /api/v1/processing-jobs**
 
