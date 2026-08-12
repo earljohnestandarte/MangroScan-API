@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthenticatedProfileController;
 use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
+use App\Http\Controllers\Api\V1\Auth\PasswordChangeController;
 use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Flight\FlightChecklistStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightCompleteController;
@@ -60,6 +61,13 @@ Route::prefix('v1')->group(function () {
     // [AUTH-03] POST /api/v1/auth/logout
     Route::post('/auth/logout', LogoutController::class)->middleware([
         'auth:sanctum',
+        'throttle:auth.authenticated',
+    ]);
+
+    // [AUTH-05] PUT /api/v1/auth/password
+    Route::put('/auth/password', PasswordChangeController::class)->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
         'throttle:auth.authenticated',
     ]);
 

@@ -154,7 +154,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | AUTH-02 | GET /auth/meReturn authenticated profile and effective access. | Bearer token | 200 {user,organization,roles,permissions} | AUTH-01 | **P0** | TBD \- Backend/Security | **Blocked** |
 | AUTH-03 | POST /auth/logoutRevoke current token/session. | Bearer token | 204 | AUTH-01 | **P0** | TBD \- Backend/Security | **Blocked** |
 | AUTH-04 | POST /auth/refreshRotate expiring mobile access credential when refresh-token design is used. | {refresh\_token} | 200 {access\_token,expires\_at,refresh\_token?} | AUTH-01 | **P1** | TBD \- Backend/Security | **Blocked** |
-| AUTH-05 | PUT /auth/passwordAuthenticated password change. | {current\_password,new\_password,new\_password\_confirmation} | 204 | AUTH-01 | **P1** | TBD \- Backend/Security | **Blocked** |
+| AUTH-05 | PUT /auth/passwordAuthenticated password change. | {current\_password,new\_password,new\_password\_confirmation} | 204 | AUTH-01 | **P1** | Codex \- Backend/Security | **Done** |
 | AUTH-06 | POST /auth/password/forgotIssue password-reset workflow. | {email} | 202 {message} | users \+ mail config | **P1** | TBD \- Backend/Security | **Blocked** |
 | AUTH-07 | POST /auth/password/resetComplete password reset. | {token,email,password,password\_confirmation} | 204 | AUTH-06 | **P1** | TBD \- Backend/Security | **Blocked** |
 | AUTH-08 | GET /auth/permissionsLightweight permission refresh for UI. | No body | 200 {roles:\[...\],permissions:\[...\]} | AUTH-02 | **P1** | TBD \- Backend/Security | **Blocked** |
@@ -242,6 +242,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Audit / notifications | Writes `auth.logout` with user ID, revoked token row ID, safe device name, revocation time, request ID, IP and user agent. Raw or hashed token material is never copied into audit JSON. No notification is required. |
 | Tests | `tests/Feature/Auth/LogoutTest.php` covers exact 204 semantics, current-token-only revocation, follow-up token validity, standard 401/429 errors, inactive-identity logout, safe audit evidence and transactional rollback. |
 | Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
+
+### **AUTH-05 - PUT /api/v1/auth/password**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Allow an authenticated active user in an active organization to replace their own password. No RBAC permission is required beyond active Sanctum identity. |
+| Request / validation | Requires the correct current password plus a confirmed new password of at least 12 characters containing mixed case, letters, numbers and symbols. Reuse of the submitted current password is rejected. Incorrect current credentials use field-level 422 without revealing stored hash details. |
+| Success / security behavior | Returns exact empty `204 No Content`. The password is rehashed through Laravel and all of the user's active access credentials are revoked, requiring fresh login on every device. Password and token material never enter response or audit data. |
+| Transaction / audit / DCL | Password update, credential revocation and immutable `auth.password.changed` evidence share one transaction; audit failure restores both old hash and tokens. Existing identity DCL already provides API UPDATE/DELETE while audit remains append-only. No notification is required. |
+| Tests / status | `PasswordChangeTest` covers exact 204, new hash, all-token revocation, secret-free audit, incorrect current password, strength/confirmation, authentication, inactive identity, rollback, throttling and DCL. Done - full SQLite passes 271 tests / 1528 assertions and PostgreSQL 18/PostGIS passes 271 / 1535; route, Pint, live privilege and diff gates pass. |
 
 ### **AUTH-08 — GET /api/v1/auth/permissions**
 
