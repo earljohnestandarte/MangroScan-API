@@ -292,9 +292,9 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| ORG-01 | GET /organizationsList organizations for system admin. | Query: page,per\_page,search,status | 200 {data:\[Organization\],meta} | AUTH-08 | **P1** | TBD \- Backend/API | **Blocked** |
-| ORG-02 | POST /organizationsCreate tenant/owner organization. | {organization\_name,organization\_type,contact\_email?,contact\_number?,address?} | 201 {data:Organization} | ORG-01 | **P1** | TBD \- Backend/API | **Blocked** |
-| ORG-03 | GET /organizations/{id}Organization detail. | Path: id | 200 {data:Organization} | ORG-01 | **P1** | TBD \- Backend/API | **Blocked** |
+| ORG-01 | GET /organizationsList organizations for system admin. | Query: page,per\_page,search,status | 200 {data:\[Organization\],meta} | AUTH-08 | **P1** | Backend/API | **Done** |
+| ORG-02 | POST /organizationsCreate tenant/owner organization. | {organization\_name,organization\_type,contact\_email?,contact\_number?,address?} | 201 {data:Organization} | ORG-01 | **P1** | TBD \- Backend/API | **Ready** |
+| ORG-03 | GET /organizations/{id}Organization detail. | Path: id | 200 {data:Organization} | ORG-01 | **P1** | TBD \- Backend/API | **Ready** |
 | ORG-04 | PATCH /organizations/{id}Update/archive organization metadata. | Partial Organization fields | 200 {data:Organization} | ORG-03 | **P1** | TBD \- Backend/API | **Blocked** |
 | USR-01 | GET /usersList users inside authorized org scope. | Query: org\_id?,role?,active?,search,page | 200 {data:\[User\],meta} | AUTH-08 | **P0** | TBD \- Backend/API | **Blocked** |
 | USR-02 | POST /usersCreate managed user account. | {organization\_id,first\_name,last\_name,email,position\_title?,roles:\[role\_id\]} | 201 {data:User} | USR-01 \+ RBAC-01 | **P0** | TBD \- Backend/API | **Blocked** |
@@ -305,6 +305,22 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RBAC-02 | GET /permissionsList permission catalog. | No body | 200 {data:\[Permission\]} | AUTH-08 | **P0** | TBD \- Backend/Security | **Blocked** |
 | RBAC-03 | PUT /users/{id}/rolesReplace a user role assignment set. | {role\_ids:\[uuid\]} | 200 {data:{user\_id,roles}} | USR-03 \+ RBAC-01 | **P0** | TBD \- Backend/Security | **Blocked** |
 | RBAC-04 | PUT /roles/{id}/permissionsReplace role permission set. | {permission\_ids:\[uuid\]} | 200 {data:{role\_id,permissions}} | RBAC-01 \+ RBAC-02 | **P1** | TBD \- Backend/Security | **Blocked** |
+
+### **ORG-01 — GET /api/v1/organizations**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | ORG-01 / P1 |
+| Purpose | Return the global, paginated organization directory used by system-administration workflows. |
+| Required permission | `organizations.manage`, enforced after Sanctum authentication and active user/organization checks. The permission must derive from a global or caller-organization role. |
+| Dependencies | AUTH-08, organizations, shared request IDs, pagination, throttling and tenant-aware effective permission resolution. |
+| Request / validation | Optional trimmed case-insensitive `search`, normalized `status` (`active` or `inactive`), positive `page`, and `per_page` from 1 through 100. Search spans name, type, email, contact number and address. |
+| Success | `200` standard envelope containing safe Organization resources and exact `request_id`, `page`, `per_page`, `total`, `last_page` metadata. Resources expose the documented metadata and timestamps but never `deleted_at`. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected database failures remain `500`. Shared missing-resource handling remains standardized for the endpoint family. |
+| Workflow / tenant scope | This is intentionally a cross-tenant system-administration view. Authorization is evaluated before the global query; a malicious permission assignment from a foreign-organization role cannot authorize access. Soft-deleted organizations remain excluded. |
+| Ordering / side effects | Results sort by organization name then UUID for stable pages. The operation is read-only and creates no business audit event or notification. |
+| DCL | Existing identity DCL gives the API role organization access needed by identity and organization workflows. Reporting, worker and auditor roles receive no organization-table access; the live PostgreSQL privilege check confirms API SELECT only among those readers. |
+| Tests / status | `OrganizationIndexTest` covers exact fields/meta/order, global scope, search/status composition, soft deletion, validation, authentication, local/foreign RBAC, inactive identity, no audit, throttling and DCL. Done — full SQLite passes 294 tests / 1647 assertions and PostgreSQL 18/PostGIS passes 294 / 1654; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
 
 ### **RBAC-01 — GET /api/v1/roles**
 
