@@ -4,6 +4,7 @@ namespace App\Services\Auth;
 
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class EffectiveAccessService
 {
@@ -12,7 +13,7 @@ class EffectiveAccessService
      */
     public function rolesAndPermissions(User $user): array
     {
-        $user->loadMissing('roles.permissions');
+        $user->loadMissing('roles');
 
         $scopedRoles = $user->roles->filter(
             fn (Role $role): bool => $role->organization_id === null
@@ -27,12 +28,14 @@ class EffectiveAccessService
                 ->values()
                 ->all(),
             'permissions' => $scopedRoles
-                ->flatMap->permissions
-                ->pluck('permission_code')
-                ->unique()
-                ->sort()
-                ->values()
-                ->all(),
+                ->isEmpty()
+                    ? []
+                    : DB::table('v_user_effective_permissions')
+                        ->where('user_id', $user->user_id)
+                        ->orderBy('permission_code')
+                        ->distinct()
+                        ->pluck('permission_code')
+                        ->all(),
         ];
     }
 

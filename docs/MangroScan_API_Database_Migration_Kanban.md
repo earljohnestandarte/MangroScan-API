@@ -1473,7 +1473,7 @@ Views should simplify repeated joins and enforce a consistent read model. They d
 
 | ID | View | Source | Purpose | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| V-01 | v\_user\_effective\_permissions | users \+ organizations \+ user\_roles \+ roles \+ role\_permissions \+ permissions | One row per user/permission. Back AUTH-02/AUTH-08 and server-side permission checks. | **P0** | DB Engineer | **Ready** |
+| V-01 | v\_user\_effective\_permissions | users \+ organizations \+ user\_roles \+ roles \+ role\_permissions \+ permissions | One row per user/permission. Back AUTH-02/AUTH-08 and server-side permission checks. | **P0** | Codex \- DB/Security | **Done** |
 | V-02 | v\_mission\_overview | survey\_missions \+ sites \+ team \+ flight aggregates | Mission list/detail counts, approval/status, coverage, flight totals. | **P0** | DB Engineer | **Blocked** |
 | V-03 | v\_flight\_readiness | flight\_sessions \+ latest preflight \+ drone/sensor/permit state | Compute whether flight may start and why blocked. | **P0** | DB Engineer | **Blocked** |
 | V-04 | v\_media\_processing\_queue | media\_assets \+ flight \+ mission \+ processing jobs | Media uploaded/quality-ready/not-yet-processed queue for Researcher. | **P0** | DB Engineer | **Blocked** |
@@ -1489,6 +1489,8 @@ Views should simplify repeated joins and enforce a consistent read model. They d
 | MV-03 | mv\_tree\_density\_by\_site | tree observations \+ site area/spatial aggregation | Trend/density reporting; refresh on finalized results. | **P2** | DB/GIS Engineer | Backlog |
 
 ## **10.1 Example PostgreSQL view**
+
+V-01 is implemented by `2026_08_12_070000_create_user_effective_permissions_view.php`. It preserves the documented six-column projection, excludes inactive/soft-deleted identities and ignores role assignments from another organization while retaining system/global roles. `EffectiveAccessService` now obtains effective permission codes from this shared read model for AUTH-02/AUTH-08 and permission middleware while preserving role projection semantics. `041_user_effective_permissions_view_grants.sql` gives only the API runtime SELECT; worker, reporting and auditor roles receive no access. `UserEffectivePermissionsViewTest` verifies global/tenant/foreign role semantics, inactive/deleted filtering, reproducible DDL, service adoption and read-only DCL on SQLite and PostgreSQL 18.
 
 | CREATE OR REPLACE VIEW app.v\_user\_effective\_permissions ASSELECT    u.user\_id,    u.organization\_id,    r.role\_id,    r.role\_name,    p.permission\_id,    p.permission\_codeFROM app.users uJOIN app.user\_roles ur ON ur.user\_id \= u.user\_idJOIN app.roles r ON r.role\_id \= ur.role\_idJOIN app.role\_permissions rp ON rp.role\_id \= r.role\_idJOIN app.permissions p ON p.permission\_id \= rp.permission\_idWHERE u.is\_active \= TRUE  AND u.deleted\_at IS NULL; |
 | :---- |
