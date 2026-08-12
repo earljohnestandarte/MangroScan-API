@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\V1\Mobile\MobileMissionBundleController;
 use App\Http\Controllers\Api\V1\Mobile\SyncDeviceRegisterController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
+use App\Http\Controllers\Api\V1\Processing\ProcessingJobIndexController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
@@ -287,4 +288,10 @@ Route::prefix('v1')->group(function () {
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:media.read', 'throttle:auth.authenticated',
         ]);
+
+    // [JOB-01] GET /api/v1/processing-jobs
+    Route::get('/processing-jobs', ProcessingJobIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:processing_jobs.manage', 'throttle:auth.authenticated',
+    ]);
 });

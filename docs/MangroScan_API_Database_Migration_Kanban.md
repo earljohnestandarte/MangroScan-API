@@ -775,11 +775,21 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | MODEL-01 | GET /ai-modelsList model registry and deployment versions. | Query: type,deployed | 200 {data:\[AiModel\]} | AUTH \+ ai\_models | **P1** | TBD \- AI/API | **Blocked** |
 | MODEL-02 | GET /ai-models/{id}Model detail and versions. | Path: id | 200 {data:{model,versions}} | MODEL-01 | **P1** | TBD \- AI/API | **Blocked** |
 | MODEL-03 | POST /ai-models/{id}/versions/{versionId}/deployMark model version deployed after validation. | {release\_notes?} | 200 {data:AiModelVersion} | MODEL-02 | **P2** | TBD \- AI/API | Backlog |
-| JOB-01 | GET /processing-jobsList processing jobs. | Query: mission\_id,flight\_id,status,type,page | 200 {data:\[ProcessingJob\],meta} | AUTH \+ processing\_jobs | **P0** | TBD \- AI/API | **Blocked** |
+| JOB-01 | GET /processing-jobsList processing jobs. | Query: mission\_id,flight\_id,status,type,page | 200 {data:\[ProcessingJob\],meta} | AUTH \+ processing\_jobs | **P0** | Codex \- AI/API | **Done** |
 | JOB-02 | POST /processing-jobsQueue detector/classifier/combined processing. | {mission\_id,flight\_session\_id?,job\_type,media\_ids:\[uuid\],parameters?} | 202 {data:{processing\_job\_id,job\_status:"queued"}} | MEDIA-03 \+ AISVC-04 \+ MODEL-01 | **P0** | TBD \- AI/API | **Blocked** |
 | JOB-03 | GET /processing-jobs/{id}Job status, runs, outputs and errors. | Path: id | 200 {data:{job,model\_runs,output\_summary}} | JOB-02 | **P0** | TBD \- AI/API | **Blocked** |
 | JOB-04 | POST /processing-jobs/{id}/retryRetry failed job idempotently. | {reason?} | 202 {data:ProcessingJob} | JOB-03 failed | **P1** | TBD \- AI/API | **Blocked** |
 | JOB-05 | POST /processing-jobs/{id}/cancelCancel queued/running job when supported. | {reason?} | 200 {data:ProcessingJob} | JOB-03 | **P2** | TBD \- AI/API | Backlog |
+
+### **JOB-01 - GET /api/v1/processing-jobs**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | List durable processing jobs visible through the authenticated user's organization; requires active identity and tenant-valid `processing_jobs.manage`. The route does not contact FastAPI. |
+| Request / response | Optional normalized UUID `mission_id`/`flight_id`, documented `status`/`type`, positive `page`, and `per_page` 1 through 100. Returns exact ProcessingJob resources with standard request/pagination metadata. |
+| Tenant / workflow behavior | Mission and flight filters resolve through existing tenant scopes, returning anti-enumeration 404s for foreign or missing resources. Jobs are constrained again through mission-site organization lineage and sorted newest queued first with a UUID tie-breaker. |
+| Schema / DCL / side effects | Adds UUID `processing_jobs` with mission/optional-flight/requester lineage, JSONB parameters/output, progress, attempts, lifecycle timestamps and safe failure evidence. PostgreSQL checks job type, status, progress and timestamp ordering. API/reporting receive SELECT only; worker access waits for JOB-02. Listing creates no audit or notification. |
+| Tests / status | `ProcessingJobIndexTest` covers exact shape/pagination, composed filters, validation, inaccessible resources, authentication/RBAC, tenant isolation, no audit, throttling, PostgreSQL constraints and DCL. Done - full SQLite passes 250 tests / 1419 assertions and PostgreSQL 18/PostGIS passes 250 / 1425; route, Pint, live privilege and diff gates pass. |
 
 ## **Tree results, summaries and geospatial layers**
 
