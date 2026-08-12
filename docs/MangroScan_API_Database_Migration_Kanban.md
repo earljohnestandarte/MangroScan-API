@@ -295,7 +295,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | ORG-01 | GET /organizationsList organizations for system admin. | Query: page,per\_page,search,status | 200 {data:\[Organization\],meta} | AUTH-08 | **P1** | Backend/API | **Done** |
 | ORG-02 | POST /organizationsCreate tenant/owner organization. | {organization\_name,organization\_type,contact\_email?,contact\_number?,address?} | 201 {data:Organization} | ORG-01 | **P1** | Backend/API | **Done** |
 | ORG-03 | GET /organizations/{id}Organization detail. | Path: id | 200 {data:Organization} | ORG-01 | **P1** | Backend/API | **Done** |
-| ORG-04 | PATCH /organizations/{id}Update/archive organization metadata. | Partial Organization fields | 200 {data:Organization} | ORG-03 | **P1** | TBD \- Backend/API | **Ready** |
+| ORG-04 | PATCH /organizations/{id}Update/archive organization metadata. | Partial Organization fields | 200 {data:Organization} | ORG-03 | **P1** | Backend/API | **Done** |
 | USR-01 | GET /usersList users inside authorized org scope. | Query: org\_id?,role?,active?,search,page | 200 {data:\[User\],meta} | AUTH-08 | **P0** | TBD \- Backend/API | **Blocked** |
 | USR-02 | POST /usersCreate managed user account. | {organization\_id,first\_name,last\_name,email,position\_title?,roles:\[role\_id\]} | 201 {data:User} | USR-01 \+ RBAC-01 | **P0** | TBD \- Backend/API | **Blocked** |
 | USR-03 | GET /users/{id}User detail \+ roles. | Path: id | 200 {data:{user,roles}} | USR-01 | **P1** | TBD \- Backend/API | **Blocked** |
@@ -350,6 +350,21 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `404 NOT_FOUND`; `429 RATE_LIMITED`; unexpected database failures remain `500`. |
 | Side effects / DCL | Read-only detail lookup with no business audit event or notification. Existing identity DCL permits API SELECT while report, worker and auditor organization SELECT remain denied. |
 | Tests / status | `OrganizationShowTest` covers exact fields, foreign-tenant detail, missing/malformed/archived 404s, authentication, local/foreign RBAC, inactive identity, no audit, throttling and DCL. Done — full SQLite passes 311 tests / 1752 assertions and PostgreSQL 18/PostGIS passes 311 / 1759; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
+
+### **ORG-04 — PATCH /api/v1/organizations/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | ORG-04 / P1 |
+| Purpose | Partially update organization metadata or logically archive/restore an organization through its documented active/inactive status. |
+| Required permission | `organizations.manage`, enforced after Sanctum and active-identity checks. Foreign-tenant role assignments cannot authorize updates. |
+| Dependencies | ORG-03, organizations, shared Organization resource, immutable audit storage, standard validation/errors and authenticated throttling. |
+| Request / validation | At least one documented field must be present. Name/type are non-null when supplied; optional contacts/address may be cleared with null; type and status use documented domains; strings and email are normalized to their storage limits. Unknown-only and empty requests fail validation. |
+| Success | `200` standard envelope containing the updated safe Organization resource and request ID metadata. `status=inactive` is a logical archive and does not soft-delete the row, so detail and restoration workflows remain available. |
+| Errors / conflicts | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; hidden/missing target `404 NOT_FOUND`; duplicate active/archived name or self-organization deactivation `409 CONFLICT`; `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected persistence failures remain `500`. |
+| Concurrency / safety | Target rows are locked for update. Name changes reuse transaction-scoped PostgreSQL advisory locking before case-insensitive reservation checks. The caller's own organization cannot be set inactive, preventing the administrative request from locking out its authenticating tenant. |
+| Transaction / audit | Metadata/status persistence and immutable `organization.update` full before/after evidence share one transaction. Audit failure restores every field. No notification is required. |
+| DCL / tests | Existing identity DCL grants API organization UPDATE and audit INSERT while audit UPDATE and report/worker organization UPDATE remain denied. `OrganizationUpdateTest` covers updates/null clearing, inactive archive, validation, name conflicts, self-lockout, 404s, rollback, local/foreign RBAC, throttling and DCL. Done — full SQLite passes 322 tests / 1835 assertions and PostgreSQL 18/PostGIS passes 322 / 1842; route, Pint, Composer, live privilege and diff gates pass. |
 
 ### **RBAC-01 — GET /api/v1/roles**
 

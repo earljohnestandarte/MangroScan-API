@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\V1\Mobile\SyncDeviceRegisterController;
 use App\Http\Controllers\Api\V1\Organization\OrganizationIndexController;
 use App\Http\Controllers\Api\V1\Organization\OrganizationShowController;
 use App\Http\Controllers\Api\V1\Organization\OrganizationStoreController;
+use App\Http\Controllers\Api\V1\Organization\OrganizationUpdateController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobIndexController;
@@ -109,6 +110,16 @@ Route::prefix('v1')->group(function () {
 
     // [ORG-03] GET /api/v1/organizations/{id}
     Route::get('/organizations/{organization}', OrganizationShowController::class)
+        ->whereUuid('organization')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:organizations.manage',
+            'throttle:auth.authenticated',
+        ]);
+
+    // [ORG-04] PATCH /api/v1/organizations/{id}
+    Route::patch('/organizations/{organization}', OrganizationUpdateController::class)
         ->whereUuid('organization')
         ->middleware([
             'auth:sanctum',
