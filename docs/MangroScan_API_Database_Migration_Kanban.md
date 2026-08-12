@@ -392,11 +392,20 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | BOUND-01 | GET /sites/{id}/boundariesList site polygons. | Path: site id | 200 {data:\[Boundary\]} | SITE-03 | **P0** | Codex \- GIS/API | **Done** |
 | BOUND-02 | POST /sites/{id}/boundariesCreate survey/no-fly/restoration polygon. | {boundary\_name,boundary\_type,boundary\_geom:GeoJSON,source?} | 201 {data:Boundary} | BOUND-01 | **P0** | Codex \- GIS/API | **Done** |
 | BOUND-03 | PATCH /boundaries/{id}Update boundary metadata/geometry. | Partial boundary fields | 200 {data:Boundary} | BOUND-02 | **P1** | TBD \- GIS/API | **Blocked** |
-| PLOT-01 | GET /sites/{id}/plotsList monitoring plots. | Path: site id | 200 {data:\[Plot\]} | SITE-03 | **P1** | TBD \- GIS/API | **Blocked** |
+| PLOT-01 | GET /sites/{id}/plotsList monitoring plots. | Path: site id | 200 {data:\[Plot\]} | SITE-03 | **P1** | Codex \- GIS/API | **Done** |
 | PLOT-02 | POST /sites/{id}/plotsCreate validation plot. | {plot\_code,plot\_name?,plot\_geom:GeoJSON,area\_square\_meters?,description?} | 201 {data:Plot} | PLOT-01 | **P1** | TBD \- GIS/API | **Blocked** |
 | PLOT-03 | PATCH /plots/{id}Update/soft archive plot. | Partial Plot fields | 200 {data:Plot} | PLOT-02 | **P2** | TBD \- GIS/API | Backlog |
 | PERMIT-01 | GET /sites/{id}/access-permissionsList permit/access records. | Path: site id | 200 {data:\[AccessPermission\]} | SITE-03 | **P2** | TBD \- Backend/API | Backlog |
 | PERMIT-02 | POST /sites/{id}/access-permissionsRecord field-access permit. | {permit\_title,issuing\_agency,permit\_number?,valid\_from?,valid\_until?,document\_path?,status} | 201 {data:AccessPermission} | PERMIT-01 | **P2** | TBD \- Backend/API | Backlog |
+
+### **PLOT-01 - GET /api/v1/sites/{id}/plots**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | List non-deleted monitoring/validation plots for one tenant-visible site; requires active identity and tenant-valid `sites.read`. Foreign, missing and malformed site identifiers remain non-enumerable 404s. |
+| Response / ordering | Returns exact Plot resources and request ID metadata, ordered by site-local plot code then UUID. SITE-03's existing plot summary now counts real non-deleted rows. The read creates no audit or notification. |
+| Schema / spatial | Adds the documented UUID `monitoring_plots` schema with site lineage, site-local code uniqueness, required PostGIS Polygon(4326), GiST index, optional positive square-meter area and soft deletion. SQLite retains JSON only as the fast compatibility test representation. |
+| DCL / tests | API and reporting roles receive SELECT only; worker receives none. `SitePlotIndexTest` covers exact shape/order, PostGIS GeoJSON, summary count, soft deletion, tenant isolation, local/foreign RBAC, throttling, PostgreSQL constraint and DCL. Done - full SQLite passes 256 tests / 1450 assertions and PostgreSQL 18/PostGIS passes 256 / 1457; route, Pint, live privilege and diff gates pass. |
 
 ### **SITE-01 - GET /api/v1/sites**
 
