@@ -1,0 +1,7 @@
+\set ON_ERROR_STOP on
+
+BEGIN;
+
+GRANT UPDATE ON TABLE app.notification_logs TO mangroscan_api_rw;
+
+COMMIT;

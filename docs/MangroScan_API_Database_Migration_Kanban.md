@@ -1100,7 +1100,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | NOTIF-01 | GET /notificationsList durable notifications for current user. | Query: unread\_only?,type?,page | 200 {data:\[Notification\],meta} | AUTH \+ notification\_logs | **P1** | Codex \- Backend/API | **Done** |
 | NOTIF-02 | GET /notifications/unread-countLightweight badge count. | No body | 200 {data:{unread\_count}} | NOTIF-01 | **P1** | Codex \- Backend/API | **Done** |
-| NOTIF-03 | POST /notifications/{id}/readMark one notification read. | No body | 200 {data:Notification} | NOTIF-01 | **P1** | TBD \- Backend/API | **Blocked** |
+| NOTIF-03 | POST /notifications/{id}/readMark one notification read. | No body | 200 {data:Notification} | NOTIF-01 | **P1** | Codex \- Backend/API | **Done** |
 | NOTIF-04 | POST /notifications/read-allMark caller notifications read. | No body | 204 | NOTIF-01 | **P2** | TBD \- Backend/API | Backlog |
 | SET-01 | GET /settingsRead permitted settings by group. | Query: group? | 200 {data:\[Setting\]} | AUTH | **P2** | TBD \- Backend/API | Backlog |
 | SET-02 | PUT /settings/{key}Update managed setting. | {setting\_value,description?} | 200 {data:Setting} | SET-01 \+ admin permission | **P2** | TBD \- Backend/API | Backlog |
@@ -1127,6 +1127,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Request / success | No body or query parameters. Returns `200` with exact integer `{data:{unread_count}}` plus request ID metadata, including zero when the caller has no unread rows. |
 | Scope / side effects | Counts only `notification_logs` rows matching both the caller's `user_id` and `is_read=false`; same-organization colleagues and foreign tenants never contribute. The read creates no audit/notification and never changes read state. |
 | Database / tests / status | Reuses NOTIF-01's user/read/time index and API SELECT-only `023_notification_log_grants.sql`; no schema or privilege expansion. `NotificationUnreadCountTest` covers exact output/type, zero behavior, caller isolation, authentication, local/foreign RBAC, inactive identity, throttling, no audit and read-only DCL. Done — full SQLite passes 463 tests / 2649 assertions (two PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 463 / 2660; focused suites and static gates pass. |
+
+### **NOTIF-03 — POST /api/v1/notifications/{id}/read**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Apply one durable unread-to-read transition for the authenticated user's notification. Requires active Sanctum authentication and tenant-valid `notifications.read`; the permission covers both reading and acknowledging the caller's own notification because the catalog defines no separate notification-write code. |
+| Request / success | UUID path ID and no body. Returns `200` with the exact shared Notification resource and request ID metadata after persistence. Malformed, missing, same-tenant-unowned and foreign notification IDs all return non-enumerable `404 NOT_FOUND`. |
+| Workflow / concurrency | The caller-owned row is resolved and locked inside a transaction before mutation. Only `is_read=false` can transition; an already-read notification returns documented `409 CONFLICT`, preventing a repeated request from claiming another state change. |
+| Side effects / DCL | Updates only `is_read`; the authoritative schema has no `read_at` field, so none is invented. Low-risk per-user UI acknowledgement creates no business audit or notification. `024_notification_log_write_grants.sql` adds API UPDATE only; combined privileges are SELECT+UPDATE with no INSERT/DELETE and no worker/report/auditor access. |
+| Tests / status | `NotificationReadTest` covers exact resource/persistence, repeat conflict, malformed/missing/same-tenant/foreign hiding, authentication, local/foreign RBAC, inactive identity, throttling, no audit and DCL. Done — full SQLite passes 470 tests / 2693 assertions (two PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 470 / 2704; focused suites, route, Pint, Composer and live privilege gates pass. |
 
 ### **AUD-01 — GET /api/v1/audit-logs**
 
