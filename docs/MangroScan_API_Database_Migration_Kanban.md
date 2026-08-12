@@ -1026,7 +1026,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | AISVC-03 | POST /admin/ai-services/{id}/testHealth-test FastAPI service. | No body | 200 {data:{status,version,latency\_ms}} | AISVC-02 | **P1** | TBD \- AI/API | **Blocked** |
 | AISVC-04 | POST /admin/ai-services/{id}/synchronizePull authoritative /models metadata. | No body | 200 {data:{models\_synced,capabilities}} | AISVC-03 | **P1** | TBD \- AI/API | **Blocked** |
 | AISVC-05 | POST /admin/ai-services/{id}/credentialsRotate encrypted FastAPI key. | {api\_key} | 204 | AISVC-02 | **P2** | TBD \- AI/API | Backlog |
-| MODEL-01 | GET /ai-modelsList model registry and deployment versions. | Query: type,deployed | 200 {data:\[AiModel\]} | AUTH \+ ai\_models | **P1** | TBD \- AI/API | **Blocked** |
+| MODEL-01 | GET /ai-modelsList model registry and deployment versions. | Query: type,deployed | 200 {data:\[AiModel\]} | AUTH \+ ai\_models | **P1** | Codex \- AI/API | **Done** |
 | MODEL-02 | GET /ai-models/{id}Model detail and versions. | Path: id | 200 {data:{model,versions}} | MODEL-01 | **P1** | TBD \- AI/API | **Blocked** |
 | MODEL-03 | POST /ai-models/{id}/versions/{versionId}/deployMark model version deployed after validation. | {release\_notes?} | 200 {data:AiModelVersion} | MODEL-02 | **P2** | TBD \- AI/API | Backlog |
 | JOB-01 | GET /processing-jobsList processing jobs. | Query: mission\_id,flight\_id,status,type,page | 200 {data:\[ProcessingJob\],meta} | AUTH \+ processing\_jobs | **P0** | Codex \- AI/API | **Done** |
@@ -1044,6 +1044,17 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Tenant / workflow behavior | Mission and flight filters resolve through existing tenant scopes, returning anti-enumeration 404s for foreign or missing resources. Jobs are constrained again through mission-site organization lineage and sorted newest queued first with a UUID tie-breaker. |
 | Schema / DCL / side effects | Adds the documented UUID `processing_jobs` schema with mission/optional-flight/creator lineage, JSONB input/output summaries, lifecycle timestamps and safe failure evidence. PostgreSQL checks documented job type/status domains and timestamp ordering. API/reporting receive SELECT only; worker access waits for JOB-02. Listing creates no audit or notification. |
 | Tests / status | `ProcessingJobIndexTest` covers exact shape/pagination, composed filters, validation, inaccessible resources, authentication/RBAC, tenant isolation, no audit, throttling, PostgreSQL constraints and DCL. Done - full SQLite passes 250 tests / 1417 assertions and PostgreSQL 18/PostGIS passes 250 / 1423; route, Pint, live privilege and diff gates pass. |
+
+### **MODEL-01 — GET /api/v1/ai-models**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | MODEL-01 / P1 |
+| Purpose / permission | Return the global, soft-delete-aware AI model registry. Requires active Sanctum authentication and tenant-valid `ai_models.read`; a foreign-organization role grant cannot authorize access. The registry is global because the authoritative AI tables have no organization key. |
+| Request / validation | Optional normalized documented type (`species_classifier`, `tree_detector`, `height_estimator`, `age_estimator`) and boolean `deployed`. `deployed=true` means at least one version has `is_deployed=true`; `false` means no deployed version exists. |
+| Success / response boundary | `200` standard envelope containing sorted base AiModel resources (`model_id`, name/type/framework/description, creator and UTC timestamps) plus request ID. Version arrays and private `model_file_path` values are not exposed: MODEL-02 explicitly owns `{model,versions}` detail. Soft-deleted models are excluded. Reads create no audit/notification and make no FastAPI call, so current success does not depend on downstream availability. |
+| Database foundation | Adds authoritative `ai_models` and `ai_model_versions` tables with UUID/FK provenance, model-type check, model/version uniqueness and deployment index. A minimal authoritative `training_datasets` table is included only because `ai_model_versions.training_dataset_id` requires it; no DATASET P2 route or completion is claimed. |
+| DCL / tests / status | `026_ai_model_registry_grants.sql` grants API/report SELECT only on model tables; the training-dataset foundation remains ungranted, as do every mutation and worker/auditor access. `AiModelIndexTest` covers exact global projection/order, soft deletion, type/deployment filters, path/version non-exposure, validation, authentication, local/foreign RBAC, inactive identity, throttling, no audit, PostgreSQL constraints and DCL. Done — full SQLite passes 487 tests / 2803 assertions (four PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 487 / 2816; focused suites, route, Pint, Composer, migration and live privilege gates pass. |
 
 ## **Tree results, summaries and geospatial layers**
 
