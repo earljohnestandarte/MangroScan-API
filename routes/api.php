@@ -70,6 +70,7 @@ use App\Http\Controllers\Api\V1\Site\SiteStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteUpdateController;
 use App\Http\Controllers\Api\V1\Tree\MissionTreeCountController;
 use App\Http\Controllers\Api\V1\Tree\MissionTreeGeoJsonController;
+use App\Http\Controllers\Api\V1\Tree\TreeHeightEstimationIndexController;
 use App\Http\Controllers\Api\V1\Tree\TreeObservationIndexController;
 use App\Http\Controllers\Api\V1\Tree\TreeObservationShowController;
 use App\Http\Controllers\Api\V1\Tree\TreeSpeciesPredictionIndexController;
@@ -545,6 +546,13 @@ Route::prefix('v1')->group(function () {
 
     // [RESULT-01] GET /api/v1/tree-observations/{id}/species
     Route::get('/tree-observations/{tree}/species', TreeSpeciesPredictionIndexController::class)
+        ->whereUuid('tree')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:results.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [RESULT-02] GET /api/v1/tree-observations/{id}/heights
+    Route::get('/tree-observations/{tree}/heights', TreeHeightEstimationIndexController::class)
         ->whereUuid('tree')->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:results.read', 'throttle:auth.authenticated',

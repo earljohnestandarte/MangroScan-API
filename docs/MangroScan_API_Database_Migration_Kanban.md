@@ -1173,7 +1173,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | TREE-03 | GET /missions/{id}/trees.geojsonMap-ready tree features. | Query: species\_id?,validated\_only? | 200 GeoJSON FeatureCollection | TREE-01 \+ PostGIS | **P0** | Codex \- GIS/API | **Done** |
 | COUNT-01 | GET /missions/{id}/tree-countsMission/species count summary. | Query: species\_id? | 200 {data:\[TreeCountSummary\]} | TREE-01 \+ count routine | **P0** | Codex \- Results/API | **Done** |
 | RESULT-01 | GET /tree-observations/{id}/speciesSpecies prediction history. | Path: id | 200 {data:\[ClassificationResult\]} | TREE-02 | **P1** | Codex \- Results/API | **Done** |
-| RESULT-02 | GET /tree-observations/{id}/heightsHeight estimates. | Path: id | 200 {data:\[HeightEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Ready** |
+| RESULT-02 | GET /tree-observations/{id}/heightsHeight estimates. | Path: id | 200 {data:\[HeightEstimation\]} | TREE-02 | **P1** | Codex \- Results/API | **Done** |
 | RESULT-03 | GET /tree-observations/{id}/agesAge estimates \+ assumptions. | Path: id | 200 {data:\[AgeEstimation\]} | TREE-02 | **P1** | TBD \- Results/API | **Ready** |
 | LAYER-01 | GET /missions/{id}/layersList geospatial/photogrammetry outputs. | Query: type? | 200 {data:\[Layer\]} | JOB-03 | **P1** | TBD \- GIS/API | **Ready** |
 | LAYER-02 | POST /missions/{id}/layers/buildQueue map layer build/refresh. | {layer\_types:\[...\],parameters?} | 202 {data:{job\_id}} | TREE-01 \+ photogrammetry inputs | **P1** | TBD \- GIS/API | **Blocked** |
@@ -1227,6 +1227,15 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Purpose / permission | Return the complete species-prediction history for one tenant-visible canonical tree. Requires active Sanctum authentication and tenant-valid `results.read`; lookup follows tree → mission → non-deleted site → caller organization and returns anti-enumerable 404s. |
 | Exact response / ordering | Returns exact `200 {data:[ClassificationResult]}`. Final evidence sorts first, then rank, newest evidence and UUID for deterministic ties; no predictions returns `[]`. Each safe result contains only observation/run/species provenance, confidence, rank, bounded classification basis, final flag and UTC creation time. |
 | Security / DCL / tests | Model file paths, service topology and credentials are absent; the read creates no audit, notification or mutation. Reuses TREE-02's API SELECT-only result DCL while reporting remains read-only. `TreeSpeciesPredictionIndexTest` covers exact fields/order, JSON basis, empty history, tenant/missing/malformed/deleted-lineage hiding, authentication/RBAC/inactivity, throttling, no audit, secret exclusion and DCL. Done — focused SQLite/PostgreSQL pass 5 tests / 24 assertions each; full SQLite passes 599 / 3662 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 599 / 3681. |
+
+### **RESULT-02 — GET /api/v1/tree-observations/{id}/heights**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | RESULT-02 / P1 |
+| Purpose / permission | Return the complete canopy-height estimation history for one tenant-visible canonical tree. Requires active Sanctum authentication and tenant-valid `results.read`; tenant and deleted-lineage behavior matches TREE-02/RESULT-01. |
+| Exact response / ordering | Returns exact `200 {data:[HeightEstimation]}`. Final evidence sorts first, then newest time and UUID; no estimates returns `[]`. The safe resource includes tree/run/dataset provenance, documented method, height/confidence, measurement notes, final flag and UTC creation time. |
+| DCL / side effects / tests | Reuses TREE-02 API SELECT-only result privileges; no DCL or schema expansion is needed. Reads create no audit, notification or mutation. `TreeHeightEstimationIndexTest` covers exact fields/order, final/notes evidence, empty history, tenant/missing/malformed/deleted-lineage hiding, authentication/RBAC/inactivity, throttling, no audit and DCL. Done — focused SQLite/PostgreSQL pass 4 tests / 22 assertions each; full SQLite passes 603 / 3684 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 603 / 3703. |
 
 ## **Confidence review and field validation**
 
