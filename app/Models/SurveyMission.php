@@ -71,4 +71,9 @@ class SurveyMission extends Model
     {
         return $this->hasMany(FlightSession::class, 'mission_id', 'mission_id');
     }
+
+    public function reports(): HasMany
+    {
+        return $this->hasMany(Report::class, 'mission_id', 'mission_id');
+    }
 }

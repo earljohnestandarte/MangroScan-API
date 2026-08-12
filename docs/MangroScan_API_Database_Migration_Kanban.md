@@ -1078,7 +1078,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| RPT-01 | GET /reportsList report records. | Query: mission\_id,site\_id,status,type,page | 200 {data:\[Report\],meta} | AUTH | **P1** | TBD \- Reporting/API | **Blocked** |
+| RPT-01 | GET /reportsList report records. | Query: mission\_id,site\_id,status,type,page | 200 {data:\[Report\],meta} | AUTH | **P1** | Codex \- Reporting/API | **Done** |
 | RPT-02 | POST /reportsPrepare report definition/draft. | {mission\_id,site\_id,report\_title,report\_type,audience?,summary?,interpretation?,limitations?,recommendations?,formats?} | 201 {data:Report} | TREE/ACC finalized | **P1** | TBD \- Reporting/API | **Blocked** |
 | RPT-03 | GET /reports/{id}Report draft/source metadata. | Path: id | 200 {data:{report,source\_summary}} | RPT-02 | **P1** | TBD \- Reporting/API | **Blocked** |
 | RPT-04 | PATCH /reports/{id}Update report content/status while editable. | Partial report fields | 200 {data:Report} | RPT-03 | **P1** | TBD \- Reporting/API | **Blocked** |
@@ -1093,6 +1093,18 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | VIEW-02 | POST /dashboard/saved-viewsSave filter/map state. | {view\_name,site\_id?,mission\_id?,filter\_config,map\_config} | 201 {data:SavedView} | VIEW-01 | **P2** | TBD \- Dashboard/API | Backlog |
 | VIEW-03 | PATCH /dashboard/saved-views/{id}Update saved view. | Partial saved-view fields | 200 {data:SavedView} | VIEW-02 | **P2** | TBD \- Dashboard/API | Backlog |
 | VIEW-04 | DELETE /dashboard/saved-views/{id}Delete own saved view. | Path: id | 204 | VIEW-02 | **P2** | TBD \- Dashboard/API | Backlog |
+
+### **RPT-01 — GET /api/v1/reports**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | RPT-01 / P1 |
+| Purpose / permission | List report-registry metadata visible through current-tenant site and mission lineage. Requires active Sanctum authentication and tenant-valid `reports.read`; a permission inherited only from a foreign-organization role cannot authorize access. |
+| Request / validation | Optional UUID `mission_id` and `site_id`; normalized documented status (`draft`, `generated`, `approved`, `archived`) and type (`monitoring_summary`, `validation_report`, `species_report`); positive `page`; and optional `per_page` from 1 through 100 under the shared pagination standard. Foreign or missing filter targets return non-enumerable 404s. |
+| Success / ordering | `200` standard envelope containing exact Report resources (`report_id`, mission/site lineage, title/type/status, generator/approver, summary and UTC timestamps) plus complete request ID/page metadata. Results sort newest first by creation time then UUID. |
+| Tenant / integrity behavior | Both the report's direct `site_id` and its `mission.site` must belong to the caller's organization, so inconsistent legacy cross-tenant rows cannot leak. The authoritative schema does not define a mission/site composite FK, so none is invented. Reads create no audit or notification and call no downstream service; documented 502/503 codes remain available only if future report reads acquire a dependency. |
+| Database / DCL | Adds the documented UUID `reports` table, required FKs, report type/status checks and mission/status, site/status and type/time indexes. `025_report_grants.sql` gives API and reporting roles SELECT only; worker/auditor and all mutations remain denied until their dependent workflows are implemented. |
+| Tests / status | `ReportIndexTest` covers exact resources/pages/order, all filters, tenant and inconsistent-lineage exclusion, target anti-enumeration, validation, authentication, local/foreign RBAC, inactive identity, no audit, throttling, PostgreSQL domains/indexes and DCL. Done — full SQLite passes 479 tests / 2750 assertions (three PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 479 / 2762; focused suites, route, Pint, Composer, migration and live privilege gates pass. |
 
 ## **Notifications, settings and audit**
 

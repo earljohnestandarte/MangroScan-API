@@ -81,4 +81,9 @@ class SurveySite extends Model
     {
         return $this->hasMany(SurveyMission::class, 'site_id', 'site_id');
     }
+
+    public function reports(): HasMany
+    {
+        return $this->hasMany(Report::class, 'site_id', 'site_id');
+    }
 }
