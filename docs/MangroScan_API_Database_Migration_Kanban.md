@@ -1021,7 +1021,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| AISVC-01 | GET /admin/ai-servicesAI backend overview for administrator. | No body | 200 {data:{services,models,jobs}} | schema extension \+ AUTH | **P1** | TBD \- AI/API | **Blocked** |
+| AISVC-01 | GET /admin/ai-servicesAI backend overview for administrator. | No body | 200 {data:{services,models,jobs}} | schema extension \+ AUTH | **P1** | Codex \- AI/API | **Done** |
 | AISVC-02 | POST /admin/ai-servicesRegister trusted FastAPI backend. | {service\_name,base\_url,api\_key,environment,enabled} | 201 {data:AiService}; key never returned | AISVC schema \+ secret encryption | **P1** | TBD \- AI/API | **Blocked** |
 | AISVC-03 | POST /admin/ai-services/{id}/testHealth-test FastAPI service. | No body | 200 {data:{status,version,latency\_ms}} | AISVC-02 | **P1** | TBD \- AI/API | **Blocked** |
 | AISVC-04 | POST /admin/ai-services/{id}/synchronizePull authoritative /models metadata. | No body | 200 {data:{models\_synced,capabilities}} | AISVC-03 | **P1** | TBD \- AI/API | **Blocked** |
@@ -1034,6 +1034,17 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | JOB-03 | GET /processing-jobs/{id}Job status, runs, outputs and errors. | Path: id | 200 {data:{job,model\_runs,output\_summary}} | JOB-02 | **P0** | TBD \- AI/API | **Blocked** |
 | JOB-04 | POST /processing-jobs/{id}/retryRetry failed job idempotently. | {reason?} | 202 {data:ProcessingJob} | JOB-03 failed | **P1** | TBD \- AI/API | **Blocked** |
 | JOB-05 | POST /processing-jobs/{id}/cancelCancel queued/running job when supported. | {reason?} | 200 {data:ProcessingJob} | JOB-03 | **P2** | TBD \- AI/API | Backlog |
+
+### **AISVC-01 — GET /api/v1/admin/ai-services**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | AISVC-01 / P1 |
+| Purpose / permission | Give an active administrator a database-backed AI operations overview; requires tenant-valid `ai_services.manage`. A permission attached only through another organization's role cannot authorize the caller. The endpoint does not probe FastAPI, so an overview read cannot leak topology credentials or fail because a backend is offline. |
+| Success / scope | Returns exact `data:{services,models,jobs}` plus request ID. `services` is the global registry sorted enabled first and then by name/UUID; it exposes operational configuration and stored health/sync evidence but never `api_key` or `encrypted_api_key`. `models` contains global non-deleted model/deployed/version counts. `jobs` contains fixed lifecycle counts constrained through mission → active site → caller organization lineage, with no job identifiers, inputs, errors, or foreign-tenant counts. |
+| Database foundation | Adds the authoritative UUID `ai_services` registry required by AISVC-02–04: unique URL and name/environment identity, encrypted credential storage, enabled state, constrained health state, version/capabilities, health/sync timestamps, and creator lineage. This foundation does not register, test, or synchronize a service and therefore does not claim dependent routes. |
+| DCL / side effects | `027_ai_service_overview_grants.sql` grants the API role column-level SELECT on safe service fields only. It cannot select the encrypted key or whole row and has no writes; report/worker roles receive nothing. The overview creates no audit/notification and makes no HTTP request. |
+| Tests / status | `AiServiceOverviewTest` covers exact nested shape/order, empty values, global model semantics, tenant-safe job aggregation, credential exclusion, zero outbound calls, authentication, local/foreign RBAC, inactive identity, throttling, PostgreSQL health constraints, and DCL. Done — focused SQLite passes 7 tests / 48 assertions with one PostgreSQL-only skip and focused PostgreSQL passes 7 / 49; full SQLite passes 501 / 2892 (five PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 501 / 2906. |
 
 ### **JOB-01 - GET /api/v1/processing-jobs**
 
