@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Flight\FlightChecklistStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightShowController;
+use App\Http\Controllers\Api\V1\Flight\FlightStartController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightIndexController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightStoreController;
 use App\Http\Controllers\Api\V1\Mission\MissionApprovalController;
@@ -228,5 +229,13 @@ Route::prefix('v1')->group(function () {
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:checklists.submit', 'throttle:auth.authenticated',
+        ]);
+
+    // [FLT-05] POST /api/v1/flights/{id}/start
+    Route::post('/flights/{flight}/start', FlightStartController::class)
+        ->whereUuid('flight')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:flights.start', 'throttle:auth.authenticated',
         ]);
 });

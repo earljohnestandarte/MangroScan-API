@@ -170,7 +170,7 @@ class MissionFlightIndexTest extends TestCase
         $this->assertStringContainsString("'pending', 'acceptable', 'rejected', 'needs_recapture'", $migration);
         $this->assertIsString($dcl);
         $this->assertStringContainsString(
-            'GRANT SELECT, INSERT ON TABLE app.flight_sessions TO mangroscan_api_rw;',
+            'GRANT SELECT, INSERT, UPDATE ON TABLE app.flight_sessions TO mangroscan_api_rw;',
             $dcl,
         );
         $this->assertStringContainsString(

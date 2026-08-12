@@ -2,7 +2,7 @@
 
 BEGIN;
 
-GRANT SELECT, INSERT ON TABLE app.flight_sessions TO mangroscan_api_rw;
+GRANT SELECT, INSERT, UPDATE ON TABLE app.flight_sessions TO mangroscan_api_rw;
 GRANT SELECT ON TABLE app.flight_sessions TO mangroscan_report_ro;
 
 COMMIT;
