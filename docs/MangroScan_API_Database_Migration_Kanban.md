@@ -731,6 +731,14 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Forward compatibility | `plots` remains an explicit empty array until P1 PLOT-01/02 deliver the authoritative monitoring plot schema; the bundle contract will not change and those endpoint cards are not claimed here. |
 | Tests / status | `MobileMissionBundleTest` covers exact graph/spatial serialization, approval and later lifecycle behavior, unavailable mission hiding, active identity, three local/foreign permissions, no audit and throttling. Done - full SQLite passes 234 tests / 1301 assertions and PostgreSQL 18/PostGIS passes 234 / 1305; route, Pint and diff gates pass. |
 
+### **SYNC-04 shared foundation (endpoint remains blocked)**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Dependency boundary | The public push endpoint is intentionally not registered until every P0/P1 mobile mutation it must reconcile is implemented. Its tracker card remains Not Done / Blocked. |
+| Schema / versioning | Adds request-idempotency, applied-change and conflict ledgers plus monotonic flight `sync_version`; existing server-side flight start/completion mutations advance that version atomically. Device cursors use unbounded text because encrypted cursor envelopes exceed the former 150-character limit. |
+| DCL / tests | API has only the ledger permissions needed for a future sync transaction; report and worker roles receive none. `MobileSyncInfrastructureTest` verifies the portable schema, uniqueness guards and versioned least-privilege DCL without exposing `/mobile/sync`. |
+
 ## **Media, sensor uploads and quality control**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |

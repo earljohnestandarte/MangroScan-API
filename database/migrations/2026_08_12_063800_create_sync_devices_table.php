@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('platform', 20);
             $table->string('app_version', 50);
             $table->string('device_name', 100)->nullable();
-            $table->string('last_cursor', 150)->nullable();
+            $table->text('last_cursor')->nullable();
             $table->timestampTz('last_sync_at')->nullable();
             $table->timestampsTz();
 

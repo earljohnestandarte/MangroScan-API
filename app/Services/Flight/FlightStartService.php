@@ -76,6 +76,7 @@ class FlightStartService
                 ->update([
                     'flight_status' => 'flying',
                     'started_at' => $startedAt->toIso8601String(),
+                    'sync_version' => DB::raw('sync_version + 1'),
                     'updated_at' => now(),
                 ]);
 

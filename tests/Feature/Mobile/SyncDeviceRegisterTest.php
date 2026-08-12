@@ -211,7 +211,7 @@ class SyncDeviceRegisterTest extends TestCase
         $this->assertIsString($migration);
         $this->assertStringContainsString('sync_devices_platform_check', $migration);
         $this->assertStringContainsString("'android', 'ios', 'web'", $migration);
-        $this->assertStringContainsString("\$table->string('last_cursor', 150)->nullable();", $migration);
+        $this->assertStringContainsString("\$table->text('last_cursor')->nullable();", $migration);
         $this->assertStringContainsString("\$table->timestampTz('last_sync_at')->nullable();", $migration);
         $this->assertIsString($dcl);
         $this->assertStringContainsString(

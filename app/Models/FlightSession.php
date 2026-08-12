@@ -45,6 +45,7 @@ class FlightSession extends Model
             'started_at' => 'datetime',
             'ended_at' => 'datetime',
             'flight_duration_minutes' => 'decimal:2',
+            'sync_version' => 'integer',
         ];
     }
 

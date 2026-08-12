@@ -70,6 +70,7 @@ class FlightCompletionService
                 'flight_status' => 'completed',
                 'ended_at' => $endedAt->toIso8601String(),
                 'flight_duration_minutes' => $durationMinutes,
+                'sync_version' => DB::raw('sync_version + 1'),
                 'updated_at' => now(),
             ];
 
