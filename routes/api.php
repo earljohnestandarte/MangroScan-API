@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\Flight\FlightFailController;
 use App\Http\Controllers\Api\V1\Flight\FlightShowController;
 use App\Http\Controllers\Api\V1\Flight\FlightStartController;
 use App\Http\Controllers\Api\V1\Flight\FlightUpdateController;
+use App\Http\Controllers\Api\V1\Flight\FlightWaypointReplaceController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightIndexController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightStoreController;
 use App\Http\Controllers\Api\V1\Media\FlightMediaIndexController;
@@ -418,6 +419,11 @@ Route::prefix('v1')->group(function () {
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:flights.update', 'throttle:auth.authenticated',
         ]);
+
+    // [WPT-01] PUT /api/v1/flights/{id}/waypoints
+    Route::put('/flights/{flight}/waypoints', FlightWaypointReplaceController::class)->whereUuid('flight')->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class, 'permission:flights.update', 'throttle:auth.authenticated',
+    ]);
 
     // [CHK-01] POST /api/v1/flights/{id}/checklists
     Route::post('/flights/{flight}/checklists', FlightChecklistStoreController::class)
