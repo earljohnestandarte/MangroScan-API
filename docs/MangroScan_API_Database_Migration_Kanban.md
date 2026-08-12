@@ -347,6 +347,22 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Tests | `tests/Feature/User/UserStoreTest.php` covers exact creation output, normalization, safe generated credentials, tenant/global role assignment, cross-tenant elevation, foreign-role and duplicate-input rejection, dual audits, rollback, authentication, permission checks and throttling. |
 | Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
 
+### **USR-03 — GET /api/v1/users/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | USR-03 / P1; implemented now because it unlocks P0 RBAC-03. |
+| Purpose | Return one managed user's safe profile together with assignable effective role resources. |
+| Required permission | `users.manage`. Cross-organization detail additionally requires `organizations.manage`. |
+| Dependencies | USR-01, users, roles, user/role joins, safe User/Role resources and the reusable scoped-user service. |
+| Request / validation | UUID path parameter; malformed, missing and soft-deleted targets resolve to the same standard 404. |
+| Success | `200` standard envelope containing `{user,roles}` and request ID metadata. The role list is sorted and contains only global or target-organization roles. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `404 NOT_FOUND`; `429 RATE_LIMITED`; unexpected database failures remain `500`. |
+| Workflow / tenant scope | Normal managers query only their own organization, so foreign UUIDs are indistinguishable from missing records. Callers with `organizations.manage` may resolve a foreign target explicitly. Malicious foreign-role assignments are excluded from output. |
+| Side effects / audit / notifications | Read-only detail lookup. No business audit event or notification is created. |
+| Tests | `tests/Feature/User/UserShowTest.php` covers safe profile/role shape, foreign-role exclusion, hidden/elevated cross-tenant access, malformed/missing/deleted targets, authentication, permission checks, no audit side effect and throttling. |
+| Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
+
 ## **Survey sites, boundaries, plots and permits**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |

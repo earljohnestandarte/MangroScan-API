@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Controllers\Api\V1\User\UserIndexController;
+use App\Http\Controllers\Api\V1\User\UserShowController;
 use App\Http\Controllers\Api\V1\User\UserStoreController;
 use App\Http\Middleware\EnsureActiveIdentity;
 use Illuminate\Support\Facades\Route;
@@ -74,4 +75,14 @@ Route::prefix('v1')->group(function () {
         'permission:users.manage',
         'throttle:auth.authenticated',
     ]);
+
+    // [USR-03] GET /api/v1/users/{id}
+    Route::get('/users/{user}', UserShowController::class)
+        ->whereUuid('user')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:users.manage',
+            'throttle:auth.authenticated',
+        ]);
 });
