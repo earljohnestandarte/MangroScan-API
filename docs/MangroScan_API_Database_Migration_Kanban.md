@@ -328,6 +328,25 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Tests | `tests/Feature/User/UserIndexTest.php` covers exact safe fields and pagination, current/cross-tenant isolation, elevated scope, unknown organizations, search/activity/role filters, foreign-role rejection, validation, authentication, permission checks, no audit side effect and throttling. |
 | Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
 
+### **USR-02 — POST /api/v1/users**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | USR-02 / P0 |
+| Purpose | Create a managed account and assign its initial authorized role set atomically. |
+| Required permission | `users.manage`. Creation in another organization additionally requires `organizations.manage`; both must derive from global/current-organization roles. |
+| Dependencies | USR-01, RBAC-01, organizations, users, roles, user/role joins and immutable audit storage. |
+| Request / validation | Required organization UUID, normalized first/last name, normalized unique email and 1–20 distinct role UUIDs; optional nullable `position_title` up to 100 characters. |
+| Success | `201` standard envelope containing the safe User resource and request ID metadata. Password material and assigned pivot internals are not returned. |
+| Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or `FORBIDDEN`; `404 NOT_FOUND` for an elevated unknown organization; `422 VALIDATION_FAILED` for malformed, duplicate-email or out-of-scope-role input; `429 RATE_LIMITED`; unexpected persistence failures remain `500`. |
+| Workflow / tenant scope | Roles must be global or owned by the target organization. Any missing, foreign or soft-deleted target reference rejects the request before user persistence. Cross-organization creation is pinned to one explicitly authorized target. |
+| Credential bootstrap | Because the endpoint contract accepts no password, the server generates and hashes a high-entropy undisclosed credential. The user later establishes a known password through the password-reset workflow; no temporary secret is logged or returned. |
+| Schema reconciliation | Adds the documented nullable `users.position_title VARCHAR(100)` column through a reversible migration. Existing physical `password` and `status` columns remain intact. |
+| Side effects | User insertion, role pivots, `user.create` audit and `role.assign` audit share one transaction and roll back together. |
+| Audit / notifications | Both audit events include actor, target UUID, safe identity/role context, request ID, IP and user agent. Password material is never passed to the audit logger. No notification is emitted until the mail workflow is implemented. |
+| Tests | `tests/Feature/User/UserStoreTest.php` covers exact creation output, normalization, safe generated credentials, tenant/global role assignment, cross-tenant elevation, foreign-role and duplicate-input rejection, dual audits, rollback, authentication, permission checks and throttling. |
+| Implementation status | Done — the endpoint passes focused and complete SQLite plus PostgreSQL 18/PostGIS suites, formatting and repository validation. |
+
 ## **Survey sites, boundaries, plots and permits**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |

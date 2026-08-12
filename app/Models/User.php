@@ -34,6 +34,7 @@ class User extends Authenticatable
         'first_name',
         'middle_name',
         'last_name',
+        'position_title',
         'email',
         'password',
         'status',

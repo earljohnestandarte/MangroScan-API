@@ -44,6 +44,7 @@ class UserIndexTest extends TestCase
                 'first_name',
                 'middle_name',
                 'last_name',
+                'position_title',
                 'email',
                 'is_active',
                 'created_at',
