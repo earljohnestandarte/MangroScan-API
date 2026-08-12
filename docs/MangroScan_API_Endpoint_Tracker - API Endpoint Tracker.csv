@@ -3,7 +3,7 @@ MangroScan API Endpoint Implementation Tracker,,,,,,,,,,,,,,,
 Status = implementation progress (Not Done / Working / Testing / Blocked / Done). HTTP response status codes are preserved in separate columns and in the HTTP & Status Codes sheet.,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 ID,Module,Method,Endpoint,Purpose,Request,Success HTTP,Success Response,Relevant Error HTTP Codes,Depends On,Unblocks / Dependents,Priority / Importance,Assigned To,Status,Manual Planning State,Notes
-SYS-01,Platform & Authentication,GET,/health,"Liveness/readiness for API, DB, storage and queue.",No body,200,"{status,db,storage,queue,time}","500, 503",DB config,SYS-02,P0,,Not Done,Ready,
+SYS-01,Platform & Authentication,GET,/health,"Liveness/readiness for API, DB, storage and queue.",No body,200,"{status,db,storage,queue,time}","500, 503",DB config,SYS-02,P0,,Done,Ready,"Implemented under /api/v1; verifies DB, default storage disk, and queue readiness with request ID traceability."
 SYS-02,Platform & Authentication,GET,/meta/capabilities,Client feature flags and API capability discovery.,No body,200,"{api_version,features,limits}","500, 503",SYS-01,,P1,,Not Done,Blocked,
 AUTH-01,Platform & Authentication,POST,/auth/login,Authenticate web/mobile user.,"{email,password,device_name?}",200,"{user,access_token,expires_at,roles,permissions}","401, 422, 429, 500",users + RBAC,"AUTH-02, AUTH-03, AUTH-04, AUTH-05",P0,,Not Done,Ready,
 AUTH-02,Platform & Authentication,GET,/auth/me,Return authenticated profile and effective access.,Bearer token,200,"{user,organization,roles,permissions}","401, 403, 404, 429, 500",AUTH-01,"AUTH-08, SYNC-01",P0,,Not Done,Blocked,

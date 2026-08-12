@@ -157,6 +157,22 @@ Each row is an implementation card. Request/response fields are intentionally ex
 | AUTH-07 | POST /auth/password/resetComplete password reset. | {token,email,password,password\_confirmation} | 204 | AUTH-06 | **P1** | TBD \- Backend/Security | **Blocked** |
 | AUTH-08 | GET /auth/permissionsLightweight permission refresh for UI. | No body | 200 {roles:\[...\],permissions:\[...\]} | AUTH-02 | **P1** | TBD \- Backend/Security | **Blocked** |
 
+### **SYS-01 — GET /api/v1/health**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | SYS-01 / P0 |
+| Purpose | Public liveness/readiness report for the API database, default private storage disk and queue connection. |
+| Required permission | None; this is an unauthenticated platform probe. |
+| Dependencies | Laravel database, filesystem and queue configuration. |
+| Request / validation | No body. An optional valid `X-Request-ID` is echoed; otherwise the API generates one. |
+| Success | `200` standard envelope containing `status`, `db`, `storage`, `queue` and ISO-8601 UTC `time`; each dependency is `ok`. |
+| Errors | `503 SERVICE_UNAVAILABLE` standard error envelope when any required dependency cannot be reached; unexpected framework errors remain `500`. |
+| Workflow / tenant scope | No organization data is queried or returned. |
+| Side effects / audit / notifications | Read-only probe; no audit event or notification is created. |
+| Tests | `tests/Feature/Platform/HealthTest.php` covers success shape/status, dependency failure, request-ID traceability and API versioning. |
+| Implementation status | Done. |
+
 ## **Organizations, users and RBAC**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
