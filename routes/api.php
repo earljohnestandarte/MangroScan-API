@@ -51,6 +51,7 @@ use App\Http\Controllers\Api\V1\Organization\OrganizationUpdateController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobIndexController;
+use App\Http\Controllers\Api\V1\Processing\ProcessingJobRetryController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobShowController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobStoreController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
@@ -518,6 +519,13 @@ Route::prefix('v1')->group(function () {
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:processing_jobs.manage', 'throttle:auth.authenticated',
+        ]);
+
+    // [JOB-04] POST /api/v1/processing-jobs/{id}/retry
+    Route::post('/processing-jobs/{job}/retry', ProcessingJobRetryController::class)
+        ->whereUuid('job')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:processing_jobs.create', 'throttle:auth.authenticated',
         ]);
 
     // [TREE-01] GET /api/v1/tree-observations

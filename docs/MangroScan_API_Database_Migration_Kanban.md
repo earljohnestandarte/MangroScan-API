@@ -1054,7 +1054,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | JOB-01 | GET /processing-jobsList processing jobs. | Query: mission\_id,flight\_id,status,type,page | 200 {data:\[ProcessingJob\],meta} | AUTH \+ processing\_jobs | **P0** | Codex \- AI/API | **Done** |
 | JOB-02 | POST /processing-jobsQueue detector/classifier/combined processing. | {mission\_id,flight\_session\_id?,job\_type,media\_ids:\[uuid\],parameters?} | 202 {data:{processing\_job\_id,job\_status:"queued"}} | MEDIA-03 \+ AISVC-04 \+ MODEL-01 | **P0** | Codex \- AI/API | **Done** |
 | JOB-03 | GET /processing-jobs/{id}Job status, runs, outputs and errors. | Path: id | 200 {data:{job,model\_runs,output\_summary}} | JOB-02 | **P0** | Codex \- AI/API | **Done** |
-| JOB-04 | POST /processing-jobs/{id}/retryRetry failed job idempotently. | {reason?} | 202 {data:ProcessingJob} | JOB-03 failed | **P1** | TBD \- AI/API | **Ready** |
+| JOB-04 | POST /processing-jobs/{id}/retryRetry failed job idempotently. | {reason?} | 202 {data:ProcessingJob} | JOB-03 failed | **P1** | Codex \- AI/API | **Done** |
 | JOB-05 | POST /processing-jobs/{id}/cancelCancel queued/running job when supported. | {reason?} | 200 {data:ProcessingJob} | JOB-03 | **P2** | TBD \- AI/API | Backlog |
 
 ### **AISVC-01 — GET /api/v1/admin/ai-services**
@@ -1131,6 +1131,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Exact response / ordering | Returns exact `200 {data:{job,model_runs,output_summary}}` plus request ID. `job` uses the established ProcessingJob resource including safe `error_message`; `model_runs` exposes run/job/version/media identifiers, type, parameters, lifecycle timestamps/status and creation time. Runs order by creation time then UUID. Queued jobs may legitimately return `model_runs:[]` and `output_summary:null`. |
 | Security / side effects / DCL | Model version provenance is exposed by UUID only; private `model_file_path`, service topology and encrypted credentials never cross the API. This read makes no FastAPI call and creates no audit, notification or mutation. It reuses JOB-01 processing-job SELECT and JOB-02 model-run SELECT; reporting remains read-only and no new DCL is needed. |
 | Tests / status | `ProcessingJobShowTest` covers exact nested fields/order and output, safe error/provenance boundaries, empty queued state, tenant/missing/malformed/deleted-lineage hiding, authentication, RBAC, inactivity, throttling, no audit and read-only DCL. Done — focused SQLite and PostgreSQL pass 6 tests / 42 assertions; Processing module passes 23 tests / 176 SQLite and 177 PostgreSQL assertions; full SQLite passes 562 / 3406 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 562 / 3422; route, Pint and diff gates pass. |
+
+### **JOB-04 — POST /api/v1/processing-jobs/{id}/retry**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | JOB-04 / P1 |
+| Purpose / permission | Queue an idempotent new execution workflow from a tenant-visible failed job while preserving the original job and runs as immutable failure evidence. Requires active Sanctum authentication and tenant-valid `processing_jobs.create`; foreign, missing, malformed and deleted-site lineage remain non-enumerable 404s. |
+| Request / exact response | Requires `Idempotency-Key` (1–100 chars) and accepts optional trimmed reason up to 5000 characters. Returns exact `202 {data:ProcessingJob}` plus request ID using the established safe resource. Actor/key plus source job and normalized reason form the fingerprint; identical retries return the same queued job without duplicate runs/audit, while changed evidence returns 409. |
+| Workflow / provenance | Only failed jobs with a non-empty execution plan, tenant-owned inputs still marked failed, and enabled healthy services behind every original model version can retry. A new queued job copies input summary and original run model/media/parameter provenance, marks inputs queued, and records `retry_of_job_id`/reason; the failed job/runs are never rewritten and no synchronous inference call occurs. |
+| Transaction / audit / DCL / tests | Idempotency advisory lock, source/media locks, job/run inserts, media queueing and secret-free `processing.retry` evidence share one transaction, so audit failure restores all state. The additive DCL grants API INSERT only on retry lineage/reason; existing JOB-02 selected-column job/run/media grants do the rest, while update/delete/report/worker boundaries remain unchanged. `ProcessingJobRetryTest` covers exact durable provenance, canonical replay/conflict, failed/media/service gates, tenant/path hiding, validation, authentication/RBAC/inactivity, audit rollback and DCL. Done — focused SQLite/PostgreSQL pass 7 tests / 43 assertions each; full SQLite passes 594 / 3638 (six PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 594 / 3657; live privilege gates pass. |
 
 ### **MODEL-01 — GET /api/v1/ai-models**
 
