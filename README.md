@@ -37,6 +37,7 @@ flowchart LR
 - [Configuration](#configuration)
 - [Development](#development)
 - [Testing](#testing)
+- [Team API Development Workflow](#team-api-development-workflow)
 - [Deployment](#deployment)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
@@ -1028,6 +1029,14 @@ php artisan test --coverage --coverage-html=coverage
 
 # Open coverage/index.html in browser
 ```
+
+---
+
+## Team API Development Workflow
+
+Remaining endpoint ownership, dependency-aware work packages, branch names, code-placement conventions, tracker status rules, testing gates, and merge-conflict controls are documented in the [MangroScan API Team Development Guide](docs/CONTRIBUTING_API.md).
+
+The authoritative assignment tracker is [docs/MangroScan_API_Endpoint_Tracker - API Endpoint Tracker.csv](docs/MangroScan_API_Endpoint_Tracker%20-%20API%20Endpoint%20Tracker.csv). Developers should update only their owned planning fields and must preserve every endpoint contract column.
 
 ---
 
