@@ -78,12 +78,18 @@ class DroneStoreTest extends TestCase
         $this->assertDatabaseMissing('drones', ['serial_number' => 'MS-AIR-001']);
     }
 
-    // [DRONE-02] Authentication and active user/organization state are mandatory.
-    public function test_it_enforces_active_authentication_without_invented_permission(): void
+    // [DRONE-02] Authentication, active identity, and hardware-management authority are mandatory.
+    public function test_it_enforces_active_authentication_and_drone_management_permission(): void
     {
         $this->postJson('/api/v1/drones', $this->payload())->assertUnauthorized();
         $g = $this->graph();
+        DB::table('role_permissions')->delete();
+        $this->app['auth']->forgetGuards();
+        $this->withToken($g['token'])->postJson('/api/v1/drones', $this->payload())
+            ->assertForbidden()->assertJsonPath('error.details.required_permission', 'drones.manage');
+        DB::table('role_permissions')->insert(['role_id' => $g['role'], 'permission_id' => $g['permission'], 'created_at' => now(), 'updated_at' => now()]);
         DB::table('users')->where('user_id', $g['actor'])->update(['status' => 'inactive']);
+        $this->app['auth']->forgetGuards();
         $this->withToken($g['token'])->postJson('/api/v1/drones', $this->payload())
             ->assertForbidden()->assertJsonPath('error.code', 'ACCOUNT_INACTIVE');
     }
@@ -121,11 +127,17 @@ class DroneStoreTest extends TestCase
         $actor = (string) Str::uuid();
         DB::table('organizations')->insert(['organization_id' => $org, 'organization_name' => 'Drone Registration', 'status' => 'active', 'created_at' => now(), 'updated_at' => now()]);
         DB::table('users')->insert(['user_id' => $actor, 'organization_id' => $org, 'first_name' => 'Drone', 'last_name' => 'Registrar', 'email' => Str::uuid().'@test', 'password' => Hash::make('password'), 'status' => 'active', 'created_at' => now(), 'updated_at' => now()]);
+        $role = (string) Str::uuid();
+        $permission = (string) Str::uuid();
+        DB::table('roles')->insert(['role_id' => $role, 'organization_id' => $org, 'role_name' => 'Drone Manager', 'role_code' => 'drone_manager', 'is_system_role' => false, 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('permissions')->insert(['permission_id' => $permission, 'permission_code' => 'drones.manage', 'permission_name' => 'Manage drones', 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('user_roles')->insert(['user_id' => $actor, 'role_id' => $role, 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('role_permissions')->insert(['role_id' => $role, 'permission_id' => $permission, 'created_at' => now(), 'updated_at' => now()]);
         DB::table('drones')->insert([
             ['drone_id' => (string) Str::uuid(), 'organization_id' => $org, 'drone_name' => 'Existing', 'serial_number' => 'EXISTING-SERIAL', 'status' => 'available', 'created_at' => now(), 'updated_at' => now(), 'deleted_at' => null],
             ['drone_id' => (string) Str::uuid(), 'organization_id' => $org, 'drone_name' => 'Deleted', 'serial_number' => 'DELETED-SERIAL', 'status' => 'retired', 'created_at' => now(), 'updated_at' => now(), 'deleted_at' => now()],
         ]);
 
-        return ['org' => $org, 'actor' => $actor, 'token' => User::findOrFail($actor)->createToken('drone-store')->plainTextToken];
+        return ['org' => $org, 'actor' => $actor, 'role' => $role, 'permission' => $permission, 'token' => User::findOrFail($actor)->createToken('drone-store')->plainTextToken];
     }
 }

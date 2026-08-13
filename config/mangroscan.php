@@ -5,6 +5,8 @@ return [
 
     'web_url' => env('MANGROSCAN_WEB_URL', 'http://localhost:5173'),
 
+    'seed_user_password' => env('MANGROSCAN_SEED_USER_PASSWORD', ''),
+
     'features' => [
         'health_checks' => true,
         'request_ids' => true,

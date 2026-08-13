@@ -682,18 +682,18 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Implementation field | Detail |
 | :---- | :---- |
 | Purpose / dependency | Return the caller's tenant-owned drone catalog. Although P1, DRONE-01 was pulled before FLT-01 because the authoritative `flight_sessions.drone_id` foreign key requires the drone table. |
-| Authentication / authorization | Sanctum and active user/organization checks are mandatory. Appendix B defines no drone/hardware permission, so the endpoint does not invent one; every query is still constrained by the authenticated user's `organization_id`. |
+| Authentication / authorization | Sanctum, active user/organization checks, and tenant-effective `drones.read` are mandatory. Every query is additionally constrained by the authenticated user's `organization_id`. |
 | Request / response | Optional normalized `status`, case-insensitive `search`, positive `page`, and `per_page` 1 through 100. Success is exact safe Drone resources plus `request_id`, `page`, `per_page`, `total`, and `last_page`. |
 | Tenant / lifecycle behavior | Records from other organizations and soft-deleted drones never affect output or pagination. Search covers name, model, and serial number; status accepts only `available`, `maintenance`, or `retired`. |
 | Database schema | Adds UUID-backed `drones`, organization FK, documented metadata and numeric capacities, globally unique nullable serial number, soft deletion, organization/status index, and a PostgreSQL lifecycle check constraint. |
 | Side effects / privileges | Read-only; no audit event or notification. `007_drone_grants.sql` gives API and reporting roles SELECT only and denies INSERT, UPDATE, and DELETE until corresponding write cards land. |
-| Tests / status | `DroneIndexTest` covers exact fields/meta/order, tenant and soft-delete isolation, filters, validation, authentication without an undocumented permission, inactive identities, no audit, throttling, constraint and DCL. Done - full SQLite passes 162 tests / 874 assertions and PostgreSQL 18/PostGIS passes 162 / 875; route, Pint, Composer, DCL and diff gates pass. |
+| Tests / status | `DroneIndexTest` covers exact fields/meta/order, tenant and soft-delete isolation, filters, validation, `drones.read` authorization, inactive identities, no audit, throttling, constraint and DCL. |
 
 ### **DRONE-02 — POST /api/v1/drones**
 
 | Implementation field | Detail |
 | :---- | :---- |
-| Purpose / access | Register a drone owned by the active authenticated caller's organization. No undocumented hardware permission is invented, matching DRONE-01 and Appendix B. |
+| Purpose / access | Register a drone owned by the active authenticated caller's organization after tenant-effective `drones.manage` authorization. |
 | Request / success | Required normalized name/status; optional model, uppercased serial, firmware and positive bounded flight/payload decimals. Returns `201` exact safe Drone plus request ID with server-owned tenant UUID. |
 | Conflicts / transaction | Serial numbers are globally reserved by active and soft-deleted units. PostgreSQL advisory locking prevents concurrent duplicate registration. Drone insert and immutable `drone.create` evidence share one rollback-safe transaction. |
 | DCL / tests | `019_drone_write_grants.sql` adds API INSERT only; API update/delete remain denied, reporting remains SELECT-only and worker insert is denied. Done — full SQLite passes 382 tests / 2148 assertions and PostgreSQL 18/PostGIS passes 382 / 2155; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
@@ -702,7 +702,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | Implementation field | Detail |
 | :---- | :---- |
-| Purpose / access | Return one tenant-owned, non-deleted drone and its attached sensors. Sanctum and active identity checks are mandatory; no undocumented hardware permission is invented, matching Appendix B and DRONE-01/02. |
+| Purpose / access | Return one tenant-owned, non-deleted drone and its attached sensors. Sanctum, active identity, and tenant-effective `drones.read` are mandatory. |
 | Success / errors | Returns the exact `200 {data:{drone,sensors}}` contract plus request ID metadata. Missing, malformed, foreign-tenant, and soft-deleted drone identifiers are all hidden behind `404 NOT_FOUND`; standard `401`, inactive-identity `403`, `429`, and unexpected `500` handling remain in force. |
 | Ordering / side effects | Sensors sort deterministically by name then UUID and expose only documented fields. This detail read creates no audit event or notification. |
 | Database schema | Adds UUID-backed `drone_sensors` with cascade FK to drones, documented sensor metadata, positive optional range, calibration flag, drone/status and serial indexes, and PostgreSQL checks for the documented sensor types and lifecycle states. Sensors do not use soft deletion because the authoritative schema does not define it. |
@@ -712,7 +712,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | Implementation field | Detail |
 | :---- | :---- |
-| Purpose / access | Attach a documented sensor to a tenant-owned, non-deleted drone. Active Sanctum identity is required, while no undocumented hardware permission is invented. |
+| Purpose / access | Attach a documented sensor to a tenant-owned, non-deleted drone. Active Sanctum identity and tenant-effective `sensors.manage` are required. |
 | Request / success | Requires normalized name, one of `rgb_camera`, `lidar`, `depth`, `gps`, or `imu`, a boolean calibration flag, and one of `active`, `inactive`, or `maintenance`; documented manufacturer, model, serial, resolution and positive two-decimal range remain optional. Returns `201 {data:Sensor}` plus request ID. |
 | Tenant / conflicts | Parent lookup is tenant-scoped and hides foreign, deleted, missing, and malformed drone IDs behind `404 NOT_FOUND`. Sensor serial numbers are normalized but intentionally not treated as unique because the authoritative schema defines only a nullable indexed field; concurrent attachments are therefore valid. |
 | Transaction / audit | Sensor insertion and immutable `sensor.create` evidence share one transaction, including actor, parent/sensor UUIDs, normalized safe metadata and request context. Audit failure rolls the sensor back; no notification is required. |
@@ -1737,6 +1737,7 @@ Audit storage is implemented by `2026_08_12_062300_create_audit_logs_table.php`.
 | Area | Permission codes |
 | :---- | :---- |
 | Identity | organizations.manage, users.manage, roles.manage, permissions.manage |
+| Hardware | drones.read, drones.manage, sensors.manage, sensor\_calibrations.manage, batteries.read |
 | Sites | sites.read, sites.manage, boundaries.manage, plots.manage, site\_permissions.manage |
 | Missions | missions.read, missions.create, missions.update, missions.approve, missions.complete, mission\_team.manage |
 | Flights | flights.read, flights.create, flights.update, flights.start, flights.complete, checklists.submit |

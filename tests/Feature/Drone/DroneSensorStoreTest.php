@@ -98,11 +98,17 @@ class DroneSensorStoreTest extends TestCase
         $this->assertDatabaseCount('drone_sensors', 0);
     }
 
-    public function test_it_requires_active_authentication_without_an_invented_permission(): void
+    public function test_it_requires_active_authentication_and_sensor_management_permission(): void
     {
         $this->postJson('/api/v1/drones/'.Str::uuid().'/sensors', $this->payload())->assertUnauthorized();
         $g = $this->graph();
+        DB::table('role_permissions')->delete();
+        $this->app['auth']->forgetGuards();
+        $this->withToken($g['token'])->postJson('/api/v1/drones/'.$g['drone'].'/sensors', $this->payload())
+            ->assertForbidden()->assertJsonPath('error.details.required_permission', 'sensors.manage');
+        DB::table('role_permissions')->insert(['role_id' => $g['role'], 'permission_id' => $g['permission'], 'created_at' => now(), 'updated_at' => now()]);
         DB::table('users')->where('user_id', $g['actor'])->update(['status' => 'inactive']);
+        $this->app['auth']->forgetGuards();
         $this->withToken($g['token'])->postJson('/api/v1/drones/'.$g['drone'].'/sensors', $this->payload())
             ->assertForbidden()->assertJsonPath('error.code', 'ACCOUNT_INACTIVE');
     }
@@ -155,13 +161,20 @@ class DroneSensorStoreTest extends TestCase
             'email' => Str::uuid().'@test', 'password' => Hash::make('password'), 'status' => 'active',
             'created_at' => now(), 'updated_at' => now(),
         ]);
+        $role = (string) Str::uuid();
+        $permission = (string) Str::uuid();
+        DB::table('roles')->insert(['role_id' => $role, 'organization_id' => $org, 'role_name' => 'Sensor Manager', 'role_code' => 'sensor_manager', 'is_system_role' => false, 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('permissions')->insert(['permission_id' => $permission, 'permission_code' => 'sensors.manage', 'permission_name' => 'Manage sensors', 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('user_roles')->insert(['user_id' => $actor, 'role_id' => $role, 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('role_permissions')->insert(['role_id' => $role, 'permission_id' => $permission, 'created_at' => now(), 'updated_at' => now()]);
         $this->drone($drone, $org, 'Local');
         $this->drone($foreignDrone, $foreignOrg, 'Foreign');
         $this->drone($deletedDrone, $org, 'Deleted', true);
 
         return [
             'org' => $org, 'actor' => $actor, 'drone' => $drone, 'foreign_drone' => $foreignDrone,
-            'deleted_drone' => $deletedDrone, 'token' => User::findOrFail($actor)->createToken('sensor-store')->plainTextToken,
+            'deleted_drone' => $deletedDrone, 'role' => $role, 'permission' => $permission,
+            'token' => User::findOrFail($actor)->createToken('sensor-store')->plainTextToken,
         ];
     }
 

@@ -16,6 +16,14 @@ class Role extends Model
 
     protected $keyType = 'string';
 
+    protected $fillable = [
+        'organization_id',
+        'role_name',
+        'role_code',
+        'description',
+        'is_system_role',
+    ];
+
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(

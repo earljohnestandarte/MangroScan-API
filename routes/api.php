@@ -398,22 +398,22 @@ Route::prefix('v1')->group(function () {
 
     // [DRONE-01] GET /api/v1/drones
     Route::get('/drones', DroneIndexController::class)->middleware([
-        'auth:sanctum', EnsureActiveIdentity::class, 'throttle:auth.authenticated',
+        'auth:sanctum', EnsureActiveIdentity::class, 'permission:drones.read', 'throttle:auth.authenticated',
     ]);
 
     // [DRONE-02] POST /api/v1/drones
     Route::post('/drones', DroneStoreController::class)->middleware([
-        'auth:sanctum', EnsureActiveIdentity::class, 'throttle:auth.authenticated',
+        'auth:sanctum', EnsureActiveIdentity::class, 'permission:drones.manage', 'throttle:auth.authenticated',
     ]);
 
     // [DRONE-03] GET /api/v1/drones/{id}
     Route::get('/drones/{drone}', DroneShowController::class)->whereUuid('drone')->middleware([
-        'auth:sanctum', EnsureActiveIdentity::class, 'throttle:auth.authenticated',
+        'auth:sanctum', EnsureActiveIdentity::class, 'permission:drones.read', 'throttle:auth.authenticated',
     ]);
 
     // [SENSOR-01] POST /api/v1/drones/{id}/sensors
     Route::post('/drones/{drone}/sensors', DroneSensorStoreController::class)->whereUuid('drone')->middleware([
-        'auth:sanctum', EnsureActiveIdentity::class, 'throttle:auth.authenticated',
+        'auth:sanctum', EnsureActiveIdentity::class, 'permission:sensors.manage', 'throttle:auth.authenticated',
     ]);
 
     // [FLT-01] GET /api/v1/missions/{id}/flights

@@ -87,8 +87,8 @@ class DroneIndexTest extends TestCase
             ->assertJsonValidationErrors(['status', 'page', 'per_page'], 'error.details');
     }
 
-    // [DRONE-01] Authentication is mandatory; no undocumented hardware permission is invented.
-    public function test_it_requires_authentication_without_an_undocumented_permission(): void
+    // [DRONE-01] Authentication and the documented hardware-read permission are mandatory.
+    public function test_it_requires_authentication_and_drone_read_permission(): void
     {
         $this->getJson('/api/v1/drones')
             ->assertUnauthorized()
@@ -96,11 +96,11 @@ class DroneIndexTest extends TestCase
 
         $graph = $this->createGraph();
 
-        $this->assertDatabaseCount('roles', 0);
-        $this->assertDatabaseCount('permissions', 0);
+        DB::table('role_permissions')->delete();
         $this->withToken($graph['token'])
             ->getJson('/api/v1/drones')
-            ->assertOk();
+            ->assertForbidden()
+            ->assertJsonPath('error.details.required_permission', 'drones.read');
     }
 
     // [DRONE-01] Inactive users and organizations cannot enumerate hardware.
@@ -119,6 +119,7 @@ class DroneIndexTest extends TestCase
             ->where('organization_id', $inactiveOrganization['organization_id'])
             ->update(['status' => 'inactive']);
 
+        $this->app['auth']->forgetGuards();
         $this->withToken($inactiveOrganization['token'])
             ->getJson('/api/v1/drones')
             ->assertForbidden()
@@ -212,6 +213,7 @@ class DroneIndexTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        $this->grantPermission($actorId, $organizationId, 'drones.read');
 
         $alphaDroneId = (string) Str::uuid();
         $betaDroneId = (string) Str::uuid();
@@ -230,6 +232,16 @@ class DroneIndexTest extends TestCase
                 ->createToken('Drone list test', ['*'], now()->addHour())
                 ->plainTextToken,
         ];
+    }
+
+    private function grantPermission(string $userId, string $organizationId, string $code): void
+    {
+        $roleId = (string) Str::uuid();
+        $permissionId = DB::table('permissions')->where('permission_code', $code)->value('permission_id') ?? (string) Str::uuid();
+        DB::table('roles')->insert(['role_id' => $roleId, 'organization_id' => $organizationId, 'role_name' => 'Drone Reader', 'role_code' => 'drone_reader', 'is_system_role' => false, 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('permissions')->insertOrIgnore(['permission_id' => $permissionId, 'permission_code' => $code, 'permission_name' => 'Read drones', 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('user_roles')->insert(['user_id' => $userId, 'role_id' => $roleId, 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('role_permissions')->insert(['role_id' => $roleId, 'permission_id' => $permissionId, 'created_at' => now(), 'updated_at' => now()]);
     }
 
     private function insertDrone(
