@@ -45,7 +45,7 @@ class UserHasPermissionFunctionTest extends TestCase
         $dcl = file_get_contents(database_path('sql/dcl/042_user_has_permission_function_grants.sql'));
 
         $this->assertIsString($migration);
-        foreach (['fn_user_has_permission', 'RETURNS boolean', 'STABLE', 'PARALLEL SAFE', 'v_user_effective_permissions', 'REVOKE ALL'] as $fragment) {
+        foreach (['CREATE OR REPLACE FUNCTION app.fn_user_has_permission', 'RETURNS boolean', 'STABLE', 'PARALLEL SAFE', 'v_user_effective_permissions', 'REVOKE ALL'] as $fragment) {
             $this->assertStringContainsString($fragment, $migration);
         }
         $this->assertStringNotContainsString('SECURITY DEFINER', $migration);

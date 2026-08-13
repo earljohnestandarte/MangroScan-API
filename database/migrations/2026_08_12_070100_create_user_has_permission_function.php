@@ -12,7 +12,7 @@ return new class extends Migration
         }
 
         DB::unprepared(<<<'SQL'
-            CREATE FUNCTION app.fn_user_has_permission(p_user_id uuid, p_permission_code text)
+            CREATE OR REPLACE FUNCTION app.fn_user_has_permission(p_user_id uuid, p_permission_code text)
             RETURNS boolean
             LANGUAGE sql
             STABLE
