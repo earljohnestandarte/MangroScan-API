@@ -4,10 +4,23 @@
 
 A production-grade RESTful API for managing drone-based surveys, AI-powered tree analysis, and environmental monitoring of mangrove forests. Built with Laravel 12, PostgreSQL, PostGIS, and modern backend practices.
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com)
+[![API](https://img.shields.io/badge/API-v1-0F766E.svg)](#api-documentation)
 [![PHP Version](https://img.shields.io/badge/php-%5E8.2-777BB4.svg?logo=php&logoColor=white)](https://www.php.net/)
 [![Laravel Version](https://img.shields.io/badge/laravel-12.0-FF2D20.svg?logo=laravel&logoColor=white)](https://laravel.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1.svg?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![PostGIS](https://img.shields.io/badge/PostGIS-enabled-5A8F29.svg)](https://postgis.net/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+```mermaid
+flowchart LR
+    Drone["🚁 Drone & sensors"] --> API["🌿 MangroScan API"]
+    Mobile["📱 Field application"] --> API
+    API --> Geo["🗺️ PostgreSQL + PostGIS"]
+    API --> AI["🧠 AI services"]
+    AI --> Results["🌳 Tree observations"]
+    Geo --> Results
+    Results --> Reports["📊 Maps & reports"]
+```
 
 ---
 
@@ -17,7 +30,7 @@ A production-grade RESTful API for managing drone-based surveys, AI-powered tree
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [System Requirements](#system-requirements)
-- [Quick Start](#quick-start)
+- [Development Environment Setup](#development-environment-setup)
 - [Project Structure](#project-structure)
 - [Database & Migrations](#database--migrations)
 - [API Documentation](#api-documentation)
@@ -163,99 +176,200 @@ MangroScan API is a comprehensive backend solution for organizations conducting 
 
 ---
 
-## Quick Start
+## Development Environment Setup
 
-### 1. Clone & Setup
+The supported development path uses PostgreSQL with PostGIS. SQLite is intentionally reserved for the fast default test suite; it does not exercise PostgreSQL constraints, functions, triggers, DCL, or geospatial behavior.
+
+```mermaid
+flowchart TD
+    A["1 · Clone repository"] --> B["2 · Install Composer & npm packages"]
+    B --> C["3 · Provision PostgreSQL + PostGIS"]
+    C --> D["4 · Create and configure .env"]
+    D --> E["5 · Run migrations"]
+    E --> F["6 · Apply least-privilege DCL"]
+    F --> G["7 · Run deterministic seeders"]
+    G --> H["8 · Start services"]
+    H --> I["✅ Health check + seeded login"]
+```
+
+### 1. Verify prerequisites
 
 ```bash
-# Clone repository
+php --version
+composer --version
+node --version
+npm --version
+psql --version
+```
+
+Required locally: PHP 8.2+, Composer 2.2+, Node.js 18+, PostgreSQL, and PostGIS. Make sure PHP has `pdo_pgsql`, `mbstring`, `bcmath`, `ctype`, and `fileinfo` enabled.
+
+### 2. Clone and install dependencies
+
+```bash
 git clone https://github.com/earljohnestandarte/MangroScan-API.git
 cd mangroscan-api
-
-# Copy environment file
-cp .env.example .env
-
-# Generate application key
-php artisan key:generate
+composer install
+npm install
 ```
 
-### 2. Install Dependencies
+Create the local environment file:
+
+```powershell
+# Windows PowerShell
+Copy-Item .env.example .env
+```
 
 ```bash
-# Install PHP dependencies
-composer install
+# macOS, Linux, or WSL
+cp .env.example .env
 ```
 
-### 3. Configure Database
+### 3. Provision the development database
 
-Edit `.env` file:
+Create a dedicated database and a local-only LOGIN role. Run these commands from the repository root using a PostgreSQL administrator account:
+
+```bash
+createdb -U postgres mangroscan
+createuser -U postgres --login --pwprompt mangroscan_dev
+psql -U postgres -d mangroscan -c "CREATE EXTENSION IF NOT EXISTS pgcrypto; CREATE EXTENSION IF NOT EXISTS postgis;"
+psql -U postgres -d mangroscan -f database/sql/dcl/001_roles_and_schema.sql
+psql -U postgres -d mangroscan -c "GRANT mangroscan_migrator, mangroscan_api_rw TO mangroscan_dev;"
+```
+
+If `mangroscan` or `mangroscan_dev` already exists, do not recreate it. Open `psql -U postgres -d postgres` and run `\password mangroscan_dev` when you only need to rotate the local credential without exposing it in shell history.
+
+The combined `mangroscan_dev` membership is a convenience for local development: it can run migrations and exercise the API. Staging and production should use separate migrator and runtime LOGIN roles.
+
+### 4. Configure `.env`
+
+Set these values in the uncommitted `.env` file:
 
 ```env
-# Using PostgreSQL (recommended)
+APP_NAME="MangroScan API"
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+MANGROSCAN_WEB_URL=http://localhost:5173
+
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_DATABASE=mangroscan
-DB_USERNAME=postgres
-DB_PASSWORD=your_password
+DB_USERNAME=mangroscan_dev
+DB_PASSWORD="replace-with-the-same-local-database-password"
+DB_SEARCH_PATH="app,public"
 
-# Or using SQLite (local development)
-DB_CONNECTION=sqlite
-DB_DATABASE=database.sqlite
+# Used only to create the three local developer accounts.
+MANGROSCAN_SEED_USER_PASSWORD="choose-a-local-login-password"
+
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+FILESYSTEM_DISK=local
+MEDIA_UPLOAD_DISK=local
 ```
 
-For PostgreSQL on Windows with WSL2:
+Never commit `.env`, database credentials, or the developer-account password. Generate the Laravel application key and clear any stale cached configuration:
 
 ```bash
-# Check if PostgreSQL is installed
-wsl -d Ubuntu psql --version
-
-# If not installed, run in Ubuntu terminal:
-sudo apt update
-sudo apt install postgresql postgresql-contrib postgis
-sudo service postgresql start
+php artisan key:generate
+php artisan optimize:clear
 ```
 
-### 4. Run Migrations
+Confirm that Laravel resolves the intended database before changing its schema:
 
 ```bash
-# Create database
-php artisan db:create
+php artisan tinker --execute="dump(config('app.env'), config('database.default'), config('database.connections.pgsql.database'), config('database.connections.pgsql.username'));"
+```
 
-# Run all migrations
+Expected values include `local`, `pgsql`, `mangroscan`, and `mangroscan_dev`.
+
+### 5. Run migrations
+
+```bash
 php artisan migrate
+php artisan migrate:status
+```
 
-# Seed with sample data (optional)
+The migrations create the application tables, PostgreSQL functions/views/triggers, and PostGIS-backed columns in the `app` schema. PostgreSQL extensions were created by the administrator in step 3 because ordinary application roles should not receive extension-management privileges.
+
+### 6. Apply database grants
+
+After migrations, apply the remaining version-controlled DCL scripts in filename order.
+
+```powershell
+# Windows PowerShell
+Get-ChildItem database/sql/dcl/*.sql |
+    Where-Object Name -ne '001_roles_and_schema.sql' |
+    Sort-Object Name |
+    ForEach-Object { & psql -v ON_ERROR_STOP=1 -U postgres -d mangroscan -f $_.FullName }
+```
+
+```bash
+# macOS, Linux, or WSL
+for file in database/sql/dcl/*.sql; do
+  if [ "$(basename "$file")" != "001_roles_and_schema.sql" ]; then
+    psql -v ON_ERROR_STOP=1 -U postgres -d mangroscan -f "$file" || exit 1
+  fi
+done
+```
+
+### 7. Run deterministic seeders
+
+```mermaid
+flowchart LR
+    Org["🏢 Development organization"] --> Permissions["🔑 54 permissions"]
+    Permissions --> Roles["🛡️ 3 primary roles"]
+    Roles --> Matrix["🔗 Role-permission matrix"]
+    Matrix --> Users["👥 3 verified developer users"]
+```
+
+Run the complete dependency-safe seed chain:
+
+```bash
 php artisan db:seed
 ```
 
-### 5. Start Development Server
+The command is idempotent and may be run repeatedly. It creates or updates:
+
+| Developer account | Seeded role | Password |
+| --- | --- | --- |
+| `admin@mangroscan.test` | System Administrator | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
+| `researcher@mangroscan.test` | Researcher | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
+| `specialist@mangroscan.test` | Environmental Specialist | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
+
+All seeded passwords are hashed. The developer-user seeder refuses a blank password and skips account creation in production. See the [RBAC Seeder Matrix](docs/MangroScan_RBAC_Seeder_Matrix.md) for the exact permission assignments.
+
+### 8. Start and verify the application
+
+Run everything together:
 
 ```bash
-# Option 1: Run all services concurrently
 composer run dev
-
-# Option 2: Run individual services separately
-php artisan serve                    # API server on localhost:8000
-php artisan queue:listen             # Queue worker
-php artisan pail --timeout=0         # Log viewer
-npm run dev                          # Vite dev server
 ```
 
-### 6. Verify Installation
+Or use separate terminals:
 
 ```bash
-# Check API health
-curl http://localhost:8000/api/v1/health
+php artisan serve
+php artisan queue:listen --tries=1
+php artisan pail --timeout=0
+npm run dev
+```
 
-# Expected response
-{
-  "status": "ok",
-  "db": "connected",
-  "storage": "ok",
-  "queue": "ready",
-  "time": "2025-08-13T10:30:45Z"
-}
+Verify the service:
+
+```bash
+curl http://localhost:8000/api/v1/health
+curl http://localhost:8000/api/v1/meta/capabilities
+```
+
+Then authenticate with one of the seeded email addresses and the local value of `MANGROSCAN_SEED_USER_PASSWORD`:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"researcher@mangroscan.test","password":"your-local-seed-password","device_name":"Local development"}'
 ```
 
 ---
@@ -354,33 +468,17 @@ Migrations are version-controlled database schema changes. They allow you to:
 
 ### Migration Files
 
-Located in `database/migrations/`, ordered chronologically:
+Migrations live in `database/migrations/` and execute in timestamp order. The current chain is organized by dependency rather than alphabetically:
 
 ```
 database/migrations/
-├── 2024_01_01_000001_create_organizations_table.php
-├── 2024_01_01_000002_create_users_table.php
-├── 2024_01_01_000003_create_roles_table.php
-├── 2024_01_01_000004_create_permissions_table.php
-├── 2024_01_01_000005_create_role_permission_table.php
-├── 2024_01_01_000006_create_user_role_table.php
-├── 2024_01_01_000007_create_audit_logs_table.php
-├── 2024_01_01_000008_create_survey_sites_table.php
-├── 2024_01_01_000009_create_site_boundaries_table.php
-├── 2024_01_01_000010_create_monitoring_plots_table.php
-├── 2024_01_01_000011_create_drones_table.php
-├── 2024_01_01_000012_create_drone_sensors_table.php
-├── 2024_01_01_000013_create_survey_missions_table.php
-├── 2024_01_01_000014_create_mission_team_members_table.php
-├── 2024_01_01_000015_create_flight_sessions_table.php
-├── 2024_01_01_000016_create_media_assets_table.php
-├── 2024_01_01_000017_create_sensor_datasets_table.php
-├── 2024_01_01_000018_create_processing_jobs_table.php
-├── 2024_01_01_000019_create_ai_services_table.php
-├── 2024_01_01_000020_create_ai_models_table.php
-├── 2024_01_01_000021_create_model_runs_table.php
-├── 2024_01_01_000022_create_tree_observations_table.php
-└── ... (more migrations for other tables)
+├── 0001_*                 Laravel cache and queue infrastructure
+├── 2026_08_12_0615*      PostgreSQL extensions
+├── 2026_08_12_0616–0623  Organizations, users, RBAC, tokens, and audit
+├── 2026_08_12_0630–0639  Sites, missions, drones, flights, and mobile sync
+├── 2026_08_12_0640–0659  Media, AI, results, maps, and upload workflows
+├── 2026_08_12_0660*      Validation data foundation
+└── 2026_08_12_0700–0702  Effective-access view/function and update triggers
 ```
 
 ### Running Migrations
@@ -389,24 +487,15 @@ database/migrations/
 # Run pending migrations
 php artisan migrate
 
-# Create database before migration (requires DB_CONNECTION config)
-php artisan db:create
-
 # Rollback last migration batch
 php artisan migrate:rollback
-
-# Rollback all migrations
-php artisan migrate:reset
-
-# Rollback and re-run all migrations
-php artisan migrate:refresh
-
-# Rollback, re-run, and seed
-php artisan migrate:refresh --seed
 
 # Check migration status
 php artisan migrate:status
 ```
+
+> [!CAUTION]
+> `migrate:fresh`, `migrate:refresh`, `migrate:reset`, and `db:wipe` are destructive. Never run them against a shared development, staging, or production database. Use them only after verifying a disposable test database.
 
 ### Creating New Migrations
 
@@ -426,36 +515,40 @@ php artisan migrate
 
 ### Seeding the Database
 
-Database seeders populate tables with sample data for development and testing.
+`DatabaseSeeder` runs a dependency-safe, idempotent chain:
+
+1. `OrganizationSeeder`
+2. `PermissionSeeder`
+3. `RoleSeeder`
+4. `RolePermissionSeeder`
+5. `DeveloperUserSeeder`
 
 ```bash
-# Run all seeders
+# Requires a non-empty MANGROSCAN_SEED_USER_PASSWORD outside production.
 php artisan db:seed
 
-# Run specific seeder
-php artisan db:seed --class=UserSeeder
-
-# Refresh database with seeds
-php artisan migrate:refresh --seed
+# Inspect the result without displaying passwords.
+php artisan tinker --execute="dump(DB::table('organizations')->count(), DB::table('permissions')->count(), DB::table('roles')->count(), DB::table('users')->count());"
 ```
+
+Expected counts in an otherwise empty development database are 1 organization, 54 permissions, 3 primary roles, and 3 developer users. Existing unrelated application data is preserved. Role-permission and user-role pivots are synchronized without duplication.
 
 ### Key Tables Overview
 
 | Table | Purpose | Key Fields |
 |-------|---------|-----------|
-| `organizations` | Tenant/org records | id, name, type, active |
-| `users` | System users | id, email, password, org_id |
-| `roles` | Authorization roles | id, name, org_id |
-| `permissions` | Granular permissions | id, name, description |
-| `survey_sites` | Monitoring areas | id, name, center_point (PostGIS Point) |
-| `site_boundaries` | Geospatial polygons | id, boundary_geom (PostGIS Polygon) |
-| `survey_missions` | Survey campaigns | id, site_id, start_date, status |
-| `flight_sessions` | Drone sorties | id, mission_id, status |
-| `media_assets` | Captured images | id, flight_id, file_path |
-| `processing_jobs` | AI inference jobs | id, status, input_data |
-| `tree_observations` | Detected trees | id, job_id, location (PostGIS Point) |
-| `species_classification_results` | Classification outputs | id, observation_id, species |
-| `audit_logs` | Action history | id, user_id, event, old/new values |
+| `organizations` | Tenant records | `organization_id`, `organization_name`, `status` |
+| `users` | Authenticated identities | `user_id`, `organization_id`, `email`, `status` |
+| `roles` | Global/tenant RBAC roles | `role_id`, `organization_id`, `role_code` |
+| `permissions` | Global permission catalog | `permission_id`, `permission_code` |
+| `survey_sites` | Monitoring areas | `site_id`, `organization_id`, `center_point` |
+| `site_boundaries` | Geospatial polygons | `boundary_id`, `site_id`, `boundary_geom` |
+| `survey_missions` | Survey campaigns | `mission_id`, `site_id`, `mission_status` |
+| `flight_sessions` | Drone sorties | `flight_session_id`, `mission_id`, `flight_status` |
+| `media_assets` | Captured media metadata | `media_asset_id`, `flight_session_id`, `storage_key` |
+| `processing_jobs` | AI inference jobs | `processing_job_id`, `job_status` |
+| `tree_observations` | Detected trees | `tree_observation_id`, `mission_id`, `tree_location` |
+| `audit_logs` | Immutable activity evidence | `audit_log_id`, `user_id`, `action`, `old_values`, `new_values` |
 
 ### PostGIS Geospatial Queries
 
@@ -686,31 +779,36 @@ Create `.env` from `.env.example` and configure:
 
 ```env
 # Application
-APP_NAME="MangroScan"
+APP_NAME="MangroScan API"
 APP_ENV=local              # local, testing, staging, production
 APP_DEBUG=true             # false in production
 APP_URL=http://localhost:8000
+MANGROSCAN_WEB_URL=http://localhost:5173
 
 # Database
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_DATABASE=mangroscan
-DB_USERNAME=postgres
-DB_PASSWORD=password
+DB_USERNAME=mangroscan_dev
+DB_PASSWORD="local-database-password"
+DB_SEARCH_PATH="app,public"
 
 # Cache & Queue
-CACHE_DRIVER=file          # file, redis, memcached
-QUEUE_CONNECTION=sync      # sync, redis, database
+CACHE_STORE=database       # database, redis, file
+QUEUE_CONNECTION=database  # database, redis, sync
 
 # Mail
 MAIL_MAILER=log            # log, smtp, mailgun
 MAIL_FROM_ADDRESS=noreply@mangroscan.local
 
 # MangroScan Config
-MANGROSCAN_WEB_URL=http://localhost:5173
+MANGROSCAN_SEED_USER_PASSWORD="local-developer-account-password"
 AUTH_ACCESS_TOKEN_TTL_MINUTES=60
+AUTH_LOGIN_ATTEMPTS_PER_MINUTE=5
+AUTHENTICATED_REQUESTS_PER_MINUTE=60
 MEDIA_UPLOAD_DISK=local    # local, s3
+MEDIA_UPLOAD_URL_TTL_MINUTES=30
 MEDIA_MAX_UPLOAD_BYTES=5368709120  # 5GB
 
 # AI Services
@@ -724,6 +822,7 @@ AI_SERVICE_TIMEOUT_SECONDS=10
 ```php
 return [
     'api_version' => 'v1',
+    'seed_user_password' => env('MANGROSCAN_SEED_USER_PASSWORD', ''),
     'features' => [
         'health_checks' => true,
         'request_ids' => true,
@@ -790,7 +889,7 @@ php artisan make:resource ResourceClassName
 
 # Database
 php artisan migrate
-php artisan migrate:refresh --seed
+php artisan migrate:status
 php artisan db:seed
 
 # Cache & Config
@@ -848,75 +947,78 @@ php artisan pail --type=error     # Only errors
 
 ## Testing
 
-### Test Structure
+Development and test data must remain separate:
 
-```
-tests/
-├── TestCase.php
-├── Feature/
-│   ├── Auth/
-│   ├── Organization/
-│   ├── Mission/
-│   └── ...
-└── Unit/
-    ├── Services/
-    ├── Models/
-    └── ...
+```mermaid
+flowchart LR
+    DevEnv[".env · APP_ENV=local"] --> DevDB[("mangroscan\nPersistent developer data")]
+    Fast["phpunit.xml"] --> SQLite[("SQLite :memory:\nFast compatibility suite")]
+    TestEnv[".env.testing · APP_ENV=testing"] --> TestDB[("mangroscan_test\nDisposable PostgreSQL data")]
+    PgProfile["phpunit.pgsql.xml"] --> TestDB
+    style DevDB fill:#dff3e4,stroke:#2f855a
+    style TestDB fill:#fff3cd,stroke:#b7791f
+    style SQLite fill:#e6f0ff,stroke:#2b6cb0
 ```
 
-### Running Tests
+### Fast SQLite suite
+
+The default PHPUnit profile forces an in-memory SQLite database. It does not read or destroy the development PostgreSQL database.
 
 ```bash
-# Run all tests (SQLite)
 php artisan test
-
-# Run with PostgreSQL (geospatial tests)
-php artisan test --configuration=phpunit.pgsql.xml
-
-# Run specific test file
 php artisan test tests/Feature/Auth/LoginTest.php
-
-# Run with specific filter
 php artisan test --filter=LoginTest
-
-# Run with coverage
-php artisan test --coverage
-
-# Stop on first failure
 php artisan test --stop-on-failure
 ```
 
-### Writing Tests
+### Dedicated PostgreSQL/PostGIS suite
 
-```php
-<?php
+Provision the disposable database once as a PostgreSQL administrator:
 
-namespace Tests\Feature;
-
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-class MissionTest extends TestCase
-{
-    use RefreshDatabase;
-
-    public function test_user_can_create_mission()
-    {
-        $user = User::factory()->create();
-        
-        $response = $this->actingAs($user)
-            ->postJson('/api/v1/missions', [
-                'site_id' => $siteId,
-                'mission_name' => 'Survey 2025',
-                'start_date' => '2025-08-15',
-            ]);
-
-        $response->assertStatus(201)
-            ->assertJsonStructure(['data' => ['id', 'name']]);
-    }
-}
+```bash
+psql -U postgres -d postgres -f database/sql/testing/001_create_test_database.sql
+psql -U postgres -d postgres
+\password mangroscan_test
+\q
 ```
+
+Copy and configure the isolated environment file:
+
+```powershell
+# Windows PowerShell
+Copy-Item .env.testing.example .env.testing
+```
+
+```bash
+# macOS, Linux, or WSL
+cp .env.testing.example .env.testing
+```
+
+Set `DB_USERNAME=mangroscan_test`, its local test password, and `MANGROSCAN_SEED_USER_PASSWORD=password` in `.env.testing`. Never copy development or production credentials into this file.
+
+Verify the resolved target before any destructive command:
+
+```bash
+php artisan tinker --env=testing --execute="dump(config('app.env'), config('database.connections.pgsql.database'), config('database.connections.pgsql.username'));"
+```
+
+The result must identify `testing`, `mangroscan_test`, and `mangroscan_test`. Then the disposable database can be safely reset and seeded:
+
+```bash
+php artisan migrate:fresh --seed --env=testing
+```
+
+Run PostgreSQL/PostGIS coverage with the dedicated profile:
+
+```bash
+php vendor/bin/phpunit -c phpunit.pgsql.xml
+
+# Focused RBAC/seeder verification
+php vendor/bin/phpunit -c phpunit.pgsql.xml tests/Feature/Rbac/RbacSeederTest.php
+```
+
+> [!WARNING]
+> PostgreSQL feature tests use `RefreshDatabase` and repeatedly rebuild `mangroscan_test`. If the resolved database name is anything else, stop immediately.
 
 ### Test Coverage Report
 
@@ -960,11 +1062,12 @@ APP_DEBUG=false
 
 # Database
 DB_HOST=prod-db.example.com
-DB_USERNAME=<secure>
+DB_USERNAME=<runtime-login-role>
 DB_PASSWORD=<secure>
+DB_SEARCH_PATH="app,public"
 
 # Cache
-CACHE_DRIVER=redis
+CACHE_STORE=redis
 REDIS_HOST=prod-redis.example.com
 
 # Queue
@@ -972,6 +1075,7 @@ QUEUE_CONNECTION=redis
 
 # Storage
 MEDIA_UPLOAD_DISK=s3
+MANGROSCAN_SEED_USER_PASSWORD=
 AWS_ACCESS_KEY_ID=<secure>
 AWS_SECRET_ACCESS_KEY=<secure>
 AWS_DEFAULT_REGION=us-east-1
@@ -984,8 +1088,9 @@ AWS_BUCKET=mangroscan-media
 ```bash
 ./vendor/bin/sail up -d
 ./vendor/bin/sail artisan migrate
-./vendor/bin/sail artisan db:seed
 ```
+
+Do not seed developer accounts during production deployment. `DeveloperUserSeeder` is production-guarded, and the production seed password should remain blank.
 
 #### Using Traditional VPS
 1. Install PHP 8.2+, PostgreSQL 18+, Composer, Node.js
@@ -1051,10 +1156,9 @@ php artisan model:prune
 **Solution**:
 ```bash
 php artisan migrate
-# Or if database doesn't exist:
-php artisan db:create
-php artisan migrate
 ```
+
+If the database does not exist, provision it with PostgreSQL tooling as described in [Development Environment Setup](#development-environment-setup); this project does not define an Artisan `db:create` command.
 
 #### 2. "Class not found" errors
 
@@ -1079,7 +1183,32 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 psql -U postgres -d mangroscan -c "SELECT PostGIS_Version();"
 ```
 
-#### 4. Port already in use (8000)
+#### 4. `MANGROSCAN_SEED_USER_PASSWORD` is not configured
+
+**Problem**: The developer-user seeder refuses to create accounts with a blank password.
+
+**Solution**:
+
+```bash
+# Set MANGROSCAN_SEED_USER_PASSWORD in the uncommitted .env, then:
+php artisan optimize:clear
+php artisan db:seed
+```
+
+#### 5. `permission denied for schema app`
+
+**Problem**: The local LOGIN role is missing its development group-role memberships, or the schema bootstrap was not applied.
+
+**Solution**:
+
+```bash
+psql -U postgres -d mangroscan -f database/sql/dcl/001_roles_and_schema.sql
+psql -U postgres -d mangroscan -c "GRANT mangroscan_migrator, mangroscan_api_rw TO mangroscan_dev;"
+```
+
+Reconnect after changing role membership so PostgreSQL starts a fresh session.
+
+#### 6. Port already in use (8000)
 
 **Problem**: Laravel server port busy  
 **Solution**:
@@ -1092,7 +1221,7 @@ lsof -i :8000
 kill -9 <PID>
 ```
 
-#### 5. Permission denied on storage directory
+#### 7. Permission denied on storage directory
 
 **Problem**: Cannot write to storage  
 **Solution**:
@@ -1101,7 +1230,7 @@ chmod -R 775 storage bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache
 ```
 
-#### 6. "The only supported ciphers are AES-128-CBC and AES-256-CBC"
+#### 8. "The only supported ciphers are AES-128-CBC and AES-256-CBC"
 
 **Problem**: APP_KEY not set  
 **Solution**:
