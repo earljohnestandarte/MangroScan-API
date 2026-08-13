@@ -1002,7 +1002,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | MEDIA-03 | POST /media/uploads/{uploadId}/completeFinalize upload after checksum/size validation. | {parts? ,checksum\_sha256?} | 201 {data:MediaAsset} | MEDIA-02 | **P0** | Codex \- Storage/API | **Done** |
 | MEDIA-04 | GET /media/{id}Return private-storage-safe media metadata; download URL/token issuance remains exclusive to MEDIA-05. | Path: id | 200 {data:MediaAsset} | MEDIA-03 | **P0** | Codex \- Storage/API | **Done** |
 | MEDIA-05 | POST /media/{id}/downloadIssue temporary private download URL or stream token. | No body | 200 {data:{url,expires\_at}} or streamed file | MEDIA-04 | **P1** | TBD \- Storage/API | **Blocked** |
-| MEDIA-06 | PATCH /media/{id}/qualitySet QC result. | {quality\_score?,quality\_status,notes?} | 200 {data:MediaAsset} | MEDIA-04 | **P0** | TBD \- Backend/API | **Ready** |
+| MEDIA-06 | PATCH /media/{id}/qualitySet QC result. | {quality\_score?,quality\_status,notes?} | 200 {data:MediaAsset} | MEDIA-04 | **P0** | Codex \- Backend/API | **Done** |
 | MEDIA-07 | DELETE /media/{id}Soft-delete unneeded media after dependency check. | Path: id | 204 | MEDIA-04 | **P2** | TBD \- Storage/API | Backlog |
 | SDS-01 | POST /flights/{id}/sensor-datasets/uploadsUpload LiDAR/depth/GPS/IMU dataset. | {file\_name,dataset\_type,file\_format,sensor\_id,file\_size\_bytes,spatial\_reference?,metadata?} | 201 {data:{upload\_id,...}} | FLT-03 \+ storage | **P1** | Codex \- Storage/API | **Done** |
 | SDS-02 | POST /sensor-datasets/uploads/{uploadId}/completeFinalize sensor dataset. | {checksum\_sha256?} | 201 {data:SensorDataset} | SDS-01 | **P1** | Codex \- Storage/API | **Done** |
@@ -1016,6 +1016,17 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Exact response / privacy | Returns exact `200 {data:MediaAsset}` plus request trace metadata. The response excludes `storage_key`, URL, preview/download pointer, token and expiry fields, and the endpoint never calls the storage adapter. |
 | Tenant and lifecycle scope | Resolves non-deleted media through flight, mission and non-deleted site organization lineage. Foreign, soft-deleted, missing, malformed and deleted-parent records are indistinguishable 404s. The read creates no audit, notification or mutation. |
 | DCL / tests / status | Reuses `012_media_asset_grants.sql`: API and reporting roles have SELECT only, with no worker access or new write privilege. `MediaShowTest` covers the exact safe shape, PostGIS Point(4326), private-field exclusion, tenant/deleted-lineage hiding, authentication, tenant-valid RBAC, inactive identity, throttling and no side effects. Done — focused SQLite media suite passes 23 tests / 203 assertions and PostgreSQL 18/PostGIS passes 23 / 204; full SQLite passes 623 / 3923 with nine PostgreSQL-only skips and full PostgreSQL passes 632 / 3953. |
+
+### **MEDIA-06 — PATCH /api/v1/media/{id}/quality**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | MEDIA-06 / P0 |
+| Purpose / permission | Sets the quality-control result on non-deleted tenant-visible media; requires an active identity and tenant-valid `media.quality_review`. Foreign, missing, malformed, soft-deleted and deleted-parent lineage remain indistinguishable 404s. |
+| Request / validation | Requires normalized `quality_status` in `pending`, `acceptable`, `rejected` or `needs_recapture`. Optional nullable `quality_score` accepts 0 through 100 with at most two decimal places; optional nullable notes are trimmed. Omitted optional fields remain unchanged and explicit null clears them. |
+| Transaction / response | A row lock serializes reviews. The QC fields and monotonic media `sync_version` update in the same transaction as immutable `media.quality` audit evidence; audit failure rolls the mutation back. Success returns exact `200 {data:MediaAsset}` plus request ID using the approved private-storage-safe shape, with no URL/token issuance or storage access. No notification is emitted. |
+| Audit / DCL | Audit evidence records the actor, media ID, request trace, old/new QC state, sync version, storage key and checksum without a URL or token. `044_media_quality_review_grants.sql` grants the API role UPDATE only on `quality_score`, `quality_status`, `notes`, `sync_version` and `updated_at`; worker/report roles receive no write and asset DELETE remains unavailable. |
+| Tests / status | `MediaQualityUpdateTest` covers exact safe response and persistence, normalized/full and partial/null updates, sync versions, audit evidence and rollback, validation/domain bounds, tenant and deleted-lineage hiding, authentication, tenant-valid RBAC, inactive identity, throttling and least-privilege DCL. Done — focused SQLite and PostgreSQL pass 7 tests / 90 assertions each; full SQLite passes 630 / 4013 with nine PostgreSQL-only skips and PostgreSQL 18/PostGIS passes 639 / 4043. Route, Pint, Composer and live allowed/denied column privilege gates pass. |
 
 ### **MEDIA-01 - GET /api/v1/flights/{id}/media**
 

@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\V1\Flight\FlightWaypointReplaceController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightIndexController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightStoreController;
 use App\Http\Controllers\Api\V1\Media\FlightMediaIndexController;
+use App\Http\Controllers\Api\V1\Media\MediaQualityUpdateController;
 use App\Http\Controllers\Api\V1\Media\MediaShowController;
 use App\Http\Controllers\Api\V1\Media\MediaUploadCompleteController;
 use App\Http\Controllers\Api\V1\Media\MediaUploadInitiateController;
@@ -514,6 +515,14 @@ Route::prefix('v1')->group(function () {
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:media.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [MEDIA-06] PATCH /api/v1/media/{id}/quality
+    Route::patch('/media/{media}/quality', MediaQualityUpdateController::class)
+        ->whereUuid('media')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:media.quality_review', 'throttle:auth.authenticated',
         ]);
 
     // [JOB-01] GET /api/v1/processing-jobs
