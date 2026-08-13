@@ -46,16 +46,18 @@ class MobileBootstrapTest extends TestCase
     // [SYNC-02] A cursor returns deterministic changes and tenant tombstones.
     public function test_it_returns_a_delta_after_the_cursor_boundary(): void
     {
-        $this->travelTo(CarbonImmutable::parse('2026-08-12T12:00:00Z'));
+        $databaseNow = $this->databaseNow();
+        $this->travelTo($databaseNow->addMinute());
         $graph = $this->createGraph();
-        $boundary = CarbonImmutable::parse('2026-08-12T11:00:00Z');
+        $boundary = $databaseNow->subHour();
         $cursor = app(SyncCursorService::class)->encode($boundary);
         DB::table('survey_missions')->where('mission_id', $graph['mission_id'])->update([
             'mission_title' => 'Changed Mission',
-            'updated_at' => $this->databaseTime('2026-08-12T11:30:00Z'),
+            'updated_at' => $this->databaseTime($boundary->addMinutes(30)->toIso8601String()),
         ]);
+        $deletedAt = $boundary->addMinutes(45);
         DB::table('survey_missions')->where('mission_id', $graph['deleted_mission_id'])->update([
-            'deleted_at' => $this->databaseTime('2026-08-12T11:45:00Z'),
+            'deleted_at' => $this->databaseTime($deletedAt->toIso8601String()),
         ]);
 
         $response = $this->withToken($graph['token'])
@@ -70,7 +72,7 @@ class MobileBootstrapTest extends TestCase
             ->assertJsonPath('data.tombstones.0.id', $graph['deleted_mission_id']);
         $this->assertTrue(
             CarbonImmutable::parse($response->json('data.tombstones.0.deleted_at'))
-                ->equalTo(CarbonImmutable::parse('2026-08-12T11:45:00Z')),
+                ->equalTo($deletedAt),
         );
     }
 
@@ -232,5 +234,16 @@ class MobileBootstrapTest extends TestCase
         return DB::getDriverName() === 'pgsql'
             ? $time->toIso8601String()
             : $time->format('Y-m-d H:i:s');
+    }
+
+    private function databaseNow(): CarbonImmutable
+    {
+        if (DB::getDriverName() !== 'pgsql') {
+            return CarbonImmutable::parse('2026-08-12T12:00:00Z');
+        }
+
+        return CarbonImmutable::parse(DB::scalar('SELECT statement_timestamp()'))
+            ->utc()
+            ->setMicrosecond(0);
     }
 }

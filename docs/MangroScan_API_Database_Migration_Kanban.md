@@ -1513,7 +1513,7 @@ V-01 is implemented by `2026_08_12_070000_create_user_effective_permissions_view
 
 | ID | Routine | Type | Purpose | Pri |
 | :---- | :---- | :---- | :---- | :---- |
-| R-01 | fn\_touch\_updated\_at() \+ triggers | BEFORE UPDATE | Set updated\_at consistently on mutable tables. | **P0** |
+| R-01 | fn\_touch\_updated\_at() \+ triggers | BEFORE UPDATE | Set updated\_at consistently on mutable tables. Implemented for every current application table carrying `updated_at`, with invoker rights and no direct runtime execution. | **P0 — Done** |
 | R-02 | fn\_audit\_row\_change() \+ triggers | AFTER INSERT/UPDATE/DELETE | Append old/new JSONB to immutable audit\_logs; include app user/request context where available. | **P0** |
 | R-03 | fn\_user\_has\_permission(user\_id, permission\_code) | SQL function | Optional DB-side helper for routines/RLS. API policies remain primary authorization surface. Implemented with V-01 tenant-safe semantics, invoker rights and API-only EXECUTE. | **P1 — Done** |
 | R-04 | fn\_flight\_readiness(flight\_id) | SQL function | Return passed:boolean and reasons\[\] from preflight/resource/approval state. | **P0** |
@@ -1523,9 +1523,13 @@ V-01 is implemented by `2026_08_12_070000_create_user_effective_permissions_view
 | R-08 | sp\_finalize\_report(report\_id, exported\_file...) | Procedure / transaction | Atomically move report to generated state and write exported\_files record. | **P1** |
 | R-09 | fn\_validate\_geometry\_srid() | Constraint/trigger helper | Reject or normalize geometry not in SRID 4326 for API-facing geographic fields. | **P1** |
 
-## **11.1 Updated-at trigger**
+## **11.1 R-01 updated-at trigger**
 
-| CREATE OR REPLACE FUNCTION app.fn\_touch\_updated\_at()RETURNS triggerLANGUAGE plpgsqlAS $$BEGIN  NEW.updated\_at := NOW();  RETURN NEW;END;$$;CREATE TRIGGER trg\_survey\_missions\_touchBEFORE UPDATE ON app.survey\_missionsFOR EACH ROW EXECUTE FUNCTION app.fn\_touch\_updated\_at(); |
+`2026_08_12_070200_create_touch_updated_at_triggers.php` creates the rerunnable PostgreSQL `app.fn_touch_updated_at()` trigger function and explicit `BEFORE UPDATE` triggers for all 32 current application tables that carry `updated_at`. Database statement time replaces caller-supplied timestamps consistently, including query-builder and worker updates that bypass Eloquent timestamp handling, without inheriting an older transaction-start timestamp. The function uses invoker rights with a `pg_catalog`-only search path; direct execution is revoked from `PUBLIC` in the migration and from every runtime role by `043_touch_updated_at_trigger_grants.sql`. `TouchUpdatedAtTriggerTest` compares trigger coverage against PostgreSQL catalog metadata, proves stale timestamps are overwritten and statically verifies the closed DCL. SQLite remains a deliberate no-op because its application writes retain Laravel timestamp behavior.
+
+## **11.2 Updated-at trigger example**
+
+| CREATE OR REPLACE FUNCTION app.fn\_touch\_updated\_at()RETURNS triggerLANGUAGE plpgsqlSECURITY INVOKERSET search\_path \= pg\_catalogAS $$BEGIN  NEW.updated\_at := statement\_timestamp();  RETURN NEW;END;$$;CREATE TRIGGER trg\_survey\_missions\_touchBEFORE UPDATE ON app.survey\_missionsFOR EACH ROW EXECUTE FUNCTION app.fn\_touch\_updated\_at(); |
 | :---- |
 
 ## **11.2 Routine design rule**
