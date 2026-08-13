@@ -1299,6 +1299,17 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 ## **Confidence review and field validation**
 
+### **Validation database foundation**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Scope | Reproduces the authoritative base `validation_sessions`, `ground_truth_tree_records`, `validation_matches` and `accuracy_metrics` tables without registering or claiming any blocked endpoint. UUID models and inverse relationships connect missions, sites, plots, users, species, tree observations and model versions. |
+| Spatial / integrity | Ground-truth locations use PostGIS `POINT(4326)` with a GiST index; SQLite JSON is test-only. Versioned foreign keys preserve referenced mission/site/plot/user/species/tree/model evidence, while session-owned ground truth and matches cascade together. PostgreSQL checks the documented validation methods, health states, match states, metric types and non-negative measurement/error/metric domains. All foreign-key navigation and mission metric lookup paths are indexed. |
+| Timestamp behavior | Validation sessions participate in the shared PostgreSQL `fn_touch_updated_at` trigger. Evidence/metric tables retain their authoritative append-style `created_at`, `validated_at` or `computed_at` timestamps and do not receive invented mutable timestamps. |
+| DCL boundary | `045_validation_foundation_grants.sql` explicitly revokes all privileges on all four tables from PUBLIC and every runtime role. Endpoint-specific SELECT/INSERT/UPDATE privileges remain unavailable until the corresponding public contract is approved and implemented. |
+| Unresolved contract conflicts | VAL-01's purpose promises mission/site/plot/species/assignee options, but its exact success response omits `sites` and `plots`, substitutes `sessions`, and defines none of the nested element projections. Later cards also require fields absent from the authoritative schema: VAL-02/VAL-05 require session lifecycle state; GT-01 requests `field_code`, `crown_diameter_m`, `is_tree` and `notes` while the table instead has `remarks`; MATCH-01 requests accepted/corrected/evidence fields not present in `validation_matches`; and ACC-01 is session-addressed while `accuracy_metrics` has mission/model lineage only. These public/schema decisions remain blocked rather than being silently invented. The nullable tree-observation FK follows the explicit reference DDL and false-negative workflow. |
+| Tests / status | `ValidationDatabaseFoundationTest` verifies exact columns and deliberate absence of unapproved extensions, UUID relationships, cascade ownership, real Point(4326), PostgreSQL domains, closed DCL and no accidental VAL-01 route. `TouchUpdatedAtTriggerTest` covers the additional mutable table. Focused SQLite passes 4 tests / 69 assertions with three PostgreSQL-only skips; PostgreSQL 18/PostGIS passes 7 / 76. Full SQLite passes 633 / 4065 with ten PostgreSQL-only skips and full PostgreSQL passes 643 / 4098; Pint, Composer, diff and live zero-privilege role gates pass. |
+
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | CONF-01 | GET /confidence-reviewMission-scoped low-confidence queue. | Query: mission\_id\*,flight\_id?,result\_type?,status?,severity?,page | 200 {data:\[ReviewRecord\],summary,groups,map,meta} | TREE/RESULT \+ confidence flag extension | **P1** | TBD \- Validation/API | **Blocked** |

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AiModelVersion extends Model
 {
@@ -46,5 +47,10 @@ class AiModelVersion extends Model
     public function model(): BelongsTo
     {
         return $this->belongsTo(AiModel::class, 'model_id', 'model_id');
+    }
+
+    public function accuracyMetrics(): HasMany
+    {
+        return $this->hasMany(AccuracyMetric::class, 'model_version_id', 'model_version_id');
     }
 }

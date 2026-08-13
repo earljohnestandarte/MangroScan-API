@@ -41,7 +41,7 @@ class TouchUpdatedAtTriggerTest extends TestCase
             ORDER BY relation.relname
             SQL))->pluck('table_name');
 
-        $this->assertCount(32, $timestampTables);
+        $this->assertCount(33, $timestampTables);
         $this->assertSame($timestampTables->all(), $triggerTables->all());
     }
 

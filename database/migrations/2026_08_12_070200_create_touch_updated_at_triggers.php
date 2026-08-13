@@ -39,6 +39,7 @@ return new class extends Migration
         'tree_observations',
         'user_roles',
         'users',
+        'validation_sessions',
     ];
 
     public function up(): void

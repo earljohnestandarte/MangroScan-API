@@ -38,4 +38,9 @@ class MangroveSpecies extends Model
     {
         return $this->hasMany(TreeObservation::class, 'final_species_id', 'species_id');
     }
+
+    public function groundTruthRecords(): HasMany
+    {
+        return $this->hasMany(GroundTruthTreeRecord::class, 'species_id', 'species_id');
+    }
 }

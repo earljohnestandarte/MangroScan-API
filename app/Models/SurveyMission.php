@@ -76,4 +76,14 @@ class SurveyMission extends Model
     {
         return $this->hasMany(Report::class, 'mission_id', 'mission_id');
     }
+
+    public function validationSessions(): HasMany
+    {
+        return $this->hasMany(ValidationSession::class, 'mission_id', 'mission_id');
+    }
+
+    public function accuracyMetrics(): HasMany
+    {
+        return $this->hasMany(AccuracyMetric::class, 'mission_id', 'mission_id');
+    }
 }

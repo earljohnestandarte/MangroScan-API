@@ -95,6 +95,16 @@ class User extends Authenticatable
         return $this->hasMany(NotificationLog::class, 'user_id', 'user_id');
     }
 
+    public function validationSessions(): HasMany
+    {
+        return $this->hasMany(ValidationSession::class, 'validated_by', 'user_id');
+    }
+
+    public function validationMatches(): HasMany
+    {
+        return $this->hasMany(ValidationMatch::class, 'validated_by', 'user_id');
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active' && $this->deleted_at === null;

@@ -86,4 +86,9 @@ class SurveySite extends Model
     {
         return $this->hasMany(Report::class, 'site_id', 'site_id');
     }
+
+    public function validationSessions(): HasMany
+    {
+        return $this->hasMany(ValidationSession::class, 'site_id', 'site_id');
+    }
 }

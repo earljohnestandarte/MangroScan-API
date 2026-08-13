@@ -88,4 +88,9 @@ class TreeObservation extends Model
     {
         return $this->hasMany(AgeEstimation::class, 'tree_observation_id', 'tree_observation_id');
     }
+
+    public function validationMatches(): HasMany
+    {
+        return $this->hasMany(ValidationMatch::class, 'tree_observation_id', 'tree_observation_id');
+    }
 }
