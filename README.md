@@ -38,6 +38,7 @@ flowchart LR
 - [Development](#development)
 - [Testing](#testing)
 - [Team API Development Workflow](#team-api-development-workflow)
+- [Frontend API Integration](#frontend-api-integration)
 - [Deployment](#deployment)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
@@ -1037,6 +1038,12 @@ php artisan test --coverage --coverage-html=coverage
 Remaining endpoint ownership, dependency-aware work packages, branch names, code-placement conventions, tracker status rules, testing gates, and merge-conflict controls are documented in the [MangroScan API Team Development Guide](docs/CONTRIBUTING_API.md).
 
 The authoritative assignment tracker is [docs/MangroScan_API_Endpoint_Tracker - API Endpoint Tracker.csv](docs/MangroScan_API_Endpoint_Tracker%20-%20API%20Endpoint%20Tracker.csv). Developers should update only their owned planning fields and must preserve every endpoint contract column.
+
+---
+
+## Frontend API Integration
+
+React web and React Native/Expo developers should use the [MangroScan Frontend API Integration Manual](docs/FRONTEND_API_MANUAL.md) for endpoint availability, authentication, permissions, validated request fields, response shapes, workflow requirements, and integration examples.
 
 ---
 
