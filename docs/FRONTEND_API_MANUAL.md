@@ -6181,6 +6181,8 @@ Representative response using only implemented keys (full resource fields are li
 
 **Workflow / UI integration note:** Returns metadata only. It never returns or redirects to downloadable bytes; MEDIA-05 is the sole planned temporary-download URL/token endpoint.
 
+> **Tracker clarification:** The current tracker Purpose cell mentions an authorized preview/download pointer, but the same row’s `{data:MediaAsset}` response and implementation Notes remain metadata-only. The verified implementation is authoritative for frontend use: `MEDIA-04` returns no URL, token, pointer, redirect, or bytes.
+
 ### MEDIA-05 — Issue temporary private download URL or stream token.
 
 > **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
@@ -10337,11 +10339,11 @@ These field names are extracted from the current Laravel API resources. A field 
 
 ## Contract / Implementation Discrepancies
 
-No material method, path, success-status, or public request/response contract discrepancy was found for the 85 endpoints marked `Done`. All 85 have one matching live Laravel route. Tracker response expressions such as `{data:Site}` are shorthand; implemented JSON commonly adds `meta.request_id`, which is documented above and is additive.
+No material method, path, success-status, or public request/response shape discrepancy was found for the 85 endpoints marked `Done`. All 85 have one matching live Laravel route. Tracker response expressions such as `{data:Site}` are shorthand; implemented JSON commonly adds `meta.request_id`, which is documented above and is additive.
 
 Frontend-relevant clarifications discovered during verification:
 
-- `MEDIA-04` is deliberately metadata-only. It does not expose a storage path, stream, redirect, or temporary URL. Use the future `MEDIA-05` only after it becomes available.
+- `MEDIA-04` has one planning-text discrepancy: its tracker Purpose cell now mentions an authorized preview/download pointer, while its `{data:MediaAsset}` response, implementation Notes, tests, and approved boundary remain metadata-only. It does not expose a storage path, pointer, stream, redirect, token, or temporary URL. Use the future `MEDIA-05` only after it becomes available.
 - Upload endpoints accept JSON metadata and return a private temporary upload URL; they are not multipart Laravel endpoints.
 - `AUTH-04` refresh is unavailable, so clients must not assume refresh-token rotation.
 - `TREE-03` returns a top-level GeoJSON `FeatureCollection` with `application/geo+json`, not the usual `data/meta` envelope.

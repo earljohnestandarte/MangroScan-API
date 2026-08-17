@@ -7,47 +7,52 @@ This guide coordinates the remaining API work across the six-person team. The au
 | Member | Responsibility |
 | --- | --- |
 | Earljohn Estandarte | Project owner; owns the 85 endpoints already marked `Done` and the shared implementation foundation |
-| Karl | Authentication, site/access, saved-view, settings, notification, and audit extensions |
-| Jessa | Hardware, field lifecycle, mobile synchronization, and remaining media lifecycle |
-| Jason | AI lifecycle, geospatial layer building, confidence review, and training/annotation extensions |
-| Abby | Validation, ground truth, decisions, completion, and accuracy calculation |
-| Josh | Reports, exports, and dashboards |
+| Karlandrei Panday | Authentication, plot/permit, saved-view, notification, and settings extensions |
+| Jessamae Sumanoy | Hardware, field lifecycle, mobile synchronization, and remaining media lifecycle |
+| Jason Benabente | AI lifecycle, geospatial layers, confidence review, validation completion/accuracy, audit detail, and training/annotation extensions |
+| Juneabby Girasol | Validation scopes/sessions, ground-truth records, and validation decisions |
+| Joshua Lopez | Reports, exports, and dashboards |
 
-Assignments optimize conflict avoidance and dependency continuity before raw endpoint-count equality. The P0 validation and reporting chains intentionally remain together because splitting their services, migrations, and tests would create substantial merge risk.
+Assignments optimize conflict avoidance and dependency continuity before raw endpoint-count equality. The revised tracker introduces an explicit `MATCH-01` handoff from Juneabby Girasol to Jason Benabente for validation accuracy/completion, while each report/export chain remains with one owner.
 
 ## Assignment summary
 
 | Developer | Endpoint count | P0 | P1 | P2 | Main domain | Estimated workload |
 | --- | ---: | ---: | ---: | ---: | --- | ---: |
-| Karl | 13 | 0 | 1 | 12 | Platform admin and tenant CRUD extensions | ~23 points |
-| Jessa | 12 | 1 | 2 | 9 | Hardware, field operations, sync, and media | ~27 points |
-| Jason | 13 | 0 | 3 | 10 | AI/results and training extensions | ~31 points |
-| Abby | 8 | 7 | 1 | 0 | Validation and accuracy | ~32 points |
-| Josh | 10 | 3 | 7 | 0 | Reports, exports, and dashboards | ~35 points |
+| Karlandrei Panday | 11 | 0 | 1 | 10 | Platform admin and tenant CRUD extensions | ~21 points |
+| Jessamae Sumanoy | 12 | 1 | 2 | 9 | Hardware, field operations, sync, and media | ~27 points |
+| Jason Benabente | 16 | 1 | 4 | 11 | AI/results, validation completion/accuracy, audit, and training extensions | ~37 points |
+| Juneabby Girasol | 6 | 6 | 0 | 0 | Validation foundations, ground truth, and decisions | ~27 points |
+| Joshua Lopez | 10 | 3 | 7 | 0 | Reports, exports, and dashboards | ~35 points |
+| Unassigned | 1 | 0 | 0 | 1 | Site archival | ~1 point |
 | **Total remaining** | **56** | **11** | **14** | **31** |  |  |
 
 The estimate starts with P0 = 3, P1 = 2, and P2 = 1, then accounts for geospatial work, async/storage workflows, validation calculations, transactions, and cross-domain coordination. It is a planning estimate, not a tracker contract.
 
-### Karl
+### Karlandrei Panday
 
-**Modules:** authentication refresh; site/archive, plot, and permit extensions; saved views; notification/settings/audit extensions.
+**Modules:** authentication refresh; plot and permit extensions; saved views; notification and settings extensions.
 
 **Endpoint IDs:**
 
 - P1: `AUTH-04`
-- P2: `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`
+- P2: `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`
 
 **Recommended branches:**
 
-- `feature/karl/auth-refresh`
-- `feature/karl/sites-permits`
-- `feature/karl/dashboard-admin-extensions`
+- `feature/karlandrei/auth-refresh`
+- `feature/karlandrei/plots-permits`
+- `feature/karlandrei/dashboard-admin-extensions`
 
-**Likely paths:** `app/Http/Controllers/Api/V1/Auth`, `Site`, `Notification`, and `Audit`; matching folders under `app/Http/Requests`, `app/Services`, and `tests/Feature`; existing site/RBAC models; module migrations and `database/sql/dcl` when new tables or privileges are required.
+**Likely paths:** `app/Http/Controllers/Api/V1/Auth`, `Site`, and `Notification`; matching folders under `app/Http/Requests`, `app/Services`, and `tests/Feature`; existing site/RBAC models; module migrations and `database/sql/dcl` when new tables or privileges are required.
 
-**Dependencies:** all named endpoint prerequisites are already owned/completed by Earljohn. Keep `PERMIT-01` before `PERMIT-02`, `VIEW-01` before `VIEW-02`, `VIEW-02` before `VIEW-03/04`, and `SET-01` before `SET-02`.
+**Dependencies:** all named endpoint prerequisites are already owned/completed by Earljohn Estandarte. Keep `PERMIT-01` before `PERMIT-02`, `VIEW-01` before `VIEW-02`, `VIEW-02` before `VIEW-03/04`, and `SET-01` before `SET-02`.
 
-### Jessa
+### Unassigned backlog
+
+`SITE-05` is currently the tracker’s only unassigned endpoint. It remains P2 / Not Done / Backlog and must receive an owner before implementation starts; do not silently fold it back into Karlandrei Panday’s package.
+
+### Jessamae Sumanoy
 
 **Modules:** drone/sensor/battery maintenance; remaining mission/flight evidence; mobile synchronization; media download/delete lifecycle.
 
@@ -59,48 +64,49 @@ The estimate starts with P0 = 3, P1 = 2, and P2 = 1, then accounts for geospatia
 
 **Recommended branches:**
 
-- `feature/jessa/hardware-field-ops`
-- `feature/jessa/mobile-sync-media`
+- `feature/jessamae/hardware-field-ops`
+- `feature/jessamae/mobile-sync-media`
 
 **Likely paths:** `app/Http/Controllers/Api/V1/Drone`, `Flight`, `Mission`, `Mobile`, and `Media`; corresponding requests/services/tests; hardware and sync models/migrations; storage services; `database/sql/dcl`.
 
-**Dependencies:** implement `BAT-01` before `BAT-02/03` and `SYNC-04` before `SYNC-05`. `MEDIA-05` depends on Earljohn's completed metadata-only `MEDIA-04`; it remains the sole temporary download URL/token endpoint. `SYNC-04` is explicitly blocked until all mutable mobile resources are available, including Abby's validation mutation chain, so coordinate its final integration with Abby.
+**Dependencies:** implement `BAT-01` before `BAT-02/03` and `SYNC-04` before `SYNC-05`. `MEDIA-05` depends on Earljohn Estandarte’s completed metadata-only `MEDIA-04`; it remains the sole temporary download URL/token endpoint. `SYNC-04` is explicitly blocked until all mutable mobile resources are available, including Juneabby Girasol’s validation mutations and Jason Benabente’s `VAL-05` completion endpoint, so coordinate final integration with both owners.
 
-### Jason
+### Jason Benabente
 
-**Modules:** AI credential/model/job lifecycle; geospatial layer building; confidence-review extension; training datasets and annotations.
+**Modules:** AI credential/model/job lifecycle; geospatial layer building; confidence-review extension; validation completion and accuracy; audit detail; training datasets and annotations.
 
 **Endpoint IDs:**
 
-- P1: `LAYER-02`, `CONF-01`, `CONF-02`
-- P2: `AISVC-05`, `MODEL-03`, `JOB-05`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`
+- P0: `ACC-01`
+- P1: `LAYER-02`, `CONF-01`, `CONF-02`, `VAL-05`
+- P2: `AISVC-05`, `MODEL-03`, `JOB-05`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`
 
 **Recommended branches:**
 
 - `feature/jason/ai-lifecycle`
 - `feature/jason/layers-confidence`
+- `feature/jason/validation-accuracy-audit`
 - `feature/jason/training-annotation`
 
-**Likely paths:** `app/Http/Controllers/Api/V1/Ai`, `Processing`, and `Tree`; matching requests/services/tests; new confidence/training modules that follow the same convention; AI/tree models; queue/storage integration; module migrations and DCL.
+**Likely paths:** `app/Http/Controllers/Api/V1/Ai`, `Processing`, `Tree`, `Validation`, and `Audit`; matching requests/services/tests; new confidence/training modules that follow the same convention; AI/tree/validation models; queue/storage integration; module migrations and DCL.
 
-**Dependencies:** `CONF-01` precedes `CONF-02`; `DATASET-01` precedes `DATASET-02/03`; `ANN-01` precedes `ANN-02`, then `ANN-03`, then `ANN-04`. `LAYER-02` still requires the documented photogrammetry inputs, and `ANN-01` requires the non-endpoint annotation foundation. Keep their `Manual Planning State` as `Blocked` until the prerequisites are approved rather than inventing contracts.
+**Dependencies:** `CONF-01` precedes `CONF-02`; `AUD-01` precedes `AUD-02`; `DATASET-01` precedes `DATASET-02/03`; `ANN-01` precedes `ANN-02`, then `ANN-03`, then `ANN-04`. Juneabby Girasol’s `MATCH-01` handoff gates `ACC-01` and `VAL-05`. `LAYER-02` still requires the documented photogrammetry inputs, and `ANN-01` requires the non-endpoint annotation foundation. Keep blocked rows blocked until their prerequisites and public contracts are approved.
 
-### Abby
+### Juneabby Girasol
 
-**Modules:** field validation sessions, ground-truth measurements, validation decisions, accuracy metrics, and validation completion.
+**Modules:** field validation scopes/sessions, ground-truth measurements, and validation decisions.
 
 **Endpoint IDs:**
 
-- P0: `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`
-- P1: `VAL-05`
+- P0: `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`
 
-**Recommended branch:** `feature/abby/validation-accuracy`
+**Recommended branch:** `feature/juneabby/validation-core`
 
 **Likely paths:** create `app/Http/Controllers/Api/V1/Validation`, `app/Http/Requests/Validation`, `app/Services/Validation`, and `tests/Feature/Validation` following existing single-action conventions; reuse the existing validation models and `2026_08_12_066000_create_validation_foundation_tables.php`; add only approved additive migrations/DCL.
 
-**Dependencies:** preserve the chain `VAL-01 → VAL-02/03 → VAL-04 → GT-01/MATCH-01 → ACC-01/VAL-05`. The manual records unresolved public-contract/schema conflicts for this family. Coordinate the contract decision with Earljohn before moving affected rows' `Manual Planning State` from `Blocked` to `Ready`; change `Status` to `Working` only when implementation actually starts.
+**Dependencies:** preserve the chain `VAL-01 → VAL-02/03 → VAL-04 → GT-01/MATCH-01`, then hand off to Jason Benabente for `ACC-01` and `VAL-05`. The manual records unresolved public-contract/schema conflicts for this family. Coordinate contract decisions with Earljohn Estandarte and the downstream owner before moving affected rows’ `Manual Planning State` from `Blocked` to `Ready`; change `Status` to `Working` only when implementation actually starts.
 
-### Josh
+### Joshua Lopez
 
 **Modules:** report definitions/lifecycle, generated exports/downloads, and dashboard analytics.
 
@@ -109,29 +115,32 @@ The estimate starts with P0 = 3, P1 = 2, and P2 = 1, then accounts for geospatia
 - P0: `RPT-05`, `EXP-01`, `EXP-03`
 - P1: `RPT-02`, `RPT-03`, `RPT-04`, `RPT-06`, `EXP-02`, `DASH-01`, `DASH-02`
 
-**Recommended branch:** `feature/josh/reports-exports-dashboard`
+**Recommended branch:** `feature/joshua/reports-exports-dashboard`
 
 **Likely paths:** `app/Http/Controllers/Api/V1/Report` plus new export/dashboard folders following existing conventions; `app/Http/Requests/Report`; report/export/dashboard services; report models and storage/queue code; `tests/Feature/Report` plus export/dashboard suites; migrations and DCL.
 
-**Dependencies:** preserve `RPT-02 → RPT-03 → RPT-04/05/EXP-01`, `RPT-05 → RPT-06`, `EXP-01 → EXP-02 → EXP-03`, and `DASH-01 → DASH-02`. Report and dashboard completion depends on Earljohn's canonical tree results and Abby's finalized `ACC-01` metrics.
+**Dependencies:** preserve `RPT-02 → RPT-03 → RPT-04/05/EXP-01`, `RPT-05 → RPT-06`, `EXP-01 → EXP-02 → EXP-03`, and `DASH-01 → DASH-02`. Report and dashboard completion depends on Earljohn Estandarte’s canonical tree results and Jason Benabente’s finalized `ACC-01` metrics.
 
 ## Cross-developer dependency map
 
 ```mermaid
 flowchart LR
-    Earl["Earljohn\nCompleted auth, RBAC, missions, media, AI & tree foundations"] --> Karl["Karl\nPlatform/admin extensions"]
-    Earl --> Jessa["Jessa\nField ops, sync & media"]
-    Earl --> Jason["Jason\nAI/results extensions"]
-    Earl --> Abby["Abby\nValidation & accuracy"]
-    Earl --> Josh["Josh\nReports & dashboards"]
-    Abby -- "ACC-01" --> Josh
-    Abby -- "validation mutations gate SYNC-04" --> Jessa
+    Earl["Earljohn Estandarte\nCompleted foundations"] --> Karlandrei["Karlandrei Panday\nPlatform/admin extensions"]
+    Earl --> Jessamae["Jessamae Sumanoy\nField ops, sync & media"]
+    Earl --> Jason["Jason Benabente\nAI, validation completion & audit"]
+    Earl --> Juneabby["Juneabby Girasol\nValidation core"]
+    Earl --> Joshua["Joshua Lopez\nReports & dashboards"]
+    Juneabby -- "MATCH-01 handoff" --> Jason
+    Jason -- "ACC-01" --> Joshua
+    Juneabby -- "validation mutations" --> Jessamae
+    Jason -- "VAL-05 completion" --> Jessamae
 ```
 
-- `ACC-01` must be finalized before Josh can complete `RPT-02` and `DASH-01` against authoritative accuracy data.
-- Abby's mutable validation resources are an explicit condition of Jessa's `SYNC-04` all-mutable-resources dependency.
-- Jason's current assigned rows depend on completed Earljohn foundations or documented non-endpoint prerequisites; the tracker declares no direct dependency on another remaining developer package.
-- Karl's current assigned rows depend only on completed Earljohn endpoints and within-Karl chains.
+- Jason Benabente must finalize `ACC-01` before Joshua Lopez can complete `RPT-02` and `DASH-01` against authoritative accuracy data.
+- Juneabby Girasol’s mutable validation resources and Jason Benabente’s `VAL-05` completion are explicit conditions of Jessamae Sumanoy’s `SYNC-04` all-mutable-resources dependency.
+- Jason Benabente’s `ACC-01` and `VAL-05` start only after Juneabby Girasol’s `MATCH-01` handoff; his other assigned rows depend on completed Earljohn Estandarte foundations or documented non-endpoint prerequisites.
+- Karlandrei Panday’s current assigned rows depend only on completed Earljohn Estandarte endpoints and within-owner chains.
+- `SITE-05` has no assigned owner in the tracker and is excluded from all developer work packages until ownership is explicitly recorded.
 
 ## Tracker workflow
 
@@ -206,7 +215,7 @@ The integration branch is currently `main`. Never discard uncommitted work.
 git status
 git switch main
 git pull
-git switch -c feature/karl/sites-permits
+git switch -c feature/karlandrei/plots-permits
 ```
 
 Substitute the assigned developer and module. Branch names must be lowercase, hyphen-separated, and use `feature/<developer>/<module>`.
@@ -214,7 +223,7 @@ Substitute the assigned developer and module. Branch names must be lowercase, hy
 ### Continue an existing branch
 
 ```bash
-git switch feature/karl/sites-permits
+git switch feature/karlandrei/plots-permits
 git pull
 git status
 ```
@@ -238,7 +247,7 @@ Prefer one endpoint per commit. Closely coupled endpoint pairs may share a commi
 ```bash
 git switch main
 git pull
-git switch feature/karl/sites-permits
+git switch feature/karlandrei/plots-permits
 git merge main
 ```
 
@@ -274,7 +283,7 @@ Confirm that the profile resolves `mangroscan_test` before destructive tests. Ne
 | `RbacSeedData` / permission catalog | New permissions affect three roles and tests | Reuse an existing code first; coordinate any genuinely new permission with Earljohn and the affected role owner |
 | `User` model / `DatabaseSeeder` | Core identity and seed order are shared by all domains | Treat Earljohn as owner; keep domain-specific relationships or seeders isolated and coordinate any required core edit |
 | Audit and notification infrastructure | Many mutations reuse shared services/tables | Reuse existing loggers/resources; avoid broad refactors inside endpoint branches |
-| Mission/media/validation sync resources | Jessa's sync work reads other domains | Agree on serialized mobile shapes with Abby before finalizing `SYNC-04`; avoid simultaneous uncoordinated edits |
+| Mission/media/validation sync resources | Jessamae Sumanoy’s sync work reads other domains | Agree on serialized mobile shapes with Juneabby Girasol and Jason Benabente before finalizing `SYNC-04`; avoid simultaneous uncoordinated edits |
 | Large manual/tracker docs | High line-level conflict | Put implementation detail in focused docs/tests and make the smallest necessary manual update near the owned endpoint card |
 
 Do not reorganize shared routes, middleware, responses, seeders, or directory structure merely to reduce a local branch's code. Propose such changes separately.
