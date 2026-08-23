@@ -97,6 +97,8 @@ use App\Http\Controllers\Api\V1\User\UserIndexController;
 use App\Http\Controllers\Api\V1\User\UserShowController;
 use App\Http\Controllers\Api\V1\User\UserStoreController;
 use App\Http\Controllers\Api\V1\User\UserUpdateController;
+use App\Http\Controllers\Api\V1\Validation\ConfidenceFlagUpdateController;
+use App\Http\Controllers\Api\V1\Validation\ConfidenceReviewIndexController;
 use App\Http\Middleware\EnsureActiveIdentity;
 use Illuminate\Support\Facades\Route;
 
@@ -634,6 +636,19 @@ Route::prefix('v1')->group(function () {
         ->whereUuid('mission')->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:processing_jobs.manage', 'throttle:auth.authenticated',
+        ]);
+
+    // [CONF-01] List the mission-scoped low-confidence review queue.
+    Route::get('/confidence-review', ConfidenceReviewIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:results.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [CONF-02] Create or update a confidence review flag.
+    Route::put('/confidence-review/{result}', ConfidenceFlagUpdateController::class)
+        ->whereUuid('result')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:validation.decide', 'throttle:auth.authenticated',
         ]);
 
     // [SDS-01] POST /api/v1/flights/{id}/sensor-datasets/uploads
