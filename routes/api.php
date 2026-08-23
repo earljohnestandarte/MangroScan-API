@@ -83,6 +83,7 @@ use App\Http\Controllers\Api\V1\Site\SiteUpdateController;
 use App\Http\Controllers\Api\V1\Training\TrainingDatasetIndexController;
 use App\Http\Controllers\Api\V1\Training\TrainingDatasetItemStoreController;
 use App\Http\Controllers\Api\V1\Training\TrainingDatasetStoreController;
+use App\Http\Controllers\Api\V1\Tree\MissionLayerBuildController;
 use App\Http\Controllers\Api\V1\Tree\MissionLayerIndexController;
 use App\Http\Controllers\Api\V1\Tree\MissionTreeCountController;
 use App\Http\Controllers\Api\V1\Tree\MissionTreeGeoJsonController;
@@ -626,6 +627,13 @@ Route::prefix('v1')->group(function () {
         ->whereUuid('mission')->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:results.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [LAYER-02] Queue a durable geospatial layer build.
+    Route::post('/missions/{mission}/layers/build', MissionLayerBuildController::class)
+        ->whereUuid('mission')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:processing_jobs.manage', 'throttle:auth.authenticated',
         ]);
 
     // [SDS-01] POST /api/v1/flights/{id}/sensor-datasets/uploads
