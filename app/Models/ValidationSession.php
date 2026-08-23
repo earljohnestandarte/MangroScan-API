@@ -24,13 +24,16 @@ class ValidationSession extends Model
         'validated_by',
         'validation_date',
         'method',
+        'status',
         'notes',
+        'completed_at',
+        'completed_by',
     ];
 
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['validation_date' => 'date'];
+        return ['validation_date' => 'date', 'completed_at' => 'datetime'];
     }
 
     public function mission(): BelongsTo
@@ -56,5 +59,15 @@ class ValidationSession extends Model
     public function groundTruthRecords(): HasMany
     {
         return $this->hasMany(GroundTruthTreeRecord::class, 'validation_session_id', 'validation_session_id');
+    }
+
+    public function accuracyMetrics(): HasMany
+    {
+        return $this->hasMany(AccuracyMetric::class, 'validation_session_id', 'validation_session_id');
+    }
+
+    public function completer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'completed_by', 'user_id');
     }
 }
