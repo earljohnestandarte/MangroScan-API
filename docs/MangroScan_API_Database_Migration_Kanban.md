@@ -1088,15 +1088,15 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | AISVC-02 | POST /admin/ai-servicesRegister trusted FastAPI backend. | {service\_name,base\_url,api\_key,environment,enabled} | 201 {data:AiService}; key never returned | AISVC schema \+ secret encryption | **P1** | Codex \- AI/API | **Done** |
 | AISVC-03 | POST /admin/ai-services/{id}/testHealth-test FastAPI service. | No body | 200 {data:{status,version,latency\_ms}} | AISVC-02 | **P1** | Codex \- AI/API | **Done** |
 | AISVC-04 | POST /admin/ai-services/{id}/synchronizePull authoritative /models metadata. | No body | 200 {data:{models\_synced,capabilities}} | AISVC-03 | **P1** | Codex \- AI/API | **Done** |
-| AISVC-05 | POST /admin/ai-services/{id}/credentialsRotate encrypted FastAPI key. | {api\_key} | 204 | AISVC-02 | **P2** | TBD \- AI/API | Backlog |
+| AISVC-05 | POST /admin/ai-services/{id}/credentialsRotate encrypted FastAPI key. | {api\_key} | 204 | AISVC-02 | **P2** | Jason Benabente | **Testing** |
 | MODEL-01 | GET /ai-modelsList model registry and deployment versions. | Query: type,deployed | 200 {data:\[AiModel\]} | AUTH \+ ai\_models | **P1** | Codex \- AI/API | **Done** |
 | MODEL-02 | GET /ai-models/{id}Model detail and versions. | Path: id | 200 {data:{model,versions}} | MODEL-01 | **P1** | Codex \- AI/API | **Done** |
-| MODEL-03 | POST /ai-models/{id}/versions/{versionId}/deployMark model version deployed after validation. | {release\_notes?} | 200 {data:AiModelVersion} | MODEL-02 | **P2** | TBD \- AI/API | Backlog |
+| MODEL-03 | POST /ai-models/{id}/versions/{versionId}/deployMark model version deployed after validation. | {release\_notes?} | 200 {data:AiModelVersion} | MODEL-02 | **P2** | Jason Benabente | **Testing** |
 | JOB-01 | GET /processing-jobsList processing jobs. | Query: mission\_id,flight\_id,status,type,page | 200 {data:\[ProcessingJob\],meta} | AUTH \+ processing\_jobs | **P0** | Codex \- AI/API | **Done** |
 | JOB-02 | POST /processing-jobsQueue detector/classifier/combined processing. | {mission\_id,flight\_session\_id?,job\_type,media\_ids:\[uuid\],parameters?} | 202 {data:{processing\_job\_id,job\_status:"queued"}} | MEDIA-03 \+ AISVC-04 \+ MODEL-01 | **P0** | Codex \- AI/API | **Done** |
 | JOB-03 | GET /processing-jobs/{id}Job status, runs, outputs and errors. | Path: id | 200 {data:{job,model\_runs,output\_summary}} | JOB-02 | **P0** | Codex \- AI/API | **Done** |
 | JOB-04 | POST /processing-jobs/{id}/retryRetry failed job idempotently. | {reason?} | 202 {data:ProcessingJob} | JOB-03 failed | **P1** | Codex \- AI/API | **Done** |
-| JOB-05 | POST /processing-jobs/{id}/cancelCancel queued/running job when supported. | {reason?} | 200 {data:ProcessingJob} | JOB-03 | **P2** | TBD \- AI/API | Backlog |
+| JOB-05 | POST /processing-jobs/{id}/cancelCancel queued/running job when supported. | {reason?} | 200 {data:ProcessingJob} | JOB-03 | **P2** | Jason Benabente | **Testing** |
 
 ### **AISVC-01 — GET /api/v1/admin/ai-services**
 
@@ -1217,7 +1217,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RESULT-02 | GET /tree-observations/{id}/heightsHeight estimates. | Path: id | 200 {data:\[HeightEstimation\]} | TREE-02 | **P1** | Codex \- Results/API | **Done** |
 | RESULT-03 | GET /tree-observations/{id}/agesAge estimates \+ assumptions. | Path: id | 200 {data:\[AgeEstimation\]} | TREE-02 | **P1** | Codex \- Results/API | **Done** |
 | LAYER-01 | GET /missions/{id}/layersList geospatial/photogrammetry outputs. | Query: type? | 200 {data:\[Layer\]} | JOB-03 | **P1** | Codex \- GIS/API | **Done** |
-| LAYER-02 | POST /missions/{id}/layers/buildQueue map layer build/refresh. | {layer\_types:\[...\],parameters?} | 202 {data:{job\_id}} | TREE-01 \+ photogrammetry inputs | **P1** | TBD \- GIS/API | **Blocked** |
+| LAYER-02 | POST /missions/{id}/layers/buildQueue map layer build/refresh. | {layer\_types:\[...\],parameters?} | 202 {data:{job\_id}} | TREE-01 \+ photogrammetry inputs | **P1** | Jason Benabente | **Blocked** |
 
 ### **TREE-01 — GET /api/v1/tree-observations**
 
@@ -1312,16 +1312,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| CONF-01 | GET /confidence-reviewMission-scoped low-confidence queue. | Query: mission\_id\*,flight\_id?,result\_type?,status?,severity?,page | 200 {data:\[ReviewRecord\],summary,groups,map,meta} | TREE/RESULT \+ confidence flag extension | **P1** | TBD \- Validation/API | **Blocked** |
-| CONF-02 | PUT /confidence-review/{resultId}Create/update review flag/status/assignment. | {status,review\_note?,assigned\_to?,reason?,resolution\_notes?} | 200 {data:ConfidenceFlag} | CONF-01 | **P1** | TBD \- Validation/API | **Blocked** |
+| CONF-01 | GET /confidence-reviewMission-scoped low-confidence queue. | Query: mission\_id\*,flight\_id?,result\_type?,status?,severity?,page | 200 {data:\[ReviewRecord\],summary,groups,map,meta} | TREE/RESULT \+ confidence flag extension | **P1** | Jason Benabente | **Blocked** |
+| CONF-02 | PUT /confidence-review/{resultId}Create/update review flag/status/assignment. | {status,review\_note?,assigned\_to?,reason?,resolution\_notes?} | 200 {data:ConfidenceFlag} | CONF-01 | **P1** | Jason Benabente | **Blocked** |
 | VAL-01 | GET /validation/scopesMission/site/plot/species/assignee options. | No body | 200 {data:{missions,species,assignees,sessions}} | MSN/SITE/USR | **P0** | TBD \- Validation/API | **Blocked** |
 | VAL-02 | GET /validation-sessionsList field validation sessions. | Query: mission\_id?,site\_id?,status?,page | 200 {data:\[ValidationSession\],meta} | VAL-01 | **P0** | TBD \- Validation/API | **Blocked** |
 | VAL-03 | POST /validation-sessionsCreate mission-scoped validation activity. | {mission\_id,site\_id,plot\_id?,validated\_by,validation\_date,method,notes?} | 201 {data:ValidationSession} | VAL-01 \+ TREE-01 | **P0** | TBD \- Validation/API | **Blocked** |
 | VAL-04 | GET /validation-sessions/{id}Validation workspace data and map layers. | Path: id | 200 {data:{context,observations,ground\_truth\_records,matches,metrics,layers}} | VAL-03 | **P0** | TBD \- Validation/API | **Blocked** |
 | GT-01 | POST /validation-sessions/{id}/ground-truthCreate manual field tree record. | {field\_code?,species\_id?,location:GeoJSON,height\_m?,age\_years?,diameter\_cm?,crown\_diameter\_m?,health\_status,is\_tree,photo\_path?,notes?} | 201 {data:GroundTruthRecord} | VAL-04 | **P0** | TBD \- Validation/API | **Blocked** |
 | MATCH-01 | POST /validation-sessions/{id}/decisionsStore matched/corrected/false-positive/false-negative decision. | {tree\_observation\_id?,ground\_truth\_id?,decision,accepted\_species\_id?,accepted\_height\_m?,accepted\_age\_years?,corrected\_geometry?,notes?,validation\_evidence?} | 201 {data:ValidationMatch} | VAL-04 \+ GT-01 | **P0** | TBD \- Validation/API | **Blocked** |
-| ACC-01 | POST /validation-sessions/{id}/accuracy/recomputeRecompute precision/recall/F1/RMSE/MAE evidence. | No body | 200 {data:\[AccuracyMetric\]} | MATCH-01 | **P0** | TBD \- Validation/DB | **Blocked** |
-| VAL-05 | POST /validation-sessions/{id}/completeComplete validation task. | {notes} | 200 {data:ValidationSession} | MATCH-01; protocol gate | **P1** | TBD \- Validation/API | **Blocked** |
+| ACC-01 | POST /validation-sessions/{id}/accuracy/recomputeRecompute precision/recall/F1/RMSE/MAE evidence. | No body | 200 {data:\[AccuracyMetric\]} | MATCH-01 | **P0** | Jason Benabente | **Blocked** |
+| VAL-05 | POST /validation-sessions/{id}/completeComplete validation task. | {notes} | 200 {data:ValidationSession} | MATCH-01; protocol gate | **P1** | Jason Benabente | **Blocked** |
 
 ## **Reports, exports, dashboard and saved views**
 
@@ -1366,7 +1366,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | SET-01 | GET /settingsRead permitted settings by group. | Query: group? | 200 {data:\[Setting\]} | AUTH | **P2** | TBD \- Backend/API | Backlog |
 | SET-02 | PUT /settings/{key}Update managed setting. | {setting\_value,description?} | 200 {data:Setting} | SET-01 \+ admin permission | **P2** | TBD \- Backend/API | Backlog |
 | AUD-01 | GET /audit-logsSearch immutable audit trail. | Query: user\_id?,action?,table\_name?,record\_id?,from?,to?,page | 200 {data:\[AuditLog\],meta} | AUTH \+ audit trigger | **P1** | Codex \- Security/API | **Done** |
-| AUD-02 | GET /audit-logs/{id}Audit event detail. | Path: id | 200 {data:AuditLog} | AUD-01 | **P2** | TBD \- Security/API | Backlog |
+| AUD-02 | GET /audit-logs/{id}Audit event detail. | Path: id | 200 {data:AuditLog} | AUD-01 | **P2** | Jason Benabente | **Testing** |
 
 ### **NOTIF-01 — GET /api/v1/notifications**
 
@@ -1415,13 +1415,13 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| DATASET-01 | GET /training-datasetsList training/validation datasets. | Query: type,source,page | 200 {data:\[TrainingDataset\],meta} | AUTH | **P2** | TBD \- AI/API | Backlog |
-| DATASET-02 | POST /training-datasetsCreate dataset metadata. | {dataset\_name,dataset\_type,source,description?,version\_label?} | 201 {data:TrainingDataset} | DATASET-01 | **P2** | TBD \- AI/API | Backlog |
-| DATASET-03 | POST /training-datasets/{id}/itemsAttach labeled media/sample. | {media\_id?,label\_file\_path,label\_format,species\_id?,annotation\_status} | 201 {data:DatasetItem} | DATASET-02 \+ MEDIA-03 | **P2** | TBD \- AI/API | Backlog |
-| ANN-01 | GET /annotation/projectsExisting annotation-workspace project list; requires extension tables if retained. | Query: status?,page | 200 {data:\[AnnotationProject\],meta} | annotation extension | **P2** | TBD \- Annotation/API | Backlog |
-| ANN-02 | POST /annotation/projectsCreate annotation project. | {name,dataset\_type,mission\_id?,status} | 201 {data:AnnotationProject} | ANN-01 | **P2** | TBD \- Annotation/API | Backlog |
-| ANN-03 | PUT /annotation/items/{id}/objectsReplace item annotations transactionally. | {objects:\[{class\_id,bbox?,polygon?,attributes?}\]} | 200 {data:{count}} | ANN-02 | **P2** | TBD \- Annotation/API | Backlog |
-| ANN-04 | POST /annotation/projects/{id}/exportsExport COCO/YOLO/CSV/GeoJSON labels. | {format} | 201 {data:{export\_id,file\_name,storage\_key}} | ANN-03 \+ storage | **P2** | TBD \- Annotation/API | Backlog |
+| DATASET-01 | GET /training-datasetsList training/validation datasets. | Query: type,source,page | 200 {data:\[TrainingDataset\],meta} | AUTH | **P2** | Jason Benabente | **Testing** |
+| DATASET-02 | POST /training-datasetsCreate dataset metadata. | {dataset\_name,dataset\_type,source,description?,version\_label?} | 201 {data:TrainingDataset} | DATASET-01 | **P2** | Jason Benabente | **Testing** |
+| DATASET-03 | POST /training-datasets/{id}/itemsAttach labeled media/sample. | {media\_id?,label\_file\_path,label\_format,species\_id?,annotation\_status} | 201 {data:DatasetItem} | DATASET-02 \+ MEDIA-03 | **P2** | Jason Benabente | **Testing** |
+| ANN-01 | GET /annotation/projectsExisting annotation-workspace project list; requires extension tables if retained. | Query: status?,page | 200 {data:\[AnnotationProject\],meta} | annotation extension | **P2** | Jason Benabente | **Testing** |
+| ANN-02 | POST /annotation/projectsCreate annotation project. | {name,dataset\_type,mission\_id?,status} | 201 {data:AnnotationProject} | ANN-01 | **P2** | Jason Benabente | **Testing** |
+| ANN-03 | PUT /annotation/items/{id}/objectsReplace item annotations transactionally. | {objects:\[{class\_id,bbox?,polygon?,attributes?}\]} | 200 {data:{count}} | ANN-02 | **P2** | Jason Benabente | **Testing** |
+| ANN-04 | POST /annotation/projects/{id}/exportsExport COCO/YOLO/CSV/GeoJSON labels. | {format} | 201 {data:{export\_id,file\_name,storage\_key}} | ANN-03 \+ storage | **P2** | Jason Benabente | **Testing** |
 
 # **7\. Key endpoint request/response examples**
 

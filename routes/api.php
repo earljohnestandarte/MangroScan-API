@@ -2,11 +2,18 @@
 
 use App\Http\Controllers\Api\V1\Ai\AiModelIndexController;
 use App\Http\Controllers\Api\V1\Ai\AiModelShowController;
+use App\Http\Controllers\Api\V1\Ai\AiModelVersionDeployController;
+use App\Http\Controllers\Api\V1\Ai\AiServiceCredentialRotateController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceHealthTestController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceOverviewController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceStoreController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceSynchronizeController;
+use App\Http\Controllers\Api\V1\Annotation\AnnotationExportStoreController;
+use App\Http\Controllers\Api\V1\Annotation\AnnotationObjectReplaceController;
+use App\Http\Controllers\Api\V1\Annotation\AnnotationProjectIndexController;
+use App\Http\Controllers\Api\V1\Annotation\AnnotationProjectStoreController;
 use App\Http\Controllers\Api\V1\Audit\AuditLogIndexController;
+use App\Http\Controllers\Api\V1\Audit\AuditLogShowController;
 use App\Http\Controllers\Api\V1\Auth\AuthenticatedProfileController;
 use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
@@ -52,6 +59,7 @@ use App\Http\Controllers\Api\V1\Organization\OrganizationStoreController;
 use App\Http\Controllers\Api\V1\Organization\OrganizationUpdateController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
+use App\Http\Controllers\Api\V1\Processing\ProcessingJobCancelController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobIndexController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobRetryController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobShowController;
@@ -72,6 +80,9 @@ use App\Http\Controllers\Api\V1\Site\SitePlotStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteShowController;
 use App\Http\Controllers\Api\V1\Site\SiteStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteUpdateController;
+use App\Http\Controllers\Api\V1\Training\TrainingDatasetIndexController;
+use App\Http\Controllers\Api\V1\Training\TrainingDatasetItemStoreController;
+use App\Http\Controllers\Api\V1\Training\TrainingDatasetStoreController;
 use App\Http\Controllers\Api\V1\Tree\MissionLayerIndexController;
 use App\Http\Controllers\Api\V1\Tree\MissionTreeCountController;
 use App\Http\Controllers\Api\V1\Tree\MissionTreeGeoJsonController;
@@ -552,6 +563,13 @@ Route::prefix('v1')->group(function () {
             'permission:processing_jobs.create', 'throttle:auth.authenticated',
         ]);
 
+    // [JOB-05] POST /api/v1/processing-jobs/{id}/cancel
+    Route::post('/processing-jobs/{job}/cancel', ProcessingJobCancelController::class)
+        ->whereUuid('job')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:processing_jobs.manage', 'throttle:auth.authenticated',
+        ]);
+
     // [TREE-01] GET /api/v1/tree-observations
     Route::get('/tree-observations', TreeObservationIndexController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class,
@@ -624,6 +642,58 @@ Route::prefix('v1')->group(function () {
         'permission:audit.read', 'throttle:auth.authenticated',
     ]);
 
+    // [AUD-02] GET /api/v1/audit-logs/{id}
+    Route::get('/audit-logs/{audit}', AuditLogShowController::class)
+        ->whereUuid('audit')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:audit.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [DATASET-01] GET /api/v1/training-datasets
+    Route::get('/training-datasets', TrainingDatasetIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:ai_models.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [DATASET-02] POST /api/v1/training-datasets
+    Route::post('/training-datasets', TrainingDatasetStoreController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:ai_models.manage', 'throttle:auth.authenticated',
+    ]);
+
+    // [DATASET-03] POST /api/v1/training-datasets/{id}/items
+    Route::post('/training-datasets/{dataset}/items', TrainingDatasetItemStoreController::class)
+        ->whereUuid('dataset')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_models.manage', 'throttle:auth.authenticated',
+        ]);
+
+    // [ANN-01] GET /api/v1/annotation/projects
+    Route::get('/annotation/projects', AnnotationProjectIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:ai_models.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [ANN-02] POST /api/v1/annotation/projects
+    Route::post('/annotation/projects', AnnotationProjectStoreController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:ai_models.manage', 'throttle:auth.authenticated',
+    ]);
+
+    // [ANN-03] PUT /api/v1/annotation/items/{id}/objects
+    Route::put('/annotation/items/{item}/objects', AnnotationObjectReplaceController::class)
+        ->whereUuid('item')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_models.manage', 'throttle:auth.authenticated',
+        ]);
+
+    // [ANN-04] POST /api/v1/annotation/projects/{id}/exports
+    Route::post('/annotation/projects/{project}/exports', AnnotationExportStoreController::class)
+        ->whereUuid('project')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_models.manage', 'throttle:auth.authenticated',
+        ]);
+
     // [NOTIF-01] GET /api/v1/notifications
     Route::get('/notifications', NotificationIndexController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class,
@@ -664,6 +734,13 @@ Route::prefix('v1')->group(function () {
             'permission:ai_models.read', 'throttle:auth.authenticated',
         ]);
 
+    // [MODEL-03] POST /api/v1/ai-models/{id}/versions/{versionId}/deploy
+    Route::post('/ai-models/{model}/versions/{version}/deploy', AiModelVersionDeployController::class)
+        ->whereUuid('model')->whereUuid('version')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_models.manage', 'throttle:auth.authenticated',
+        ]);
+
     // [AISVC-01] GET /api/v1/admin/ai-services
     Route::get('/admin/ai-services', AiServiceOverviewController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class,
@@ -686,6 +763,14 @@ Route::prefix('v1')->group(function () {
 
     // [AISVC-04] POST /api/v1/admin/ai-services/{id}/synchronize
     Route::post('/admin/ai-services/{service}/synchronize', AiServiceSynchronizeController::class)
+        ->whereUuid('service')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_services.manage', 'throttle:auth.authenticated',
+        ]);
+
+    // [AISVC-05] POST /api/v1/admin/ai-services/{id}/credentials
+    Route::post('/admin/ai-services/{service}/credentials', AiServiceCredentialRotateController::class)
         ->whereUuid('service')
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,

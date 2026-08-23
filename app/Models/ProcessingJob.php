@@ -26,6 +26,9 @@ class ProcessingJob extends Model
         'output_summary',
         'started_at',
         'completed_at',
+        'cancelled_at',
+        'cancelled_by',
+        'cancellation_reason',
         'error_message',
         'created_by',
         'idempotency_key',
@@ -40,6 +43,7 @@ class ProcessingJob extends Model
             'output_summary' => 'array',
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 
