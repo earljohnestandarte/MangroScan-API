@@ -18,14 +18,14 @@ class ValidationDatabaseFoundationTest extends TestCase
 {
     use RefreshDatabase;
 
-    // [VAL-DB] The authoritative base validation schema is reproducible without endpoint-only extensions.
+    // [VAL-DB] The authoritative validation schema includes the approved completion and metric lineage extensions.
     public function test_it_provisions_the_documented_base_tables(): void
     {
         $this->assertTrue(Schema::hasColumns('validation_sessions', [
             'validation_session_id', 'mission_id', 'site_id', 'plot_id', 'validated_by',
-            'validation_date', 'method', 'notes', 'created_at', 'updated_at',
+            'validation_date', 'method', 'status', 'notes', 'completed_at', 'completed_by',
+            'created_at', 'updated_at',
         ]));
-        $this->assertFalse(Schema::hasColumn('validation_sessions', 'status'));
 
         $this->assertTrue(Schema::hasColumns('ground_truth_tree_records', [
             'ground_truth_id', 'validation_session_id', 'species_id', 'ground_location',
@@ -46,10 +46,13 @@ class ValidationDatabaseFoundationTest extends TestCase
         }
 
         $this->assertTrue(Schema::hasColumns('accuracy_metrics', [
-            'accuracy_metric_id', 'mission_id', 'model_version_id', 'metric_type',
+            'accuracy_metric_id', 'validation_session_id', 'mission_id', 'model_version_id', 'metric_type',
             'metric_value', 'sample_size', 'computed_at', 'notes',
         ]));
-        $this->assertFalse(Schema::hasColumn('accuracy_metrics', 'validation_session_id'));
+        $this->assertTrue(Schema::hasColumns('confidence_flags', [
+            'confidence_flag_id', 'mission_id', 'result_id', 'result_type', 'status', 'severity',
+            'review_note', 'assigned_to', 'reason', 'resolution_notes', 'created_by', 'created_at', 'updated_at',
+        ]));
     }
 
     // [VAL-DB] UUID models, documented relations and cascade ownership behave consistently.
