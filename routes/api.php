@@ -97,8 +97,10 @@ use App\Http\Controllers\Api\V1\User\UserIndexController;
 use App\Http\Controllers\Api\V1\User\UserShowController;
 use App\Http\Controllers\Api\V1\User\UserStoreController;
 use App\Http\Controllers\Api\V1\User\UserUpdateController;
+use App\Http\Controllers\Api\V1\Validation\AccuracyRecomputeController;
 use App\Http\Controllers\Api\V1\Validation\ConfidenceFlagUpdateController;
 use App\Http\Controllers\Api\V1\Validation\ConfidenceReviewIndexController;
+use App\Http\Controllers\Api\V1\Validation\ValidationSessionCompleteController;
 use App\Http\Middleware\EnsureActiveIdentity;
 use Illuminate\Support\Facades\Route;
 
@@ -649,6 +651,20 @@ Route::prefix('v1')->group(function () {
         ->whereUuid('result')->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:validation.decide', 'throttle:auth.authenticated',
+        ]);
+
+    // [ACC-01] Recompute authoritative validation-session metrics.
+    Route::post('/validation-sessions/{session}/accuracy/recompute', AccuracyRecomputeController::class)
+        ->whereUuid('session')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:accuracy.recompute', 'throttle:auth.authenticated',
+        ]);
+
+    // [VAL-05] Complete a validation session after decisions and fresh metrics.
+    Route::post('/validation-sessions/{session}/complete', ValidationSessionCompleteController::class)
+        ->whereUuid('session')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:validation.complete', 'throttle:auth.authenticated',
         ]);
 
     // [SDS-01] POST /api/v1/flights/{id}/sensor-datasets/uploads
