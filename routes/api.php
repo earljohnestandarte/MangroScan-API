@@ -104,6 +104,7 @@ use App\Http\Controllers\Api\V1\Validation\ConfidenceReviewIndexController;
 use App\Http\Controllers\Api\V1\Validation\ValidationScopeController;
 use App\Http\Controllers\Api\V1\Validation\ValidationSessionCompleteController;
 use App\Http\Controllers\Api\V1\Validation\ValidationSessionIndexController;
+use App\Http\Controllers\Api\V1\Validation\ValidationSessionStoreController;
 use App\Http\Middleware\EnsureActiveIdentity;
 use Illuminate\Support\Facades\Route;
 
@@ -671,6 +672,12 @@ Route::prefix('v1')->group(function () {
     Route::get('/validation-sessions', ValidationSessionIndexController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:validation.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [VAL-03] Create a mission-scoped field validation session.
+    Route::post('/validation-sessions', ValidationSessionStoreController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:validation.create', 'throttle:auth.authenticated',
     ]);
 
     // [ACC-01] Recompute authoritative validation-session metrics.
