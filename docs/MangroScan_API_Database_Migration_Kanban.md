@@ -1336,7 +1336,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | RPT-01 | GET /reportsList report records. | Query: mission\_id,site\_id,status,type,page | 200 {data:\[Report\],meta} | AUTH | **P1** | Codex \- Reporting/API | **Done** |
-| RPT-02 | POST /reportsPrepare report definition/draft. | {mission\_id,site\_id,report\_title,report\_type,audience?,summary?,interpretation?,limitations?,recommendations?,formats?} | 201 {data:Report} | TREE/ACC finalized | **P1** | Earljohn Estandarte | **Blocked** |
+| RPT-02 | POST /reportsPrepare report definition/draft. | {mission\_id,site\_id,report\_title,report\_type,audience?,summary?,interpretation?,limitations?,recommendations?,formats?} | 201 {data:Report} | TREE/ACC finalized | **P1** | Earljohn Estandarte | **Done** |
 | RPT-03 | GET /reports/{id}Report draft/source metadata. | Path: id | 200 {data:{report,source\_summary}} | RPT-02 | **P1** | Earljohn Estandarte | **Blocked** |
 | RPT-04 | PATCH /reports/{id}Update report content/status while editable. | Partial report fields | 200 {data:Report} | RPT-03 | **P1** | Earljohn Estandarte | **Blocked** |
 | RPT-05 | POST /reports/{id}/generateGenerate professional PDF/report artifact asynchronously. | {format:"PDF",options?} | 202 {data:{job\_id,report\_id,status}} | RPT-03 \+ report routine/storage | **P0** | Earljohn Estandarte | **Blocked** |
@@ -1362,6 +1362,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Tenant / integrity behavior | Both the report's direct `site_id` and its `mission.site` must belong to the caller's organization, so inconsistent legacy cross-tenant rows cannot leak. The authoritative schema does not define a mission/site composite FK, so none is invented. Reads create no audit or notification and call no downstream service; documented 502/503 codes remain available only if future report reads acquire a dependency. |
 | Database / DCL | Adds the documented UUID `reports` table, required FKs, report type/status checks and mission/status, site/status and type/time indexes. `025_report_grants.sql` gives API and reporting roles SELECT only; worker/auditor and all mutations remain denied until their dependent workflows are implemented. |
 | Tests / status | `ReportIndexTest` covers exact resources/pages/order, all filters, tenant and inconsistent-lineage exclusion, target anti-enumeration, validation, authentication, local/foreign RBAC, inactive identity, no audit, throttling, PostgreSQL domains/indexes and DCL. Done — full SQLite passes 479 tests / 2750 assertions (three PostgreSQL-only skips) and PostgreSQL 18/PostGIS passes 479 / 2762; focused suites, route, Pint, Composer, migration and live privilege gates pass. |
+
+### **RPT-02 — POST /api/v1/reports**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Create a tenant-scoped `draft` report definition. Requires active Sanctum authentication and a tenant-valid `reports.create` grant. |
+| Request / normalization | Required tenant-visible `mission_id` and matching `site_id`, trimmed title (max 200), and documented report type. Optional audience (max 2,000), four content fields (max 20,000 each), and one to five distinct normalized requested formats from PDF, CSV, XLSX, GeoJSON, and KML. Blank optional strings become `null`. |
+| Response / server fields | `201 {data:Report}` returns the exact draft content resource. `report_status=draft`, `generated_by=null`, and `approved_by=null` are server-owned regardless of extra client input. RPT-01 keeps its established metadata-only list resource. |
+| Scope / transaction | The mission must belong to the supplied site and that site must belong to the caller's organization; foreign, missing, and inconsistent lineage returns non-enumerable 404. Report insertion and immutable `report.create` audit evidence share one rollback-safe transaction. |
+| Schema / DCL / tests | Adds only the five tracker-approved content columns. `054_report_creation_grants.sql` grants column-limited API INSERT; API UPDATE/DELETE and report/worker INSERT remain denied. `ReportStoreTest` covers full/minimal drafts, normalization, validation, lineage, auth, local/foreign RBAC, inactivity, audit rollback, throttling, route/schema/DCL, and both databases. Focused SQLite and PostgreSQL/PostGIS each pass 9 / 84; full SQLite passes 765 / 5298 with thirteen expected PostgreSQL-only skips; full PostgreSQL/PostGIS passes 778 / 5335. |
 
 ## **Notifications, settings and audit**
 

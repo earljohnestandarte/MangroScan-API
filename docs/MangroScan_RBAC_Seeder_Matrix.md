@@ -38,17 +38,17 @@ This is the developer reference for the deterministic RBAC data installed by `Da
 | `ai_models.manage` | Yes | — | — | — | MODEL-03 (P2) |
 | `processing_jobs.create` | — | Yes | — | — | JOB-02, JOB-04 |
 | `processing_jobs.manage` | — | Yes | — | — | JOB-01, JOB-03 |
-| `results.read` | — | Yes | Yes | — | TREE-01..03, COUNT-01, RESULT-01..03, LAYER-01, DASH-01; planned CONF-01, DASH-02 |
+| `results.read` | — | Yes | Yes | — | TREE-01..03, COUNT-01, RESULT-01..03, LAYER-01, DASH-01/02; CONF-01 testing |
 | `results.export` | — | Yes | Yes | — | EXP-01 (planned) |
 | `maps.read` | — | Yes | Yes | — | LAYER-01/02 (planned map-specific enforcement) |
-| `validation.read` | — | Yes | Yes | — | VAL-01, VAL-02, VAL-04 (blocked) |
-| `validation.create` | — | Yes | Yes | — | VAL-03 (blocked) |
+| `validation.read` | — | Yes | Yes | — | VAL-01, VAL-02, VAL-04 |
+| `validation.create` | — | Yes | Yes | — | VAL-03 |
 | `validation.record_ground_truth` | — | Yes | Yes | — | GT-01 |
 | `validation.decide` | — | Yes | Yes | — | CONF-02, MATCH-01 |
 | `validation.complete` | — | Yes | Yes | — | VAL-05 |
 | `accuracy.recompute` | — | — | Yes | — | ACC-01 |
 | `reports.read` | — | Yes | Yes | — | RPT-01, RPT-03/04 (partly blocked) |
-| `reports.create` | — | Yes | Yes | — | RPT-02 (blocked) |
+| `reports.create` | — | Yes | Yes | — | RPT-02 |
 | `reports.generate` | — | Yes | Yes | — | RPT-05, EXP-01 (blocked) |
 | `reports.approve` | — | — | Yes | — | RPT-06 (blocked) |
 | `exports.download` | — | Yes | Yes | — | EXP-02, EXP-03 (blocked) |
