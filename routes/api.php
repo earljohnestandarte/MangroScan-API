@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\V1\Auth\PasswordChangeController;
 use App\Http\Controllers\Api\V1\Auth\PasswordForgotController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Battery\BatteryIndexController;
+use App\Http\Controllers\Api\V1\Dashboard\DashboardOverviewController;
 use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
@@ -808,6 +809,12 @@ Route::prefix('v1')->group(function () {
     Route::get('/reports', ReportIndexController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:reports.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [DASH-01] Return role-scoped dashboard KPI aggregates.
+    Route::get('/dashboard/overview', DashboardOverviewController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:results.read', 'throttle:auth.authenticated',
     ]);
 
     // [MODEL-01] GET /api/v1/ai-models

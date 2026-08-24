@@ -126,7 +126,7 @@ These changes are not yet approved as `Done`:
 **Endpoint IDs:**
 
 - P0: `RPT-05`, `EXP-01`, `EXP-03`
-- P1: `RPT-02`, `RPT-03`, `RPT-04`, `RPT-06`, `EXP-02`, `DASH-01`, `DASH-02`
+- P1: `RPT-02`, `RPT-03`, `RPT-04`, `RPT-06`, `EXP-02`, `DASH-02` (`DASH-01` complete)
 
 **Recommended branch:** `feature/earljohn/reports-exports-dashboard`
 

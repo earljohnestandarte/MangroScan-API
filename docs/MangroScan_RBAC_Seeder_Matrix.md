@@ -38,7 +38,7 @@ This is the developer reference for the deterministic RBAC data installed by `Da
 | `ai_models.manage` | Yes | — | — | — | MODEL-03 (P2) |
 | `processing_jobs.create` | — | Yes | — | — | JOB-02, JOB-04 |
 | `processing_jobs.manage` | — | Yes | — | — | JOB-01, JOB-03 |
-| `results.read` | — | Yes | Yes | — | TREE-01..03, COUNT-01, RESULT-01..03, LAYER-01; planned CONF-01, DASH-01/02 |
+| `results.read` | — | Yes | Yes | — | TREE-01..03, COUNT-01, RESULT-01..03, LAYER-01, DASH-01; planned CONF-01, DASH-02 |
 | `results.export` | — | Yes | Yes | — | EXP-01 (planned) |
 | `maps.read` | — | Yes | Yes | — | LAYER-01/02 (planned map-specific enforcement) |
 | `validation.read` | — | Yes | Yes | — | VAL-01, VAL-02, VAL-04 (blocked) |
