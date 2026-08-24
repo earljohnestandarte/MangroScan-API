@@ -21,8 +21,8 @@ use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\PasswordChangeController;
 use App\Http\Controllers\Api\V1\Auth\PasswordForgotController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
-use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Battery\BatteryIndexController;
+use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
 use App\Http\Controllers\Api\V1\Drone\DroneStoreController;
@@ -101,6 +101,7 @@ use App\Http\Controllers\Api\V1\User\UserUpdateController;
 use App\Http\Controllers\Api\V1\Validation\AccuracyRecomputeController;
 use App\Http\Controllers\Api\V1\Validation\ConfidenceFlagUpdateController;
 use App\Http\Controllers\Api\V1\Validation\ConfidenceReviewIndexController;
+use App\Http\Controllers\Api\V1\Validation\ValidationScopeController;
 use App\Http\Controllers\Api\V1\Validation\ValidationSessionCompleteController;
 use App\Http\Middleware\EnsureActiveIdentity;
 use Illuminate\Support\Facades\Route;
@@ -658,6 +659,12 @@ Route::prefix('v1')->group(function () {
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:validation.decide', 'throttle:auth.authenticated',
         ]);
+
+    // [VAL-01] Return tenant-scoped mission, species, assignee and session options.
+    Route::get('/validation/scopes', ValidationScopeController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:validation.read', 'throttle:auth.authenticated',
+    ]);
 
     // [ACC-01] Recompute authoritative validation-session metrics.
     Route::post('/validation-sessions/{session}/accuracy/recompute', AccuracyRecomputeController::class)

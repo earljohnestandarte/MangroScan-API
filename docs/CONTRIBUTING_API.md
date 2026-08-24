@@ -110,13 +110,13 @@ These changes are not yet approved as `Done`:
 
 **Endpoint IDs:**
 
-- P0: `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`
+- P0: `VAL-01` (Testing), `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`
 
 **Recommended branch:** `feature/earljohn/validation-core`
 
 **Likely paths:** create `app/Http/Controllers/Api/V1/Validation`, `app/Http/Requests/Validation`, `app/Services/Validation`, and `tests/Feature/Validation` following existing single-action conventions; reuse the existing validation models and `2026_08_12_066000_create_validation_foundation_tables.php`; add only approved additive migrations/DCL.
 
-**Dependencies:** preserve the chain `VAL-01 → VAL-02/03 → VAL-04 → GT-01/MATCH-01`. `MATCH-01` must write the validation-match evidence consumed by `ACC-01` and `VAL-05`; those downstream endpoints remain blocked until that handoff is implemented and verified. The remaining public-contract/schema conflicts for these transferred endpoints must still be resolved before moving rows from `Blocked` to `Ready`.
+**Dependencies:** VAL-01's implementation is ready but remains in Testing until the dedicated PostgreSQL owner is configured and the PostgreSQL suite passes. It does not unblock `VAL-02/03` yet. Preserve the chain `VAL-01 → VAL-02/03 → VAL-04 → GT-01/MATCH-01`. `MATCH-01` must write the validation-match evidence consumed by `ACC-01` and `VAL-05`; those downstream endpoints remain blocked until that handoff is implemented and verified.
 
 ### Earljohn Estandarte — transferred reports, exports, and dashboards
 

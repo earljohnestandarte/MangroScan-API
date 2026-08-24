@@ -36,7 +36,7 @@ For a physical Expo device, `localhost` means the phone itself. Use a reachable 
 | 🚧 UNDER CONSTRUCTION | Planned or actively being built; do not use as a production dependency. |
 | ⛔ BLOCKED / UNDER CONSTRUCTION | Not implemented and waiting on a documented prerequisite or decision. |
 
-Current inventory: **141 endpoints**, **85 available**, **31 under construction**, **25 blocked in manual planning**, and **0 testing**.
+Current inventory: **141 endpoints**, **85 available**, **19 under construction**, **22 blocked in manual planning**, and **15 testing**.
 
 ## Currently available endpoints
 
@@ -155,7 +155,7 @@ Do not integrate the newly routed endpoints above yet. Jessamae Sumanoy's `BAT-0
 | `LAYER-02` | POST | `/api/v1/missions/{id}/layers/build` | P1 | Testing | 🧪 TESTING — NOT AVAILABLE |
 | `CONF-01` | GET | `/api/v1/confidence-review` | P1 | Testing | 🧪 TESTING — NOT AVAILABLE |
 | `CONF-02` | PUT | `/api/v1/confidence-review/{resultId}` | P1 | Testing | 🧪 TESTING — NOT AVAILABLE |
-| `VAL-01` | GET | `/api/v1/validation/scopes` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
+| `VAL-01` | GET | `/api/v1/validation/scopes` | P0 | Testing | 🧪 TESTING — NOT AVAILABLE |
 | `VAL-02` | GET | `/api/v1/validation-sessions` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `VAL-03` | POST | `/api/v1/validation-sessions` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `VAL-04` | GET | `/api/v1/validation-sessions/{id}` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
@@ -353,7 +353,8 @@ flowchart LR
 
 ### SYS-01 — Liveness/readiness for API, DB, storage and queue.
 
-> **Status: ✅ AVAILABLE**
+> **Status: 🧪 TESTING — NOT AVAILABLE**
+> The route and implementation are present and the full SQLite suite passes. PostgreSQL verification is blocked before migrations because `.env.testing` uses `mangroscan_dev`, which lacks `CREATE` on the test schema. Coordinate before frontend integration.
 > Implemented and intended for frontend integration.
 
 | Property | Value |
@@ -8230,8 +8231,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### VAL-01 — Mission/site/plot/species/assignee options.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
 
 | Property | Value |
 | --- | --- |
@@ -8245,11 +8245,11 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Success | 200 — {data:{missions,species,assignees,sessions}} |
 | Relevant errors | 401, 403, 404, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `No body`
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 GET /api/v1/validation/scopes HTTP/1.1
@@ -8258,13 +8258,72 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
-HTTP `200`; contract shape `{data:{missions,species,assignees,sessions}}`.
+HTTP `200`; exact contract shape `{data:{missions,species,assignees,sessions}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "missions": [
+            {
+                "mission_id": "<uuid>",
+                "mission_code": "MSN-2026-001",
+                "mission_title": "Baseline survey",
+                "status": "completed",
+                "site": {
+                    "site_id": "<uuid>",
+                    "site_code": "SITE-001",
+                    "site_name": "North Estuary"
+                },
+                "plots": [
+                    {
+                        "plot_id": "<uuid>",
+                        "plot_code": "PLOT-A",
+                        "plot_name": "Alpha Plot"
+                    }
+                ]
+            }
+        ],
+        "species": [
+            {
+                "species_id": "<uuid>",
+                "scientific_name": "Avicennia marina",
+                "common_name": "Grey mangrove",
+                "local_name": "Bungalon"
+            }
+        ],
+        "assignees": [
+            {
+                "user_id": "<uuid>",
+                "display_name": "Ana Maria Validator",
+                "position_title": "Environmental Specialist"
+            }
+        ],
+        "sessions": [
+            {
+                "validation_session_id": "<uuid>",
+                "mission_id": "<uuid>",
+                "site_id": "<uuid>",
+                "plot_id": "<uuid>",
+                "validated_by": "<uuid>",
+                "validation_date": "2026-08-24",
+                "method": "ground_survey",
+                "status": "open",
+                "notes": null,
+                "completed_at": null,
+                "completed_by": null,
+                "created_at": "2026-08-24T00:00:00+00:00",
+                "updated_at": "2026-08-24T00:00:00+00:00"
+            }
+        ]
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: MSN/SITE/USR.
+Only non-deleted missions/sites/plots in the caller's organization are returned. Sites and plots are intentionally nested under each mission to preserve the approved four-key response envelope. Species must be active. Assignees must be active users in the caller's organization with an effective current-tenant or global `validation.create` grant. Sessions must have consistent mission/site lineage. Collections use stable code/name/date ordering and may be empty.
+
+**Workflow / UI integration note:** Load this endpoint before rendering validation-session selectors. Use the selected mission's nested `site` and `plots`; do not construct cross-site mission/plot combinations. Refresh after VAL-03 creates a session.
 
 ### VAL-02 — List field validation sessions.
 

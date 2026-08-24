@@ -168,8 +168,8 @@ class ValidationDatabaseFoundationTest extends TestCase
         ]);
     }
 
-    // [VAL-DB] Runtime roles remain closed until their endpoint-specific grants are approved.
-    public function test_it_versions_a_closed_validation_dcl_and_registers_no_endpoint(): void
+    // [VAL-DB] The foundation remains closed while endpoint-specific grants and routes are additive.
+    public function test_it_versions_a_closed_foundation_dcl_and_the_validation_scope_route(): void
     {
         $dcl = file_get_contents(database_path('sql/dcl/045_validation_foundation_grants.sql'));
         $migration = file_get_contents(database_path('migrations/2026_08_12_066000_create_validation_foundation_tables.php'));
@@ -200,7 +200,7 @@ class ValidationDatabaseFoundationTest extends TestCase
             $this->assertStringContainsString($invariant, $migration);
         }
 
-        $this->assertFalse(collect(Route::getRoutes())->contains(
+        $this->assertTrue(collect(Route::getRoutes())->contains(
             fn ($route): bool => $route->uri() === 'api/v1/validation/scopes',
         ));
     }
