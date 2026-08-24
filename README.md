@@ -262,7 +262,7 @@ DB_USERNAME=mangroscan_dev
 DB_PASSWORD="replace-with-the-same-local-database-password"
 DB_SEARCH_PATH="app,public"
 
-# Used only to create the three local developer accounts.
+# Used only to create the four local developer accounts.
 MANGROSCAN_SEED_USER_PASSWORD="choose-a-local-login-password"
 
 CACHE_STORE=database
@@ -321,9 +321,9 @@ done
 ```mermaid
 flowchart LR
     Org["🏢 Development organization"] --> Permissions["🔑 54 permissions"]
-    Permissions --> Roles["🛡️ 3 primary roles"]
+    Permissions --> Roles["🛡️ 4 primary roles"]
     Roles --> Matrix["🔗 Role-permission matrix"]
-    Matrix --> Users["👥 3 verified developer users"]
+    Matrix --> Users["👥 4 verified developer users"]
 ```
 
 Run the complete dependency-safe seed chain:
@@ -339,8 +339,9 @@ The command is idempotent and may be run repeatedly. It creates or updates:
 | `admin@mangroscan.test` | System Administrator | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
 | `researcher@mangroscan.test` | Researcher | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
 | `specialist@mangroscan.test` | Environmental Specialist | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
+| `operator@mangroscan.test` | Drone Operator | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
 
-All seeded passwords are hashed. The developer-user seeder refuses a blank password and skips account creation in production. See the [RBAC Seeder Matrix](docs/MangroScan_RBAC_Seeder_Matrix.md) for the exact permission assignments.
+All seeded passwords are hashed. The developer-user seeder refuses a blank password and skips account creation in production. The Drone Operator is a field/mobile role: it can see assigned approved missions and piloted flights, submit checklists, operate flights, upload/read field media, and read its notifications, but it has no management, AI-processing, validation, reporting, audit, or settings permissions. See the [RBAC Seeder Matrix](docs/MangroScan_RBAC_Seeder_Matrix.md) for the exact permission assignments.
 
 ### 8. Start and verify the application
 
@@ -533,7 +534,7 @@ php artisan db:seed
 php artisan tinker --execute="dump(DB::table('organizations')->count(), DB::table('permissions')->count(), DB::table('roles')->count(), DB::table('users')->count());"
 ```
 
-Expected counts in an otherwise empty development database are 1 organization, 54 permissions, 3 primary roles, and 3 developer users. Existing unrelated application data is preserved. Role-permission and user-role pivots are synchronized without duplication.
+Expected counts in an otherwise empty development database are 1 organization, 54 permissions, 4 primary roles, and 4 developer users. Existing unrelated application data is preserved. Role-permission and user-role pivots are synchronized without duplication.
 
 ### Key Tables Overview
 

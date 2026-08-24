@@ -4,20 +4,24 @@ namespace App\Services\Flight;
 
 use App\Models\FlightSession;
 use App\Models\User;
+use App\Services\Auth\DroneOperatorScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class ScopedFlightService
 {
+    public function __construct(private readonly DroneOperatorScope $operatorScope) {}
+
     public function find(User $actor, string $id): FlightSession
     {
-        return FlightSession::query()
+        $query = FlightSession::query()
             ->withLocationGeoJson()
             ->whereHas('mission.site', function (Builder $query) use ($actor): void {
                 $query->where('organization_id', $actor->organization_id);
-            })
-            ->findOrFail($id);
+            });
+
+        return $this->operatorScope->flights($query, $actor)->findOrFail($id);
     }
 
     /** @return array{waypoint_count: int, media_count: int} */

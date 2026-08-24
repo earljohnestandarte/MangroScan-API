@@ -7,6 +7,7 @@ use App\Http\Requests\Mission\MissionIndexRequest;
 use App\Http\Resources\SurveyMissionResource;
 use App\Models\SurveyMission;
 use App\Models\User;
+use App\Services\Auth\DroneOperatorScope;
 use App\Services\Site\ScopedSurveySiteService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -18,6 +19,7 @@ class MissionIndexController extends Controller
     public function __invoke(
         MissionIndexRequest $request,
         ScopedSurveySiteService $scopedSites,
+        DroneOperatorScope $operatorScope,
     ): JsonResponse {
         /** @var User $actor */
         $actor = $request->user();
@@ -25,6 +27,7 @@ class MissionIndexController extends Controller
         $perPage = (int) ($validated['per_page'] ?? 25);
         $query = SurveyMission::query()
             ->whereHas('site', fn (Builder $query) => $query->where('organization_id', $actor->organization_id));
+        $operatorScope->missions($query, $actor);
 
         if (! empty($validated['site_id'])) {
             $site = $scopedSites->find($actor, $validated['site_id']);

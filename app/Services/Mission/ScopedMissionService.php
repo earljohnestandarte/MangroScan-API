@@ -4,15 +4,21 @@ namespace App\Services\Mission;
 
 use App\Models\SurveyMission;
 use App\Models\User;
+use App\Services\Auth\DroneOperatorScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class ScopedMissionService
 {
+    public function __construct(private readonly DroneOperatorScope $operatorScope) {}
+
     public function find(User $actor, string $id): SurveyMission
     {
-        return SurveyMission::query()->whereHas('site', fn (Builder $q) => $q->where('organization_id', $actor->organization_id))->findOrFail($id);
+        $query = SurveyMission::query()
+            ->whereHas('site', fn (Builder $q) => $q->where('organization_id', $actor->organization_id));
+
+        return $this->operatorScope->missions($query, $actor)->findOrFail($id);
     }
 
     /** @return array{total:int,planned:int,flying:int,completed:int,aborted:int,failed:int} */

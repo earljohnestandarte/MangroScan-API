@@ -27,7 +27,7 @@ class MobileMissionBundleController extends Controller
         $actor = $request->user();
         $model = $scoped->find($actor, $mission);
         $model->setRelation('site', $model->site()->withCenterPointGeoJson()->firstOrFail());
-        $bundle = $bundles->bundle($model);
+        $bundle = $bundles->bundle($model, $actor);
 
         return response()->json([
             'data' => [

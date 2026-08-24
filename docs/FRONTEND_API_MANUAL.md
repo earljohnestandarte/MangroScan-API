@@ -203,6 +203,14 @@ Do not integrate the newly routed endpoints above yet. Jessamae Sumanoy's `BAT-0
 - `AUTH-03` revokes the current token. `AUTH-05` password change and `AUTH-07` reset revoke all existing tokens.
 - UI visibility should be based on the effective `permissions` returned by `AUTH-01`, `AUTH-02`, or `AUTH-08`, not only on role names.
 
+### Drone Operator authorization
+
+`Drone Operator` is the fourth seeded operational role and is intended for field/mobile flight work. The deterministic local/testing account is `operator@mangroscan.test`; its password comes from `MANGROSCAN_SEED_USER_PASSWORD` and is never documented as a literal credential.
+
+The role receives exactly these effective permissions: `sites.read`, `missions.read`, `flights.read`, `flights.start`, `flights.complete`, `checklists.submit`, `media.read`, `media.upload`, `notifications.read`, `drones.read`, and `batteries.read`. It does not receive administration, planning, approval, AI-processing, results/validation, accuracy, reporting, audit, or settings permissions.
+
+For this role, mission and flight visibility is narrower than normal organization scope: mission reads return only approved missions where the caller is a mission-team member or assigned pilot; flight and media workflows return only approved-mission flights whose `pilot_user_id` is the caller. Same-organization unassigned resources and every foreign-organization resource are returned as `404`, not exposed through a client-supplied role or device flag. The supported field chain is `SYNC-01..03`, `MSN-01/03`, `FLT-01/03/05/06/07`, `CHK-01`, `MEDIA-01..04`, and `NOTIF-01..03`, subject to each endpoint's normal lifecycle checks.
+
 ## Common headers
 
 ```http

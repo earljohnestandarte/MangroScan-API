@@ -187,7 +187,7 @@ class RbacSeederTest extends TestCase
             app()->detectEnvironment(fn (): string => 'production');
             app(DeveloperUserSeeder::class)->run();
             $this->assertDatabaseCount('users', 0);
-            $this->assertDatabaseCount('roles', 3);
+            $this->assertDatabaseCount('roles', 4);
             $this->assertDatabaseCount('permissions', count(RbacSeedData::PERMISSIONS));
         } finally {
             app()->detectEnvironment(fn (): string => $originalEnvironment);
