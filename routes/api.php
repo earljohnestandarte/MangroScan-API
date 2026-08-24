@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\V1\Auth\PasswordChangeController;
 use App\Http\Controllers\Api\V1\Auth\PasswordForgotController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
+use App\Http\Controllers\Api\V1\Battery\BatteryIndexController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
 use App\Http\Controllers\Api\V1\Drone\DroneStoreController;
@@ -430,6 +431,11 @@ Route::prefix('v1')->group(function () {
     // [SENSOR-01] POST /api/v1/drones/{id}/sensors
     Route::post('/drones/{drone}/sensors', DroneSensorStoreController::class)->whereUuid('drone')->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:sensors.manage', 'throttle:auth.authenticated',
+    ]);
+
+    // [BAT-01] GET /api/v1/batteries
+    Route::get('/batteries', BatteryIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class, 'permission:batteries.read', 'throttle:auth.authenticated',
     ]);
 
     // [FLT-01] GET /api/v1/missions/{id}/flights
