@@ -355,7 +355,7 @@ Or use separate terminals:
 
 ```bash
 php artisan serve
-php artisan queue:listen --queue=reports,default --tries=1
+php artisan queue:listen --queue=exports,reports,default --tries=1
 php artisan pail --timeout=0
 npm run dev
 ```
@@ -872,7 +872,7 @@ Runs concurrently:
 php artisan serve
 
 # Terminal 2: Queue Worker
-php artisan queue:listen --queue=reports,default --tries=1
+php artisan queue:listen --queue=exports,reports,default --tries=1
 
 # Terminal 3: Log Viewer
 php artisan pail --timeout=0

@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
 use App\Http\Controllers\Api\V1\Drone\DroneStoreController;
+use App\Http\Controllers\Api\V1\Export\ExportStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightChecklistStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightCompleteController;
 use App\Http\Controllers\Api\V1\Flight\FlightFailController;
@@ -853,6 +854,15 @@ Route::prefix('v1')->group(function () {
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:reports.approve', 'throttle:auth.authenticated',
+        ]);
+
+    // [EXP-01] Queue a canonical mission-result export for one tenant report.
+    Route::post('/reports/{report}/exports', ExportStoreController::class)
+        ->whereUuid('report')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:results.export', 'permission:reports.generate',
+            'throttle:auth.authenticated',
         ]);
 
     // [DASH-01] Return role-scoped dashboard KPI aggregates.

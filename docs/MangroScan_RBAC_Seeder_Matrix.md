@@ -39,7 +39,7 @@ This is the developer reference for the deterministic RBAC data installed by `Da
 | `processing_jobs.create` | — | Yes | — | — | JOB-02, JOB-04 |
 | `processing_jobs.manage` | — | Yes | — | — | JOB-01, JOB-03 |
 | `results.read` | — | Yes | Yes | — | TREE-01..03, COUNT-01, RESULT-01..03, LAYER-01, DASH-01/02; CONF-01 testing |
-| `results.export` | — | Yes | Yes | — | EXP-01 (planned) |
+| `results.export` | — | Yes | Yes | — | EXP-01 |
 | `maps.read` | — | Yes | Yes | — | LAYER-01/02 (planned map-specific enforcement) |
 | `validation.read` | — | Yes | Yes | — | VAL-01, VAL-02, VAL-04 |
 | `validation.create` | — | Yes | Yes | — | VAL-03 |
@@ -49,9 +49,9 @@ This is the developer reference for the deterministic RBAC data installed by `Da
 | `accuracy.recompute` | — | — | Yes | — | ACC-01 |
 | `reports.read` | — | Yes | Yes | — | RPT-01, RPT-03 |
 | `reports.create` | — | Yes | Yes | — | RPT-02, RPT-04 |
-| `reports.generate` | — | Yes | Yes | — | RPT-05; EXP-01 planned |
+| `reports.generate` | — | Yes | Yes | — | RPT-05, EXP-01 |
 | `reports.approve` | — | — | Yes | — | RPT-06 |
-| `exports.download` | — | Yes | Yes | — | EXP-02, EXP-03 (blocked) |
+| `exports.download` | — | Yes | Yes | — | EXP-02 ready; EXP-03 blocked |
 | `settings.manage` | Yes | — | — | — | SET-01, SET-02 (P2) |
 | `audit.read` | Yes | — | — | — | AUD-01 |
 | `notifications.read` | Yes | Yes | Yes | Yes | NOTIF-01..03 |

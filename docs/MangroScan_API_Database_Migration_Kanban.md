@@ -1341,8 +1341,8 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RPT-04 | PATCH /reports/{id}Update report content/status while editable. | Partial report fields | 200 {data:Report} | RPT-03 | **P1** | Earljohn Estandarte | **Done** |
 | RPT-05 | POST /reports/{id}/generateGenerate professional PDF/report artifact asynchronously. | {format:"PDF",options?} | 202 {data:{job\_id,report\_id,status}} | RPT-03 \+ report routine/storage | **P0** | Earljohn Estandarte | **Done** |
 | RPT-06 | POST /reports/{id}/approveApprove generated report. | {decision:"approved"|"rejected",notes?} | 200 {data:Report} | RPT-05 complete | **P1** | Earljohn Estandarte | **Done** |
-| EXP-01 | POST /reports/{id}/exportsGenerate CSV/XLSX/GeoJSON/KML/etc. | {format,filters?,options?} | 202 {data:{job\_id,export\_type}} | RPT-03 \+ canonical results | **P0** | Earljohn Estandarte | **Blocked** |
-| EXP-02 | GET /exported-filesExport audit registry. | Query: report\_id?,mission\_id?,type?,page | 200 {data:\[ExportedFile\],meta} | EXP-01 | **P1** | Earljohn Estandarte | **Blocked** |
+| EXP-01 | POST /reports/{id}/exportsGenerate CSV/XLSX/GeoJSON/KML/etc. | {format,filters?,options?} | 202 {data:{job\_id,export\_type}} | RPT-03 \+ canonical results | **P0** | Earljohn Estandarte | **Done** |
+| EXP-02 | GET /exported-filesExport audit registry. | Query: report\_id?,mission\_id?,type?,page | 200 {data:\[ExportedFile\],meta} | EXP-01 | **P1** | Earljohn Estandarte | **Ready** |
 | EXP-03 | POST /exported-files/{id}/downloadAuthorized temporary download. | No body | 200 {data:{url,expires\_at}} or stream | EXP-02 \+ storage | **P0** | Earljohn Estandarte | **Blocked** |
 | DASH-01 | GET /dashboard/overviewRole-scoped KPI overview. | Query: site\_id?,mission\_id?,date range? | 200 {data:{missions,trees,species,validation,processing}} | TREE \+ ACC \+ materialized views | **P1** | Earljohn Estandarte | **Done** |
 | DASH-02 | GET /dashboard/missions/{id}Mission analytics/detail dashboard. | Path: id | 200 {data:{counts,species,height,age,accuracy,layers}} | DASH-01 | **P1** | Earljohn Estandarte | **Done** |
@@ -1412,6 +1412,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Lifecycle / artifact gate | Only a row-locked `generated` report with a tenant-matching completed RPT-05 job is decidable. Approval also verifies the private object exists, maps to `approved`, and records the reviewer without replacing the generator. Rejection maps to `draft` and clears generator/approver ownership for revision; the completed job remains immutable evidence. Missing objects return 503 without state change. |
 | Transaction / audit / DCL | State and `report.approval` audit evidence are atomic; audit values include decision, normalized notes, generation job, old/new actor fields, and lifecycle. `058_report_approval_grants.sql` grants API UPDATE only on status, generator, approver, and timestamp columns. DELETE, report-role mutation, worker approval, and every other report column remain denied. |
 | Tests / status | `ReportApprovalTest` covers exact resources, approval/rejection mapping, artifact ledger and object gates, validation, lineage hiding, auth/local/foreign RBAC/inactivity, audit rollback, throttling, route/DCL, and both databases. Focused SQLite and PostgreSQL/PostGIS each pass 11 / 67; full SQLite passes 807 / 5602 with thirteen expected skips; full PostgreSQL 18/PostGIS passes 820 / 5639. |
+
+### **EXP-01 — POST /api/v1/reports/{id}/exports**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Queue CSV, XLSX, GeoJSON, or KML export of canonical tree results for a tenant-visible report mission. Requires active Sanctum authentication plus tenant-valid `results.export` and `reports.generate` grants. PDF remains RPT-05. |
+| Request / idempotency | Requires `Idempotency-Key` up to 100 characters. Format and validation status are normalized. Optional filters are limited to authoritative final species UUID and validation status; options is an explicitly reserved empty object. Canonical key ordering makes equivalent requests replay one job, while changed input conflicts. |
+| Worker / outputs | A database partial unique index permits one queued/running job per report and format. The `exports` worker reads ordered non-deleted canonical tree rows and writes private CSV (formula-safe), valid XLSX, GeoJSON, or KML. It then atomically creates the schema-approved `exported_files` metadata row, completes the job, and writes audit evidence. No storage path or URL is returned by EXP-01. |
+| Schema / DCL | Adds the approved `exported_files` fields and a separate tenant-keyed async `export_jobs` ledger with lifecycle/idempotency/completion invariants and shared updated-at trigger. `059_export_generation_grants.sql` limits API access to job reads/creation and worker access to canonical sources, job execution, exported-file insertion, and audit insertion. API cannot read file paths here; report/auditor access and all DELETE remain denied. |
+| Tests / status | `ExportStoreTest` covers exact queueing, semantic idempotency, overlap, real four-format private artifacts, filters/geometry, validation, lineage, dual RBAC/inactivity, rollback, throttling, schema/job/DCL, and both databases. Focused SQLite passes 10 / 79; focused PostgreSQL with shared trigger coverage passes 13 / 104; full SQLite passes 817 / 5681 with thirteen expected skips; full PostgreSQL 18/PostGIS passes 830 / 5718. |
 
 ## **Notifications, settings and audit**
 

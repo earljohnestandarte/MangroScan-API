@@ -36,15 +36,15 @@ For a physical Expo device, `localhost` means the phone itself. Use a reachable 
 | 🚧 UNDER CONSTRUCTION | Planned or actively being built; do not use as a production dependency. |
 | ⛔ BLOCKED / UNDER CONSTRUCTION | Not implemented and waiting on a documented prerequisite or decision. |
 
-Current inventory: **141 endpoints**, **100 available**, **20 under construction**, **7 blocked**, and **14 testing**.
+Current inventory: **141 endpoints**, **101 available**, **21 under construction**, **5 blocked**, and **14 testing**.
 
 ## Currently available endpoints
 
-`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-01`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `DASH-01`, `DASH-02`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
+`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-01`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `DASH-01`, `DASH-02`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
 
 ## Unavailable, testing, and blocked endpoints
 
-`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `EXP-01`, `EXP-02`, `EXP-03`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
+`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `EXP-02`, `EXP-03`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
 
 Do not integrate the unavailable endpoints above yet. Jessamae Sumanoy's `BAT-01` remains `Working` after schema, DCL, test, and formatting gaps were found. Jason Benabente's P2 endpoints plus `LAYER-02` and `CONF-01/02` remain `Testing` under their earlier incomplete per-endpoint review. ACC-01 and VAL-05 have since passed MATCH-01 handoff, protocol, and cross-database verification.
 
@@ -169,8 +169,8 @@ Do not integrate the unavailable endpoints above yet. Jessamae Sumanoy's `BAT-01
 | `RPT-04` | PATCH | `/api/v1/reports/{id}` | P1 | Done | ✅ AVAILABLE |
 | `RPT-05` | POST | `/api/v1/reports/{id}/generate` | P0 | Done | ✅ AVAILABLE |
 | `RPT-06` | POST | `/api/v1/reports/{id}/approve` | P1 | Done | ✅ AVAILABLE |
-| `EXP-01` | POST | `/api/v1/reports/{id}/exports` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `EXP-02` | GET | `/api/v1/exported-files` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
+| `EXP-01` | POST | `/api/v1/reports/{id}/exports` | P0 | Done | ✅ AVAILABLE |
+| `EXP-02` | GET | `/api/v1/exported-files` | P1 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `EXP-03` | POST | `/api/v1/exported-files/{id}/download` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `DASH-01` | GET | `/api/v1/dashboard/overview` | P1 | Done | ✅ AVAILABLE |
 | `DASH-02` | GET | `/api/v1/dashboard/missions/{id}` | P1 | Done | ✅ AVAILABLE |
@@ -9260,7 +9260,7 @@ HTTP `202`; contract shape `{data:{job_id,report_id,status}}`.
 }
 ```
 
-**Workflow / UI integration note:** Only a tenant-visible `draft` report can be queued, and a database invariant permits only one `queued` or `running` job for it. Draft edit/archive requests conflict while generation is active, so the persisted report and artifact cannot diverge. A worker consumes the `reports` queue, writes the PDF to private storage, records its checksum and size, and changes the report to `generated` only after storage succeeds. A failed job remains recorded as `failed` and the report remains `draft`. Run `php artisan queue:work --queue=reports,default` when the worker is not already managed by the local development process. This endpoint never returns a storage key or temporary download URL; use the dedicated export/download workflow once available. After `202`, retain `job_id` for diagnostics and refresh RPT-03 until `report.report_status` becomes `generated` before enabling RPT-06.
+**Workflow / UI integration note:** Only a tenant-visible `draft` report can be queued, and a database invariant permits only one `queued` or `running` job for it. Draft edit/archive requests conflict while generation is active, so the persisted report and artifact cannot diverge. A worker consumes the `reports` queue, writes the PDF to private storage, records its checksum and size, and changes the report to `generated` only after storage succeeds. A failed job remains recorded as `failed` and the report remains `draft`. Run `php artisan queue:work --queue=exports,reports,default` when the worker is not already managed by the local development process. This endpoint never returns a storage key or temporary download URL; use the dedicated export/download workflow once available. After `202`, retain `job_id` for diagnostics and refresh RPT-03 until `report.report_status` becomes `generated` before enabling RPT-06.
 
 ### RPT-06 — Approve generated report.
 
@@ -9319,8 +9319,8 @@ The response is the exact 16-field report resource used by RPT-02/RPT-04. For `a
 
 ### EXP-01 — Generate CSV/XLSX/GeoJSON/KML/etc.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> The endpoint queues a private canonical tree-result export and returns its durable job identifier.
 
 | Property | Value |
 | --- | --- |
@@ -9340,43 +9340,59 @@ The response is the exact 16-field report resource used by RPT-02/RPT-04. For `a
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Required headers**
+
+`Idempotency-Key` is required, non-empty, and limited to 100 characters. Same-key retries with semantically identical input replay one job; changed input returns `409 CONFLICT`.
+
+**Verified request contract**
 
 `{format,filters?,options?}`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `format` | `not finalized` | Yes |
-| `filters` | `not finalized` | No |
-| `options` | `not finalized` | No |
+| `format` | `"csv"`, `"xlsx"`, `"geojson"`, or `"kml"`; case-normalized | Yes |
+| `filters` | Object containing only the fields below | No |
+| `filters.species_id` | UUID or `null`; matches canonical `final_species_id` | No |
+| `filters.validation_status` | `"unvalidated"`, `"validated"`, `"corrected"`, `"rejected"`, or `null` | No |
+| `options` | Reserved empty object; non-empty input is rejected until an option is approved | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/reports/<uuid>/exports HTTP/1.1
 Host: localhost:8000
 Accept: application/json
 Authorization: Bearer <token>
+Idempotency-Key: report-<uuid>-validated-geojson-v1
 Content-Type: application/json
 
 {
-    "format": "<format>"
+    "format": "geojson",
+    "filters": {
+        "validation_status": "validated"
+    }
 }
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `202`; contract shape `{data:{job_id,export_type}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "job_id": "<uuid>",
+        "export_type": "geojson"
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: RPT-03 + canonical results.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+**Workflow / UI integration note:** Both `results.export` and `reports.generate` are required. CSV/XLSX/GeoJSON/KML contain deterministic, soft-delete-aware canonical mission tree rows with species, measurement, validation, and point coordinates; CSV formula prefixes are neutralized. PDF remains exclusively RPT-05. One active job is allowed per report and format, while different formats may run independently. The `exports` worker writes private storage first, then atomically creates the schema-approved `exported_files` record and completion audit. Run `php artisan queue:work --queue=exports,reports,default` if the local combined process is not running. EXP-01 returns no file path or URL; wait for EXP-02/EXP-03 to expose authorized retrieval.
 
 ### EXP-02 — Export audit registry.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: 🚧 UNDER CONSTRUCTION**
+> EXP-01 now populates the registry; this tenant-scoped read endpoint is ready for implementation but must not be called yet.
 
 | Property | Value |
 | --- | --- |
