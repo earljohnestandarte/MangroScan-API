@@ -6,14 +6,14 @@ This guide coordinates the remaining API work across the six-person team. The au
 
 | Member | Responsibility |
 | --- | --- |
-| Earljohn Estandarte | Project owner; owns the 85 endpoints already marked `Done` and the shared implementation foundation |
+| Earljohn Estandarte | Project owner; owns the completed foundation plus the 16 transferred validation, report, export, and dashboard endpoints |
 | Karlandrei Panday | Authentication, plot/permit, saved-view, notification, and settings extensions |
 | Jessamae Sumanoy | Hardware, field lifecycle, mobile synchronization, and remaining media lifecycle |
 | Jason Benabente | AI lifecycle, geospatial layers, confidence review, validation completion/accuracy, audit detail, and training/annotation extensions |
-| Juneabby Girasol | Validation scopes/sessions, ground-truth records, and validation decisions |
-| Joshua Lopez | Reports, exports, and dashboards |
+| Juneabby Girasol | No current endpoint assignment; validation work transferred to Earljohn Estandarte |
+| Joshua Lopez | No current endpoint assignment; report/export/dashboard work transferred to Earljohn Estandarte |
 
-Assignments optimize conflict avoidance and dependency continuity before raw endpoint-count equality. The revised tracker introduces an explicit `MATCH-01` handoff from Juneabby Girasol to Jason Benabente for validation accuracy/completion, while each report/export chain remains with one owner.
+Assignments optimize conflict avoidance and dependency continuity before raw endpoint-count equality. All 16 endpoints previously assigned to Juneabby Girasol and Joshua Lopez are now assigned to Earljohn Estandarte. The `MATCH-01` handoff from Earljohn to Jason Benabente remains required for validation accuracy/completion, and the report/export/dashboard chains stay with Earljohn.
 
 ## Assignment summary
 
@@ -22,8 +22,9 @@ Assignments optimize conflict avoidance and dependency continuity before raw end
 | Karlandrei Panday | 11 | 0 | 1 | 10 | Platform admin and tenant CRUD extensions | ~21 points |
 | Jessamae Sumanoy | 12 | 1 | 2 | 9 | Hardware, field operations, sync, and media | ~27 points |
 | Jason Benabente | 16 | 1 | 4 | 11 | AI/results, validation completion/accuracy, audit, and training extensions | ~37 points |
-| Juneabby Girasol | 6 | 6 | 0 | 0 | Validation foundations, ground truth, and decisions | ~27 points |
-| Joshua Lopez | 10 | 3 | 7 | 0 | Reports, exports, and dashboards | ~35 points |
+| Earljohn Estandarte | 16 | 9 | 7 | 0 | Transferred validation, reports, exports, and dashboards | ~62 points |
+| Juneabby Girasol | 0 | 0 | 0 | 0 | No remaining assigned endpoints | 0 points |
+| Joshua Lopez | 0 | 0 | 0 | 0 | No remaining assigned endpoints | 0 points |
 | Unassigned | 1 | 0 | 0 | 1 | Site archival | ~1 point |
 | **Total remaining** | **56** | **11** | **14** | **31** |  |  |
 
@@ -80,7 +81,7 @@ These changes are not yet approved as `Done`:
 
 **Likely paths:** `app/Http/Controllers/Api/V1/Drone`, `Flight`, `Mission`, `Mobile`, and `Media`; corresponding requests/services/tests; hardware and sync models/migrations; storage services; `database/sql/dcl`.
 
-**Dependencies:** complete and verify `BAT-01` before `BAT-02/03`, and implement `SYNC-04` before `SYNC-05`. `MEDIA-05` depends on Earljohn Estandarte’s completed metadata-only `MEDIA-04`; it remains the sole temporary download URL/token endpoint. `VAL-05` is not available: it remains blocked with `SYNC-04` until Juneabby Girasol's `MATCH-01` and the remaining mutable validation chain are complete.
+**Dependencies:** complete and verify `BAT-01` before `BAT-02/03`, and implement `SYNC-04` before `SYNC-05`. `MEDIA-05` depends on Earljohn Estandarte’s completed metadata-only `MEDIA-04`; it remains the sole temporary download URL/token endpoint. `VAL-05` is not available: it remains blocked with `SYNC-04` until Earljohn Estandarte's transferred `MATCH-01` and mutable validation chain are complete.
 
 ### Jason Benabente
 
@@ -103,7 +104,7 @@ These changes are not yet approved as `Done`:
 
 **Dependencies:** `CONF-01` precedes `CONF-02`; `AUD-01` precedes `AUD-02`; `DATASET-01` precedes `DATASET-02/03`; `ANN-01` precedes `ANN-02`, then `ANN-03`, then `ANN-04`. Preserve the approved dependencies: `ACC-01` depends on `MATCH-01`, and `VAL-05` depends on `MATCH-01` plus its protocol gate. Existing `validation_matches` tables support implementation and testing but do not satisfy or replace those endpoint dependencies. `LAYER-02` consumes canonical tree observations and existing photogrammetry products through the durable processing queue.
 
-### Juneabby Girasol
+### Earljohn Estandarte — transferred validation core
 
 **Modules:** field validation scopes/sessions, ground-truth measurements, and validation decisions.
 
@@ -111,13 +112,13 @@ These changes are not yet approved as `Done`:
 
 - P0: `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`
 
-**Recommended branch:** `feature/juneabby/validation-core`
+**Recommended branch:** `feature/earljohn/validation-core`
 
 **Likely paths:** create `app/Http/Controllers/Api/V1/Validation`, `app/Http/Requests/Validation`, `app/Services/Validation`, and `tests/Feature/Validation` following existing single-action conventions; reuse the existing validation models and `2026_08_12_066000_create_validation_foundation_tables.php`; add only approved additive migrations/DCL.
 
-**Dependencies:** preserve the chain `VAL-01 → VAL-02/03 → VAL-04 → GT-01/MATCH-01`. `MATCH-01` must write the validation-match evidence consumed by `ACC-01` and `VAL-05`; those downstream endpoints remain blocked until that handoff is implemented and verified. The remaining public-contract/schema conflicts for Juneabby Girasol’s endpoints must still be resolved before moving those rows from `Blocked` to `Ready`.
+**Dependencies:** preserve the chain `VAL-01 → VAL-02/03 → VAL-04 → GT-01/MATCH-01`. `MATCH-01` must write the validation-match evidence consumed by `ACC-01` and `VAL-05`; those downstream endpoints remain blocked until that handoff is implemented and verified. The remaining public-contract/schema conflicts for these transferred endpoints must still be resolved before moving rows from `Blocked` to `Ready`.
 
-### Joshua Lopez
+### Earljohn Estandarte — transferred reports, exports, and dashboards
 
 **Modules:** report definitions/lifecycle, generated exports/downloads, and dashboard analytics.
 
@@ -126,7 +127,7 @@ These changes are not yet approved as `Done`:
 - P0: `RPT-05`, `EXP-01`, `EXP-03`
 - P1: `RPT-02`, `RPT-03`, `RPT-04`, `RPT-06`, `EXP-02`, `DASH-01`, `DASH-02`
 
-**Recommended branch:** `feature/joshua/reports-exports-dashboard`
+**Recommended branch:** `feature/earljohn/reports-exports-dashboard`
 
 **Likely paths:** `app/Http/Controllers/Api/V1/Report` plus new export/dashboard folders following existing conventions; `app/Http/Requests/Report`; report/export/dashboard services; report models and storage/queue code; `tests/Feature/Report` plus export/dashboard suites; migrations and DCL.
 
@@ -139,16 +140,16 @@ flowchart LR
     Earl["Earljohn Estandarte\nCompleted foundations"] --> Karlandrei["Karlandrei Panday\nPlatform/admin extensions"]
     Earl --> Jessamae["Jessamae Sumanoy\nField ops, sync & media"]
     Earl --> Jason["Jason Benabente\nAI, validation completion & audit"]
-    Earl --> Juneabby["Juneabby Girasol\nValidation core"]
-    Earl --> Joshua["Joshua Lopez\nReports & dashboards"]
-    Juneabby -- "MATCH-01 handoff" --> Jason
-    Jason -- "ACC-01" --> Joshua
-    Juneabby -- "validation mutations" --> Jessamae
+    Earl --> Validation["Earljohn Estandarte\nTransferred validation core"]
+    Earl --> Reporting["Earljohn Estandarte\nTransferred reports & dashboards"]
+    Validation -- "MATCH-01 handoff" --> Jason
+    Jason -- "ACC-01" --> Reporting
+    Validation -- "validation mutations" --> Jessamae
     Jason -- "VAL-05 completion" --> Jessamae
 ```
 
-- Jason Benabente's `ACC-01` is not yet available to Joshua Lopez's report/dashboard work; it remains blocked on `MATCH-01` and PostgreSQL verification.
-- Juneabby Girasol's mutable validation resources, including `MATCH-01`, remain outstanding conditions for Jessamae Sumanoy's `SYNC-04`; Jason Benabente's `VAL-05` is also blocked on that chain.
+- Jason Benabente's `ACC-01` is not yet available to Earljohn Estandarte's transferred report/dashboard work; it remains blocked on `MATCH-01` and PostgreSQL verification.
+- Earljohn Estandarte's transferred mutable validation resources, including `MATCH-01`, remain outstanding conditions for Jessamae Sumanoy's `SYNC-04`; Jason Benabente's `VAL-05` is also blocked on that chain.
 - `MATCH-01` must populate the validation-match evidence consumed by `ACC-01` recomputation and the `VAL-05` protocol gate before either endpoint can be approved.
 - Karlandrei Panday’s current assigned rows depend only on completed Earljohn Estandarte endpoints and within-owner chains.
 - `SITE-05` has no assigned owner in the tracker and is excluded from all developer work packages until ownership is explicitly recorded.
@@ -291,10 +292,10 @@ Confirm that the profile resolves `mangroscan_test` before destructive tests. Ne
 | Tracker CSV | All developers update planning state | Change only owned `Assigned To`, `Status`, `Manual Planning State`, and additive `Notes`; use the documented enums and preserve row/column order and contracts |
 | `database/sql/dcl` numbering | Concurrent scripts can claim the same sequence | Reserve the next DCL number in team chat before creating a file; renumber on merge if necessary |
 | Migration timestamps | Concurrent migrations can collide or order incorrectly | Use a unique timestamp and ensure parent tables/columns precede dependents |
-| `RbacSeedData` / permission catalog | New permissions affect three roles and tests | Reuse an existing code first; coordinate any genuinely new permission with Earljohn and the affected role owner |
+| `RbacSeedData` / permission catalog | New permissions affect four roles and tests | Reuse an existing code first; coordinate any genuinely new permission with Earljohn and the affected role owner |
 | `User` model / `DatabaseSeeder` | Core identity and seed order are shared by all domains | Treat Earljohn as owner; keep domain-specific relationships or seeders isolated and coordinate any required core edit |
 | Audit and notification infrastructure | Many mutations reuse shared services/tables | Reuse existing loggers/resources; avoid broad refactors inside endpoint branches |
-| Mission/media/validation sync resources | Jessamae Sumanoy’s sync work reads other domains | Agree on serialized mobile shapes with Juneabby Girasol and Jason Benabente before finalizing `SYNC-04`; avoid simultaneous uncoordinated edits |
+| Mission/media/validation sync resources | Jessamae Sumanoy’s sync work reads other domains | Agree on serialized mobile shapes with Earljohn Estandarte and Jason Benabente before finalizing `SYNC-04`; avoid simultaneous uncoordinated edits |
 | Large manual/tracker docs | High line-level conflict | Put implementation detail in focused docs/tests and make the smallest necessary manual update near the owned endpoint card |
 
 Do not reorganize shared routes, middleware, responses, seeders, or directory structure merely to reduce a local branch's code. Propose such changes separately.
