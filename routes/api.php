@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\V1\Auth\PasswordForgotController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Battery\BatteryIndexController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardOverviewController;
+use App\Http\Controllers\Api\V1\Dashboard\MissionDashboardController;
 use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
@@ -816,6 +817,14 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:results.read', 'throttle:auth.authenticated',
     ]);
+
+    // [DASH-02] Return tenant-scoped analytics for one visible mission.
+    Route::get('/dashboard/missions/{mission}', MissionDashboardController::class)
+        ->whereUuid('mission')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:results.read', 'throttle:auth.authenticated',
+        ]);
 
     // [MODEL-01] GET /api/v1/ai-models
     Route::get('/ai-models', AiModelIndexController::class)->middleware([

@@ -126,13 +126,13 @@ These changes are not yet approved as `Done`:
 **Endpoint IDs:**
 
 - P0: `RPT-05`, `EXP-01`, `EXP-03`
-- P1: `RPT-02`, `RPT-03`, `RPT-04`, `RPT-06`, `EXP-02`, `DASH-02` (`DASH-01` complete)
+- P1: `RPT-02`, `RPT-03`, `RPT-04`, `RPT-06`, `EXP-02` (`DASH-01/02` complete)
 
 **Recommended branch:** `feature/earljohn/reports-exports-dashboard`
 
 **Likely paths:** `app/Http/Controllers/Api/V1/Report` plus new export/dashboard folders following existing conventions; `app/Http/Requests/Report`; report/export/dashboard services; report models and storage/queue code; `tests/Feature/Report` plus export/dashboard suites; migrations and DCL.
 
-**Dependencies:** preserve `RPT-02 → RPT-03 → RPT-04/05/EXP-01`, `RPT-05 → RPT-06`, `EXP-01 → EXP-02 → EXP-03`, and `DASH-01 → DASH-02`. The V-08/MV-01 dashboard database prerequisite is complete: `v_mission_accuracy_summary` and tenant-keyed `mv_dashboard_mission_metrics` are versioned, indexed, covered by SELECT-only API/report DCL, and refreshed explicitly with `php artisan dashboard:refresh`. MATCH-01 and the independently verified ACC-01 are also complete. Dashboard routes may proceed but must treat the materialized relation as a snapshot and still apply server-derived role and organization scope.
+**Dependencies:** preserve `RPT-02 → RPT-03 → RPT-04/05/EXP-01`, `RPT-05 → RPT-06`, and `EXP-01 → EXP-02 → EXP-03`. The `DASH-01 → DASH-02` chain and its V-08/MV-01 database prerequisite are complete: `v_mission_accuracy_summary` and tenant-keyed `mv_dashboard_mission_metrics` are versioned, indexed, covered by SELECT-only API/report DCL, and refreshed explicitly with `php artisan dashboard:refresh`. Both dashboard routes treat the materialized relation as a snapshot and apply server-derived role and organization scope; DASH-02 returns `503 SERVICE_UNAVAILABLE` if a visible mission is not yet present in the PostgreSQL snapshot. MATCH-01 and the independently verified ACC-01 are also complete.
 
 ## Cross-developer dependency map
 
