@@ -71,6 +71,7 @@ use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RolePermissionReplaceController;
 use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
+use App\Http\Controllers\Api\V1\Report\ReportApprovalController;
 use App\Http\Controllers\Api\V1\Report\ReportGenerateController;
 use App\Http\Controllers\Api\V1\Report\ReportIndexController;
 use App\Http\Controllers\Api\V1\Report\ReportShowController;
@@ -844,6 +845,14 @@ Route::prefix('v1')->group(function () {
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:reports.generate', 'throttle:auth.authenticated',
+        ]);
+
+    // [RPT-06] POST /api/v1/reports/{report}/approve
+    Route::post('/reports/{report}/approve', ReportApprovalController::class)
+        ->whereUuid('report')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:reports.approve', 'throttle:auth.authenticated',
         ]);
 
     // [DASH-01] Return role-scoped dashboard KPI aggregates.

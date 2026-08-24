@@ -1340,7 +1340,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RPT-03 | GET /reports/{id}Report draft/source metadata. | Path: id | 200 {data:{report,source\_summary}} | RPT-02 | **P1** | Earljohn Estandarte | **Done** |
 | RPT-04 | PATCH /reports/{id}Update report content/status while editable. | Partial report fields | 200 {data:Report} | RPT-03 | **P1** | Earljohn Estandarte | **Done** |
 | RPT-05 | POST /reports/{id}/generateGenerate professional PDF/report artifact asynchronously. | {format:"PDF",options?} | 202 {data:{job\_id,report\_id,status}} | RPT-03 \+ report routine/storage | **P0** | Earljohn Estandarte | **Done** |
-| RPT-06 | POST /reports/{id}/approveApprove generated report. | {decision:"approved"|"rejected",notes?} | 200 {data:Report} | RPT-05 complete | **P1** | Earljohn Estandarte | **Ready** |
+| RPT-06 | POST /reports/{id}/approveApprove generated report. | {decision:"approved"|"rejected",notes?} | 200 {data:Report} | RPT-05 complete | **P1** | Earljohn Estandarte | **Done** |
 | EXP-01 | POST /reports/{id}/exportsGenerate CSV/XLSX/GeoJSON/KML/etc. | {format,filters?,options?} | 202 {data:{job\_id,export\_type}} | RPT-03 \+ canonical results | **P0** | Earljohn Estandarte | **Blocked** |
 | EXP-02 | GET /exported-filesExport audit registry. | Query: report\_id?,mission\_id?,type?,page | 200 {data:\[ExportedFile\],meta} | EXP-01 | **P1** | Earljohn Estandarte | **Blocked** |
 | EXP-03 | POST /exported-files/{id}/downloadAuthorized temporary download. | No body | 200 {data:{url,expires\_at}} or stream | EXP-02 \+ storage | **P0** | Earljohn Estandarte | **Blocked** |
@@ -1402,6 +1402,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Worker / lifecycle | `GenerateReportArtifact` runs on the `reports` queue, renders RPT-02 content and optional V-09 evidence, stores the artifact privately, then atomically records file name, key, byte size, SHA-256 checksum, and completion time before changing the report from `draft` to `generated`. Worker failure records a bounded error and leaves the report draft; the HTTP response exposes no storage key or download URL. |
 | Schema / audit / DCL | Adds tenant-keyed `report_generation_jobs` with format/status/artifact invariants, actor idempotency uniqueness, active/status indexes, FKs, and the shared PostgreSQL `updated_at` trigger. Queue and completion audits are append-only. `057_report_generation_grants.sql` limits API access to SELECT/creation columns and worker access to job execution, report generation fields, V-09 reads, and audit insert columns; approval, DELETE, report-only, and auditor mutations remain denied. |
 | Tests / status | `ReportGenerateTest` covers exact `202`, normalization, idempotency, overlap, edit/generation concurrency, lifecycle, input/header validation, lineage hiding, auth/RBAC/inactivity, audit rollback, real private PDF execution/checksum/state/audit, throttling, schema/job/DCL, and both databases. The shared trigger suite verifies all 39 mutable tables. Focused PostgreSQL passes 16 / 115; full SQLite passes 796 / 5535 with thirteen expected PostgreSQL-only skips; full PostgreSQL 18/PostGIS passes 809 / 5572. |
+
+### **RPT-06 — POST /api/v1/reports/{id}/approve**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Record a reviewer decision for a tenant-scoped generated report. Requires active Sanctum authentication and a tenant-valid `reports.approve` grant. |
+| Request / normalization | Required decision normalizes to `approved` or `rejected`. Optional notes are trimmed, blank-to-null, and limited to 2,000 characters. No client-supplied actor, lifecycle, artifact, or lineage field is accepted. |
+| Lifecycle / artifact gate | Only a row-locked `generated` report with a tenant-matching completed RPT-05 job is decidable. Approval also verifies the private object exists, maps to `approved`, and records the reviewer without replacing the generator. Rejection maps to `draft` and clears generator/approver ownership for revision; the completed job remains immutable evidence. Missing objects return 503 without state change. |
+| Transaction / audit / DCL | State and `report.approval` audit evidence are atomic; audit values include decision, normalized notes, generation job, old/new actor fields, and lifecycle. `058_report_approval_grants.sql` grants API UPDATE only on status, generator, approver, and timestamp columns. DELETE, report-role mutation, worker approval, and every other report column remain denied. |
+| Tests / status | `ReportApprovalTest` covers exact resources, approval/rejection mapping, artifact ledger and object gates, validation, lineage hiding, auth/local/foreign RBAC/inactivity, audit rollback, throttling, route/DCL, and both databases. Focused SQLite and PostgreSQL/PostGIS each pass 11 / 67; full SQLite passes 807 / 5602 with thirteen expected skips; full PostgreSQL 18/PostGIS passes 820 / 5639. |
 
 ## **Notifications, settings and audit**
 
