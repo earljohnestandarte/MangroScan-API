@@ -47,7 +47,7 @@ This is the developer reference for the deterministic RBAC data installed by `Da
 | `validation.decide` | — | Yes | Yes | — | CONF-02, MATCH-01 |
 | `validation.complete` | — | Yes | Yes | — | VAL-05 |
 | `accuracy.recompute` | — | — | Yes | — | ACC-01 |
-| `reports.read` | — | Yes | Yes | — | RPT-01, RPT-03/04 (partly blocked) |
+| `reports.read` | — | Yes | Yes | — | RPT-01, RPT-03; RPT-04 planned |
 | `reports.create` | — | Yes | Yes | — | RPT-02 |
 | `reports.generate` | — | Yes | Yes | — | RPT-05, EXP-01 (blocked) |
 | `reports.approve` | — | — | Yes | — | RPT-06 (blocked) |

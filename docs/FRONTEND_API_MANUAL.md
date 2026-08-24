@@ -36,15 +36,15 @@ For a physical Expo device, `localhost` means the phone itself. Use a reachable 
 | 🚧 UNDER CONSTRUCTION | Planned or actively being built; do not use as a production dependency. |
 | ⛔ BLOCKED / UNDER CONSTRUCTION | Not implemented and waiting on a documented prerequisite or decision. |
 
-Current inventory: **141 endpoints**, **96 available**, **20 under construction**, **11 blocked**, and **14 testing**.
+Current inventory: **141 endpoints**, **97 available**, **20 under construction**, **10 blocked**, and **14 testing**.
 
 ## Currently available endpoints
 
-`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-01`, `RPT-02`, `DASH-01`, `DASH-02`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
+`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-01`, `RPT-02`, `RPT-03`, `DASH-01`, `DASH-02`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
 
 ## Unavailable, testing, and blocked endpoints
 
-`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
+`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
 
 Do not integrate the unavailable endpoints above yet. Jessamae Sumanoy's `BAT-01` remains `Working` after schema, DCL, test, and formatting gaps were found. Jason Benabente's P2 endpoints plus `LAYER-02` and `CONF-01/02` remain `Testing` under their earlier incomplete per-endpoint review. ACC-01 and VAL-05 have since passed MATCH-01 handoff, protocol, and cross-database verification.
 
@@ -165,7 +165,7 @@ Do not integrate the unavailable endpoints above yet. Jessamae Sumanoy's `BAT-01
 | `VAL-05` | POST | `/api/v1/validation-sessions/{id}/complete` | P1 | Done | ✅ AVAILABLE |
 | `RPT-01` | GET | `/api/v1/reports` | P1 | Done | ✅ AVAILABLE |
 | `RPT-02` | POST | `/api/v1/reports` | P1 | Done | ✅ AVAILABLE |
-| `RPT-03` | GET | `/api/v1/reports/{id}` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
+| `RPT-03` | GET | `/api/v1/reports/{id}` | P1 | Done | ✅ AVAILABLE |
 | `RPT-04` | PATCH | `/api/v1/reports/{id}` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `RPT-05` | POST | `/api/v1/reports/{id}/generate` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `RPT-06` | POST | `/api/v1/reports/{id}/approve` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
@@ -9053,8 +9053,8 @@ HTTP `201`; contract shape `{data:Report}`.
 
 ### RPT-03 — Report draft/source metadata.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and verified on SQLite and PostgreSQL/PostGIS.
 
 | Property | Value |
 | --- | --- |
@@ -9074,11 +9074,11 @@ HTTP `201`; contract shape `{data:Report}`.
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `Path: id`
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 GET /api/v1/reports/<uuid> HTTP/1.1
@@ -9087,13 +9087,52 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:{report,source_summary}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "report": {
+            "report_id": "<uuid>",
+            "mission_id": "<uuid>",
+            "site_id": "<uuid>",
+            "report_title": "Quarterly Mangrove Review",
+            "report_type": "validation_report",
+            "report_status": "draft",
+            "audience": "Coastal managers",
+            "summary": "Current monitoring evidence.",
+            "interpretation": "Canopy recovery remains stable.",
+            "limitations": "Weather reduced coverage.",
+            "recommendations": "Repeat the eastern transect.",
+            "formats": ["pdf", "geojson"],
+            "generated_by": null,
+            "approved_by": null,
+            "created_at": "2026-08-25T00:00:00Z",
+            "updated_at": "2026-08-25T00:00:00Z"
+        },
+        "source_summary": {
+            "mission": {"mission_id": "<uuid>", "mission_code": "MSN-001", "mission_title": "Quarterly survey", "mission_status": "completed"},
+            "site": {"site_id": "<uuid>", "site_code": "SITE-001", "site_name": "Coastal Site"},
+            "trees": {"total": 4, "distinct_species": 2, "validated": 2, "unvalidated": 1, "rejected": 1},
+            "validation": {"sessions": 2, "open_sessions": 1, "completed_sessions": 1, "ground_truth_records": 2},
+            "accuracy": {
+                "species_accuracy": "0.950000",
+                "count_precision": "0.800000",
+                "count_recall": "0.700000",
+                "count_f1": "0.750000",
+                "height_rmse": "1.250000",
+                "age_mae": "2.500000"
+            }
+        }
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: RPT-02.
+The `source_summary` always contains all five groups. Counts are integers; all six accuracy keys are decimal strings or `null`. Missions with no evidence return zero count groups and null accuracy metrics.
+
+**Workflow / UI integration note:** V-09 is a live canonical view, not the dashboard materialized snapshot, so this endpoint does not require `dashboard:refresh`. Foreign, missing, malformed, inconsistent, or deleted report lineage returns `404`. Reads do not create audit events. Use the returned `source_summary` for draft preview and generation readiness; refresh it after tree, validation, or accuracy changes.
 
 ### RPT-04 — Update report content/status while editable.
 

@@ -1337,7 +1337,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | RPT-01 | GET /reportsList report records. | Query: mission\_id,site\_id,status,type,page | 200 {data:\[Report\],meta} | AUTH | **P1** | Codex \- Reporting/API | **Done** |
 | RPT-02 | POST /reportsPrepare report definition/draft. | {mission\_id,site\_id,report\_title,report\_type,audience?,summary?,interpretation?,limitations?,recommendations?,formats?} | 201 {data:Report} | TREE/ACC finalized | **P1** | Earljohn Estandarte | **Done** |
-| RPT-03 | GET /reports/{id}Report draft/source metadata. | Path: id | 200 {data:{report,source\_summary}} | RPT-02 | **P1** | Earljohn Estandarte | **Blocked** |
+| RPT-03 | GET /reports/{id}Report draft/source metadata. | Path: id | 200 {data:{report,source\_summary}} | RPT-02 | **P1** | Earljohn Estandarte | **Done** |
 | RPT-04 | PATCH /reports/{id}Update report content/status while editable. | Partial report fields | 200 {data:Report} | RPT-03 | **P1** | Earljohn Estandarte | **Blocked** |
 | RPT-05 | POST /reports/{id}/generateGenerate professional PDF/report artifact asynchronously. | {format:"PDF",options?} | 202 {data:{job\_id,report\_id,status}} | RPT-03 \+ report routine/storage | **P0** | Earljohn Estandarte | **Blocked** |
 | RPT-06 | POST /reports/{id}/approveApprove generated report. | {decision:"approved"|"rejected",notes?} | 200 {data:Report} | RPT-05 complete | **P1** | Earljohn Estandarte | **Blocked** |
@@ -1372,6 +1372,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Response / server fields | `201 {data:Report}` returns the exact draft content resource. `report_status=draft`, `generated_by=null`, and `approved_by=null` are server-owned regardless of extra client input. RPT-01 keeps its established metadata-only list resource. |
 | Scope / transaction | The mission must belong to the supplied site and that site must belong to the caller's organization; foreign, missing, and inconsistent lineage returns non-enumerable 404. Report insertion and immutable `report.create` audit evidence share one rollback-safe transaction. |
 | Schema / DCL / tests | Adds only the five tracker-approved content columns. `054_report_creation_grants.sql` grants column-limited API INSERT; API UPDATE/DELETE and report/worker INSERT remain denied. `ReportStoreTest` covers full/minimal drafts, normalization, validation, lineage, auth, local/foreign RBAC, inactivity, audit rollback, throttling, route/schema/DCL, and both databases. Focused SQLite and PostgreSQL/PostGIS each pass 9 / 84; full SQLite passes 765 / 5298 with thirteen expected PostgreSQL-only skips; full PostgreSQL/PostGIS passes 778 / 5335. |
+
+### **RPT-03 — GET /api/v1/reports/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Return one full report draft plus stable live source evidence. Requires active Sanctum authentication and tenant-valid `reports.read`. |
+| Response | Exact `{data:{report,source_summary}}`. `report` uses the RPT-02 content resource. `source_summary` always contains `mission`, `site`, `trees`, `validation`, and `accuracy`; counts are integers and all six accuracy keys are decimal strings or `null`. Empty missions are zero/null-filled. |
+| V-09 design | `v_report_source_summary` separately pre-aggregates non-deleted tree observations, validation sessions/ground truth, and deterministic latest V-08 accuracy metrics before joining them to non-deleted mission/site lineage. It is a live view, not MV-01, so report preview does not require dashboard refresh. |
+| Scope / effects | Both direct report site and mission-site lineage must match and belong to the actor's organization. Foreign, missing, malformed, inconsistent, or deleted lineage returns non-enumerable 404. Reads create no audit event or notification. |
+| DCL / tests | `055_report_source_summary_grants.sql` revokes all view access before granting SELECT only to API/report roles; worker/auditor and every mutation remain denied. `ReportShowTest` covers exact/full and empty summaries, latest metrics, lineage hiding, auth, local/foreign RBAC, inactivity, throttling, V-09 DDL/DCL, and both databases. Focused SQLite and PostgreSQL/PostGIS each pass 8 / 68; full SQLite passes 773 / 5366 with thirteen expected skips; full PostgreSQL/PostGIS passes 786 / 5403. |
 
 ## **Notifications, settings and audit**
 

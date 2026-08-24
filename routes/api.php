@@ -72,6 +72,7 @@ use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RolePermissionReplaceController;
 use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
 use App\Http\Controllers\Api\V1\Report\ReportIndexController;
+use App\Http\Controllers\Api\V1\Report\ReportShowController;
 use App\Http\Controllers\Api\V1\Report\ReportStoreController;
 use App\Http\Controllers\Api\V1\Sensor\SensorDatasetUploadCompleteController;
 use App\Http\Controllers\Api\V1\Sensor\SensorDatasetUploadInitiateController;
@@ -818,6 +819,14 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:reports.create', 'throttle:auth.authenticated',
     ]);
+
+    // [RPT-03] GET /api/v1/reports/{report}
+    Route::get('/reports/{report}', ReportShowController::class)
+        ->whereUuid('report')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:reports.read', 'throttle:auth.authenticated',
+        ]);
 
     // [DASH-01] Return role-scoped dashboard KPI aggregates.
     Route::get('/dashboard/overview', DashboardOverviewController::class)->middleware([
