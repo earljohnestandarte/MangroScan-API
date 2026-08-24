@@ -102,6 +102,7 @@ use App\Http\Controllers\Api\V1\Validation\AccuracyRecomputeController;
 use App\Http\Controllers\Api\V1\Validation\ConfidenceFlagUpdateController;
 use App\Http\Controllers\Api\V1\Validation\ConfidenceReviewIndexController;
 use App\Http\Controllers\Api\V1\Validation\GroundTruthStoreController;
+use App\Http\Controllers\Api\V1\Validation\ValidationDecisionStoreController;
 use App\Http\Controllers\Api\V1\Validation\ValidationScopeController;
 use App\Http\Controllers\Api\V1\Validation\ValidationSessionCompleteController;
 use App\Http\Controllers\Api\V1\Validation\ValidationSessionIndexController;
@@ -694,6 +695,13 @@ Route::prefix('v1')->group(function () {
         ->whereUuid('session')->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:validation.record_ground_truth', 'throttle:auth.authenticated',
+        ]);
+
+    // [MATCH-01] Store a matched, corrected, false-positive, or false-negative decision.
+    Route::post('/validation-sessions/{session}/decisions', ValidationDecisionStoreController::class)
+        ->whereUuid('session')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:validation.decide', 'throttle:auth.authenticated',
         ]);
 
     // [ACC-01] Recompute authoritative validation-session metrics.

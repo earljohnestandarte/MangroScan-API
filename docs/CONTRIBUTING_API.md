@@ -110,14 +110,14 @@ These changes are not yet approved as `Done`:
 
 **Endpoint IDs:**
 
-- Completed validation endpoints: `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`
-- Remaining P0: `MATCH-01`
+- Completed validation endpoints: `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`
+- Remaining validation handoff: verify and promote `ACC-01` and `VAL-05`
 
 **Recommended branch:** `feature/earljohn/validation-core`
 
 **Likely paths:** create `app/Http/Controllers/Api/V1/Validation`, `app/Http/Requests/Validation`, `app/Services/Validation`, and `tests/Feature/Validation` following existing single-action conventions; reuse the existing validation models and `2026_08_12_066000_create_validation_foundation_tables.php`; add only approved additive migrations/DCL.
 
-**Dependencies:** VAL-01 through GT-01 are complete. GT-01 uses the approved additive `field_code`, `crown_diameter_m`, and default-true `is_tree` columns and preserves the canonical location/measurement/remarks mappings. Implement `MATCH-01` next using its approved direct session lineage and decision evidence. `MATCH-01` must write the evidence consumed by `ACC-01` and `VAL-05`; those downstream endpoints remain blocked until that handoff is implemented and verified.
+**Dependencies:** VAL-01 through MATCH-01 are complete. GT-01 uses the approved additive `field_code`, `crown_diameter_m`, and default-true `is_tree` columns and preserves canonical location/measurement/remarks mappings. MATCH-01 uses direct required session lineage plus asymmetric ground/tree references, retains accepted/corrected/evidence fields, and calculates errors before applying canonical corrections. Its handoff to `ACC-01` and `VAL-05` is implemented; verify those endpoints independently before promoting their tracker states.
 
 ### Earljohn Estandarte — transferred reports, exports, and dashboards
 
@@ -149,9 +149,9 @@ flowchart LR
     Jason -- "VAL-05 completion" --> Jessamae
 ```
 
-- Jason Benabente's `ACC-01` is not yet available to Earljohn Estandarte's transferred report/dashboard work; it remains blocked on `MATCH-01` and PostgreSQL verification. V-08/MV-01 are complete, so this validation chain is the remaining DASH-01 data dependency.
-- Earljohn Estandarte's transferred mutable validation resources, including `MATCH-01`, remain outstanding conditions for Jessamae Sumanoy's `SYNC-04`; Jason Benabente's `VAL-05` is also blocked on that chain.
-- `MATCH-01` must populate the validation-match evidence consumed by `ACC-01` recomputation and the `VAL-05` protocol gate before either endpoint can be approved.
+- MATCH-01 now populates the direct-session evidence consumed by Jason Benabente's `ACC-01` and `VAL-05`. Those endpoints remain unavailable only until their independent handoff verification and tracker promotion are complete. V-08/MV-01 are complete, so ACC-01 promotion is the remaining DASH-01 data dependency.
+- Earljohn Estandarte's transferred validation mutations are complete for Jessamae Sumanoy's `SYNC-04`; Jason Benabente's `VAL-05` promotion remains the completion-state dependency.
+- Preserve MATCH-01's direct `validation_session_id` lineage in accuracy and completion queries so false positives are included without requiring a ground-truth row.
 - Karlandrei Panday’s current assigned rows depend only on completed Earljohn Estandarte endpoints and within-owner chains.
 - `SITE-05` has no assigned owner in the tracker and is excluded from all developer work packages until ownership is explicitly recorded.
 

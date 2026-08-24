@@ -66,6 +66,11 @@ class ValidationSession extends Model
         return $this->hasMany(AccuracyMetric::class, 'validation_session_id', 'validation_session_id');
     }
 
+    public function matches(): HasMany
+    {
+        return $this->hasMany(ValidationMatch::class, 'validation_session_id', 'validation_session_id');
+    }
+
     public function completer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'completed_by', 'user_id');

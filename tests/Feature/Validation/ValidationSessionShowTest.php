@@ -55,7 +55,9 @@ class ValidationSessionShowTest extends TestCase
             'crown_diameter_m', 'health_status', 'is_tree', 'remarks', 'created_at',
         ], array_keys($response->json('data.ground_truth_records.0')));
         $this->assertSame([
-            'validation_match_id', 'ground_truth_id', 'tree_observation_id', 'match_status',
+            'validation_match_id', 'validation_session_id', 'ground_truth_id', 'tree_observation_id', 'match_status',
+            'accepted_species_id', 'accepted_height_m', 'accepted_age_years', 'corrected_geometry',
+            'notes', 'validation_evidence',
             'distance_error_meters', 'species_correct', 'height_error_meters', 'age_error_years',
             'validated_by', 'validated_at',
         ], array_keys($response->json('data.matches.0')));
@@ -252,7 +254,8 @@ class ValidationSessionShowTest extends TestCase
             'photo_path' => 'private/validation/photo.jpg', 'remarks' => 'Verified.', 'created_at' => now(),
         ]);
         DB::table('validation_matches')->insert([
-            'validation_match_id' => $ids['match_id'], 'ground_truth_id' => $ids['ground_truth_id'],
+            'validation_match_id' => $ids['match_id'], 'validation_session_id' => $ids['session_id'],
+            'ground_truth_id' => $ids['ground_truth_id'],
             'tree_observation_id' => $ids['tree_id'], 'match_status' => 'matched',
             'distance_error_meters' => 0.25, 'species_correct' => true,
             'height_error_meters' => 0.1, 'age_error_years' => 0,

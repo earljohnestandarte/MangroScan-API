@@ -26,10 +26,9 @@ class ValidationSessionCompletionService
             if ($locked->status !== 'open') {
                 throw new WorkflowConflictException('Only an open validation session can be completed.', ['status' => $locked->status]);
             }
-            $latestDecision = DB::table('validation_matches as match')
-                ->join('ground_truth_tree_records as truth', 'truth.ground_truth_id', '=', 'match.ground_truth_id')
-                ->where('truth.validation_session_id', $locked->validation_session_id)
-                ->max('match.validated_at');
+            $latestDecision = DB::table('validation_matches')
+                ->where('validation_session_id', $locked->validation_session_id)
+                ->max('validated_at');
             if ($latestDecision === null) {
                 throw new WorkflowConflictException('At least one validation decision is required before completion.');
             }

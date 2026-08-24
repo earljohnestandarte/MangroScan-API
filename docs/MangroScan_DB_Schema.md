@@ -959,9 +959,16 @@ Links AI result to ground-truth record.
 | Field | Type | Notes |
 | ----- | ----- | ----- |
 | validation\_match\_id | UUID | Primary key |
-| ground\_truth\_id | UUID | FK → ground\_truth\_tree\_records.ground\_truth\_id |
-| tree\_observation\_id | UUID | FK → tree\_observations.tree\_observation\_id |
+| validation\_session\_id | UUID | Required FK → validation\_sessions.validation\_session\_id |
+| ground\_truth\_id | UUID | Nullable FK → ground\_truth\_tree\_records.ground\_truth\_id |
+| tree\_observation\_id | UUID | Nullable FK → tree\_observations.tree\_observation\_id |
 | match\_status | VARCHAR(30) | matched, false\_positive, false\_negative, corrected |
+| accepted\_species\_id | UUID | Nullable FK → mangrove\_species.species\_id |
+| accepted\_height\_m | NUMERIC(8,2) | Nullable, non-negative |
+| accepted\_age\_years | NUMERIC(8,2) | Nullable, non-negative |
+| corrected\_geometry | GEOMETRY(Point, 4326\) | Nullable canonical correction |
+| notes | TEXT | Nullable |
+| validation\_evidence | JSONB | Nullable structured evidence |
 | distance\_error\_meters | NUMERIC(10,4) | Nullable |
 | species\_correct | BOOLEAN | Nullable |
 | height\_error\_meters | NUMERIC(10,4) | Nullable |

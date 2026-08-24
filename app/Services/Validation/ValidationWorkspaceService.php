@@ -50,8 +50,8 @@ class ValidationWorkspaceService
                 ->orderBy('ground_truth_id')
                 ->get(),
             'matches' => ValidationMatch::query()
-                ->whereHas('groundTruthRecord', fn ($query) => $query
-                    ->where('validation_session_id', $session->validation_session_id))
+                ->withCorrectedGeometryGeoJson()
+                ->where('validation_session_id', $session->validation_session_id)
                 ->orderBy('validated_at')
                 ->orderBy('validation_match_id')
                 ->get(),

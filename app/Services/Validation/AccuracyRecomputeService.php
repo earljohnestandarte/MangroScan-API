@@ -27,10 +27,9 @@ class AccuracyRecomputeService
             if ($locked->status !== 'open') {
                 throw new WorkflowConflictException('Accuracy can only be recomputed for an open validation session.', ['status' => $locked->status]);
             }
-            $matches = DB::table('validation_matches as match')
-                ->join('ground_truth_tree_records as truth', 'truth.ground_truth_id', '=', 'match.ground_truth_id')
-                ->where('truth.validation_session_id', $locked->validation_session_id)
-                ->select('match.*')->get();
+            $matches = DB::table('validation_matches')
+                ->where('validation_session_id', $locked->validation_session_id)
+                ->get();
             if ($matches->isEmpty()) {
                 throw new WorkflowConflictException('At least one validation decision is required before accuracy can be recomputed.');
             }

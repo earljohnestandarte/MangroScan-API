@@ -36,15 +36,15 @@ For a physical Expo device, `localhost` means the phone itself. Use a reachable 
 | 🚧 UNDER CONSTRUCTION | Planned or actively being built; do not use as a production dependency. |
 | ⛔ BLOCKED / UNDER CONSTRUCTION | Not implemented and waiting on a documented prerequisite or decision. |
 
-Current inventory: **141 endpoints**, **90 available**, **21 under construction**, **16 blocked**, and **14 testing**.
+Current inventory: **141 endpoints**, **91 available**, **20 under construction**, **16 blocked**, and **14 testing**.
 
 ## Currently available endpoints
 
-`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `RPT-01`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
+`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `RPT-01`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
 
 ## Unavailable, testing, and blocked endpoints
 
-`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `DASH-01`, `DASH-02`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
+`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `ACC-01`, `VAL-05`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `DASH-01`, `DASH-02`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
 
 Do not integrate the newly routed endpoints above yet. Jessamae Sumanoy's `BAT-01` remains `Working` after schema, DCL, test, and formatting gaps were found. Jason Benabente's P2 endpoints plus `LAYER-02` and `CONF-01/02` are `Testing`: SQLite passes, but PostgreSQL has not run because the test role lacks schema-creation privilege, and the per-endpoint test matrix is incomplete. `ACC-01` and `VAL-05` remain `Blocked` on `MATCH-01`.
 
@@ -160,7 +160,7 @@ Do not integrate the newly routed endpoints above yet. Jessamae Sumanoy's `BAT-0
 | `VAL-03` | POST | `/api/v1/validation-sessions` | P0 | Done | ✅ AVAILABLE |
 | `VAL-04` | GET | `/api/v1/validation-sessions/{id}` | P0 | Done | ✅ AVAILABLE |
 | `GT-01` | POST | `/api/v1/validation-sessions/{id}/ground-truth` | P0 | Done | ✅ AVAILABLE |
-| `MATCH-01` | POST | `/api/v1/validation-sessions/{id}/decisions` | P0 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `MATCH-01` | POST | `/api/v1/validation-sessions/{id}/decisions` | P0 | Done | ✅ AVAILABLE |
 | `ACC-01` | POST | `/api/v1/validation-sessions/{id}/accuracy/recompute` | P0 | Blocked | ⛔ BLOCKED — MATCH-01 REQUIRED |
 | `VAL-05` | POST | `/api/v1/validation-sessions/{id}/complete` | P1 | Blocked | ⛔ BLOCKED — MATCH-01 REQUIRED |
 | `RPT-01` | GET | `/api/v1/reports` | P1 | Done | ✅ AVAILABLE |
@@ -8524,7 +8524,7 @@ The six keys under `data` are exact and always present:
 | `context` | `{session,mission,site,plot,validator}`; `plot` may be `null` |
 | `observations` | Mission-scoped TreeObservation resources, including GeoJSON `tree_location`/`crown_polygon` |
 | `ground_truth_records` | Session records with `ground_truth_id`, `validation_session_id`, `field_code`, `species_id`, GeoJSON `ground_location`, `measured_height_meters`, `estimated_age_years`, `diameter_cm`, `crown_diameter_m`, `health_status`, `is_tree`, `remarks`, `created_at` |
-| `matches` | Session decisions with `validation_match_id`, `ground_truth_id`, `tree_observation_id`, `match_status`, error measurements, `species_correct`, `validated_by`, `validated_at` |
+| `matches` | Session decisions with direct `validation_session_id`, asymmetric ground/tree references, accepted/corrected evidence, server-calculated errors, validator, and timestamp |
 | `metrics` | Session-consistent AccuracyMetric resources |
 | `layers` | Mission Layer resources; private `storage_key` is excluded |
 
@@ -8677,8 +8677,8 @@ The backend maps `location`, `height_m`, `age_years`, and `notes` to the canonic
 
 ### MATCH-01 — Store matched/corrected/false-positive/false-negative decision.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and intended for frontend integration.
 
 | Property | Value |
 | --- | --- |
@@ -8698,7 +8698,7 @@ The backend maps `location`, `height_m`, `age_years`, and `notes` to the canonic
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `{tree_observation_id?,ground_truth_id?,decision,accepted_species_id?,accepted_height_m?,accepted_age_years?,corrected_geometry?,notes?,validation_evidence?}`
 
@@ -8714,7 +8714,7 @@ The backend maps `location`, `height_m`, `age_years`, and `notes` to the canonic
 | `notes` | String | No |
 | `validation_evidence` | JSON object | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/validation-sessions/<uuid>/decisions HTTP/1.1
@@ -8725,19 +8725,50 @@ Content-Type: application/json
 
 {
     "tree_observation_id": "<uuid>",
-    "decision": "<decision>"
+    "ground_truth_id": "<uuid>",
+    "decision": "corrected",
+    "accepted_species_id": "<active-species-uuid>",
+    "accepted_height_m": 7.25,
+    "accepted_age_years": 5,
+    "corrected_geometry": {"type": "Point", "coordinates": [123.81, 10.31]},
+    "notes": "Canonical values corrected.",
+    "validation_evidence": {"photos": 2, "reviewer": "field-team"}
 }
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `201`; contract shape `{data:ValidationMatch}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "validation_match_id": "<uuid>",
+        "validation_session_id": "<uuid>",
+        "ground_truth_id": "<uuid-or-null>",
+        "tree_observation_id": "<uuid-or-null>",
+        "match_status": "corrected",
+        "accepted_species_id": "<uuid-or-null>",
+        "accepted_height_m": "7.25",
+        "accepted_age_years": "5.00",
+        "corrected_geometry": {"type": "Point", "coordinates": [123.81, 10.31]},
+        "notes": "Canonical values corrected.",
+        "validation_evidence": {"photos": 2, "reviewer": "field-team"},
+        "distance_error_meters": "12.3456",
+        "species_correct": false,
+        "height_error_meters": "1.2500",
+        "age_error_years": "2.0000",
+        "validated_by": "<uuid>",
+        "validated_at": "2026-08-25T00:00:00+00:00"
+    }
+}
+```
+
+Error and nullable metric values depend on the referenced evidence; the numbers above illustrate formatting, not a fixed calculation. Missing, inactive, foreign, deleted, or cross-lineage session/truth/tree/species references return `404`. A completed session or a repeated decision for the same truth/tree within that session returns `409`. Invalid decision-specific bodies return `422`.
 
 **Approved workflow semantics:** `matched` marks the tree validated. `corrected` updates supplied canonical tree species/height/age/location values, preserves the decision evidence, and marks the tree corrected. `false_positive` rejects the referenced tree without a ground-truth record. `false_negative` records the missed ground-truth tree without creating a fake tree observation. Distance, species correctness, and height/age errors are calculated by the server.
 
-**Workflow / UI integration note:** GT-01 is complete. After MATCH-01 becomes available, refresh the VAL-04 workspace after every successful decision.
+**Workflow / UI integration note:** `matched` marks the tree validated without replacing canonical values. `corrected` requires at least one accepted/corrected value and updates only supplied canonical fields. `false_positive` requires a tree and no ground truth; `false_negative` requires ground truth and no tree. After success, refresh VAL-04. ACC-01 and VAL-05 remain unavailable until their independent handoff verification is promoted.
 
 ### ACC-01 — Recompute precision/recall/F1/RMSE/MAE evidence.
 

@@ -34,13 +34,12 @@ class ValidationDatabaseFoundationTest extends TestCase
         ]));
 
         $this->assertTrue(Schema::hasColumns('validation_matches', [
-            'validation_match_id', 'ground_truth_id', 'tree_observation_id', 'match_status',
+            'validation_match_id', 'validation_session_id', 'ground_truth_id', 'tree_observation_id', 'match_status',
+            'accepted_species_id', 'accepted_height_m', 'accepted_age_years', 'corrected_geometry',
+            'notes', 'validation_evidence',
             'distance_error_meters', 'species_correct', 'height_error_meters', 'age_error_years',
             'validated_by', 'validated_at',
         ]));
-        foreach (['accepted_species_id', 'accepted_height_m', 'accepted_age_years', 'corrected_geometry', 'validation_evidence'] as $unapprovedColumn) {
-            $this->assertFalse(Schema::hasColumn('validation_matches', $unapprovedColumn));
-        }
 
         $this->assertTrue(Schema::hasColumns('accuracy_metrics', [
             'accuracy_metric_id', 'validation_session_id', 'mission_id', 'model_version_id', 'metric_type',
@@ -83,6 +82,7 @@ class ValidationDatabaseFoundationTest extends TestCase
         ]);
 
         $match = ValidationMatch::query()->create([
+            'validation_session_id' => $session->validation_session_id,
             'ground_truth_id' => $groundTruthId,
             'tree_observation_id' => null,
             'match_status' => 'false_negative',
@@ -100,7 +100,7 @@ class ValidationDatabaseFoundationTest extends TestCase
 
         $session->load(['mission', 'site', 'plot', 'validator', 'groundTruthRecords.species']);
         $groundTruth = GroundTruthTreeRecord::query()->findOrFail($groundTruthId);
-        $match->load(['groundTruthRecord', 'validator']);
+        $match->load(['validationSession', 'groundTruthRecord', 'validator']);
         $metric->load('mission');
 
         $this->assertTrue(Str::isUuid($session->validation_session_id));
@@ -111,6 +111,7 @@ class ValidationDatabaseFoundationTest extends TestCase
         $this->assertSame($groundTruthId, $session->groundTruthRecords->sole()->ground_truth_id);
         $this->assertSame($graph['species_id'], $groundTruth->species->species_id);
         $this->assertSame($groundTruthId, $match->groundTruthRecord->ground_truth_id);
+        $this->assertSame($session->validation_session_id, $match->validationSession->validation_session_id);
         $this->assertNull($match->treeObservation);
         $this->assertSame($graph['mission_id'], $metric->mission->mission_id);
 
@@ -171,6 +172,7 @@ class ValidationDatabaseFoundationTest extends TestCase
         $dcl = file_get_contents(database_path('sql/dcl/045_validation_foundation_grants.sql'));
         $migration = file_get_contents(database_path('migrations/2026_08_12_066000_create_validation_foundation_tables.php'));
         $groundTruthMigration = file_get_contents(database_path('migrations/2026_08_25_000100_add_ground_truth_capture_fields.php'));
+        $decisionMigration = file_get_contents(database_path('migrations/2026_08_25_000200_add_validation_decision_fields.php'));
 
         $this->assertIsString($dcl);
         $this->assertStringContainsString('REVOKE ALL PRIVILEGES ON TABLE', $dcl);
@@ -200,6 +202,10 @@ class ValidationDatabaseFoundationTest extends TestCase
 
         $this->assertIsString($groundTruthMigration);
         $this->assertStringContainsString('ground_truth_tree_records_crown_diameter_check', $groundTruthMigration);
+        $this->assertIsString($decisionMigration);
+        foreach (['validation_matches_accepted_values_check', 'validation_matches_reference_shape_check', "->spatialIndex('corrected_geometry')"] as $invariant) {
+            $this->assertStringContainsString($invariant, $decisionMigration);
+        }
 
         $this->assertTrue(collect(Route::getRoutes())->contains(
             fn ($route): bool => $route->uri() === 'api/v1/validation/scopes',

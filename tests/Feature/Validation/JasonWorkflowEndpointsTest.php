@@ -81,8 +81,9 @@ class JasonWorkflowEndpointsTest extends TestCase
                 'health_status' => 'healthy', 'created_at' => now(),
             ]);
             DB::table('validation_matches')->insert([
-                'validation_match_id' => (string) Str::uuid(), 'ground_truth_id' => $truth,
-                'tree_observation_id' => null, 'match_status' => $status,
+                'validation_match_id' => (string) Str::uuid(), 'validation_session_id' => $session,
+                'ground_truth_id' => $status === 'false_positive' ? null : $truth,
+                'tree_observation_id' => $status === 'false_negative' ? null : $graph['tree'], 'match_status' => $status,
                 'species_correct' => $speciesCorrect, 'height_error_meters' => $heightError,
                 'age_error_years' => $ageError, 'validated_by' => $graph['actor'], 'validated_at' => now(),
             ]);
