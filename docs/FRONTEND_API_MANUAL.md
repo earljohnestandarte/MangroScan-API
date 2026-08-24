@@ -36,15 +36,15 @@ For a physical Expo device, `localhost` means the phone itself. Use a reachable 
 | 🚧 UNDER CONSTRUCTION | Planned or actively being built; do not use as a production dependency. |
 | ⛔ BLOCKED / UNDER CONSTRUCTION | Not implemented and waiting on a documented prerequisite or decision. |
 
-Current inventory: **141 endpoints**, **86 available**, **19 under construction**, **22 blocked in manual planning**, and **14 testing**.
+Current inventory: **141 endpoints**, **87 available**, **19 under construction**, **21 blocked in manual planning**, and **14 testing**.
 
 ## Currently available endpoints
 
-`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `VAL-01`, `RPT-01`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
+`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `VAL-01`, `VAL-02`, `RPT-01`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
 
 ## Unavailable, testing, and blocked endpoints
 
-`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `DASH-01`, `DASH-02`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
+`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `DASH-01`, `DASH-02`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
 
 Do not integrate the newly routed endpoints above yet. Jessamae Sumanoy's `BAT-01` remains `Working` after schema, DCL, test, and formatting gaps were found. Jason Benabente's P2 endpoints plus `LAYER-02` and `CONF-01/02` are `Testing`: SQLite passes, but PostgreSQL has not run because the test role lacks schema-creation privilege, and the per-endpoint test matrix is incomplete. `ACC-01` and `VAL-05` remain `Blocked` on `MATCH-01`.
 
@@ -156,7 +156,7 @@ Do not integrate the newly routed endpoints above yet. Jessamae Sumanoy's `BAT-0
 | `CONF-01` | GET | `/api/v1/confidence-review` | P1 | Testing | 🧪 TESTING — NOT AVAILABLE |
 | `CONF-02` | PUT | `/api/v1/confidence-review/{resultId}` | P1 | Testing | 🧪 TESTING — NOT AVAILABLE |
 | `VAL-01` | GET | `/api/v1/validation/scopes` | P0 | Done | ✅ AVAILABLE |
-| `VAL-02` | GET | `/api/v1/validation-sessions` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
+| `VAL-02` | GET | `/api/v1/validation-sessions` | P0 | Done | ✅ AVAILABLE |
 | `VAL-03` | POST | `/api/v1/validation-sessions` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `VAL-04` | GET | `/api/v1/validation-sessions/{id}` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `GT-01` | POST | `/api/v1/validation-sessions/{id}/ground-truth` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
@@ -8326,8 +8326,8 @@ Only non-deleted missions/sites/plots in the caller's organization are returned.
 
 ### VAL-02 — List field validation sessions.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and intended for frontend integration.
 
 | Property | Value |
 | --- | --- |
@@ -8341,33 +8341,62 @@ Only non-deleted missions/sites/plots in the caller's organization are returned.
 | Success | 200 — {data:[ValidationSession],meta} |
 | Relevant errors | 401, 403, 404, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `Query: mission_id?,site_id?,status?,page`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `mission_id` | `not finalized` | No |
-| `site_id` | `not finalized` | No |
-| `status` | `not finalized` | No |
-| `page` | `not finalized` | Yes |
+| `mission_id` | UUID; normalized to lowercase | No |
+| `site_id` | UUID; normalized to lowercase | No |
+| `status` | `open` or `completed`; case/outer whitespace normalized | No |
+| `page` | Integer, minimum `1`; fixed page size is `25` | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
-GET /api/v1/validation-sessions?mission_id=%3Cuuid%3E&page=%3Cpage%3E HTTP/1.1
+GET /api/v1/validation-sessions?mission_id=<uuid>&status=open&page=1 HTTP/1.1
 Host: localhost:8000
 Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:[ValidationSession],meta}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": [
+        {
+            "validation_session_id": "<uuid>",
+            "mission_id": "<uuid>",
+            "site_id": "<uuid>",
+            "plot_id": "<uuid-or-null>",
+            "validated_by": "<uuid>",
+            "validation_date": "2026-08-24",
+            "method": "ground_survey",
+            "status": "open",
+            "notes": "Field evidence.",
+            "completed_at": null,
+            "completed_by": null,
+            "created_at": "2026-08-24T01:00:00+00:00",
+            "updated_at": "2026-08-24T01:00:00+00:00"
+        }
+    ],
+    "meta": {
+        "request_id": "<request-id>",
+        "page": 1,
+        "per_page": 25,
+        "total": 1,
+        "last_page": 1
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: VAL-01.
+Sessions are sorted by validation date descending, then UUID. Filters compose. A missing or foreign mission/site filter returns `404`; sessions with deleted parents or inconsistent mission/site/plot lineage are omitted.
+
+**Workflow / UI integration note:** Use VAL-01 to populate filter options, then refresh this list after VAL-03 creates a session or VAL-05 completes one.
 
 ### VAL-03 — Create mission-scoped validation activity.
 

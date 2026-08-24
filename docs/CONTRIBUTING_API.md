@@ -22,11 +22,11 @@ Assignments optimize conflict avoidance and dependency continuity before raw end
 | Karlandrei Panday | 11 | 0 | 1 | 10 | Platform admin and tenant CRUD extensions | ~21 points |
 | Jessamae Sumanoy | 12 | 1 | 2 | 9 | Hardware, field operations, sync, and media | ~27 points |
 | Jason Benabente | 16 | 1 | 4 | 11 | AI/results, validation completion/accuracy, audit, and training extensions | ~37 points |
-| Earljohn Estandarte | 15 | 8 | 7 | 0 | Transferred validation, reports, exports, and dashboards | ~59 points |
+| Earljohn Estandarte | 14 | 7 | 7 | 0 | Transferred validation, reports, exports, and dashboards | ~56 points |
 | Juneabby Girasol | 0 | 0 | 0 | 0 | No remaining assigned endpoints | 0 points |
 | Joshua Lopez | 0 | 0 | 0 | 0 | No remaining assigned endpoints | 0 points |
 | Unassigned | 1 | 0 | 0 | 1 | Site archival | ~1 point |
-| **Total remaining** | **55** | **10** | **14** | **31** |  |  |
+| **Total remaining** | **54** | **9** | **14** | **31** |  |  |
 
 The estimate starts with P0 = 3, P1 = 2, and P2 = 1, then accounts for geospatial work, async/storage workflows, validation calculations, transactions, and cross-domain coordination. It is a planning estimate, not a tracker contract.
 
@@ -110,14 +110,14 @@ These changes are not yet approved as `Done`:
 
 **Endpoint IDs:**
 
-- Completed foundation: `VAL-01`
-- Remaining P0: `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`
+- Completed foundation: `VAL-01`, `VAL-02`
+- Remaining P0: `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`
 
 **Recommended branch:** `feature/earljohn/validation-core`
 
 **Likely paths:** create `app/Http/Controllers/Api/V1/Validation`, `app/Http/Requests/Validation`, `app/Services/Validation`, and `tests/Feature/Validation` following existing single-action conventions; reuse the existing validation models and `2026_08_12_066000_create_validation_foundation_tables.php`; add only approved additive migrations/DCL.
 
-**Dependencies:** VAL-01 is complete and unblocks `VAL-02/03`. Preserve the chain `VAL-01 → VAL-02/03 → VAL-04 → GT-01/MATCH-01`. `MATCH-01` must write the validation-match evidence consumed by `ACC-01` and `VAL-05`; those downstream endpoints remain blocked until that handoff is implemented and verified.
+**Dependencies:** VAL-01 is complete; VAL-02 is also complete, and VAL-03 remains dependency-ready. Preserve the chain `VAL-01 → VAL-02/03 → VAL-04 → GT-01/MATCH-01`. `MATCH-01` must write the validation-match evidence consumed by `ACC-01` and `VAL-05`; those downstream endpoints remain blocked until that handoff is implemented and verified.
 
 ### Earljohn Estandarte — transferred reports, exports, and dashboards
 
