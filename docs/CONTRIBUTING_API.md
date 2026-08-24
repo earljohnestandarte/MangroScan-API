@@ -132,7 +132,7 @@ These changes are not yet approved as `Done`:
 
 **Likely paths:** `app/Http/Controllers/Api/V1/Report` plus new export/dashboard folders following existing conventions; `app/Http/Requests/Report`; report/export/dashboard services; report models and storage/queue code; `tests/Feature/Report` plus export/dashboard suites; migrations and DCL.
 
-**Dependencies:** preserve `RPT-02 → RPT-03 → RPT-04/05/EXP-01`, `RPT-05 → RPT-06`, `EXP-01 → EXP-02 → EXP-03`, and `DASH-01 → DASH-02`. Report and dashboard completion depends on Earljohn Estandarte’s canonical tree results and a verified `ACC-01`; Jason Benabente's implementation is currently blocked on `MATCH-01` and is not a finalized integration dependency.
+**Dependencies:** preserve `RPT-02 → RPT-03 → RPT-04/05/EXP-01`, `RPT-05 → RPT-06`, `EXP-01 → EXP-02 → EXP-03`, and `DASH-01 → DASH-02`. The V-08/MV-01 dashboard database prerequisite is complete: `v_mission_accuracy_summary` and tenant-keyed `mv_dashboard_mission_metrics` are versioned, indexed, covered by SELECT-only API/report DCL, and refreshed explicitly with `php artisan dashboard:refresh`. The route must treat the materialized relation as a snapshot and still apply server-derived role and organization scope. Report and dashboard endpoint completion continues to depend on Earljohn Estandarte’s canonical tree results and a verified `ACC-01`; Jason Benabente's implementation is currently blocked on `MATCH-01` and is not a finalized integration dependency.
 
 ## Cross-developer dependency map
 
@@ -149,7 +149,7 @@ flowchart LR
     Jason -- "VAL-05 completion" --> Jessamae
 ```
 
-- Jason Benabente's `ACC-01` is not yet available to Earljohn Estandarte's transferred report/dashboard work; it remains blocked on `MATCH-01` and PostgreSQL verification.
+- Jason Benabente's `ACC-01` is not yet available to Earljohn Estandarte's transferred report/dashboard work; it remains blocked on `MATCH-01` and PostgreSQL verification. V-08/MV-01 are complete, so this validation chain is the remaining DASH-01 data dependency.
 - Earljohn Estandarte's transferred mutable validation resources, including `MATCH-01`, remain outstanding conditions for Jessamae Sumanoy's `SYNC-04`; Jason Benabente's `VAL-05` is also blocked on that chain.
 - `MATCH-01` must populate the validation-match evidence consumed by `ACC-01` recomputation and the `VAL-05` protocol gate before either endpoint can be approved.
 - Karlandrei Panday’s current assigned rows depend only on completed Earljohn Estandarte endpoints and within-owner chains.

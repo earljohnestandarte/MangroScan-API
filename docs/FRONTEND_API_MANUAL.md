@@ -9307,7 +9307,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Authentication | Required — Bearer token |
 | Permission | `results.read` |
 | Typical seeded roles | Researcher, Environmental Specialist |
-| Dependencies | TREE + ACC + materialized views |
+| Dependencies | TREE + ACC + materialized views (database read-model prerequisite complete; ACC pending) |
 | Success | 200 — {data:{missions,trees,species,validation,processing}} |
 | Relevant errors | 401, 403, 404, 429, 500, 502/503 |
 
@@ -9335,7 +9335,7 @@ HTTP `200`; contract shape `{data:{missions,trees,species,validation,processing}
 
 This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: TREE + ACC + materialized views.
+**Workflow / UI integration note:** The V-08/MV-01 database read models are implemented and PostgreSQL-verified, but that is internal infrastructure rather than an API. The route is still absent and the MATCH-01 → ACC-01 dependency remains unresolved, so clients must not call or mock this endpoint as available.
 
 ### DASH-02 — Mission analytics/detail dashboard.
 
@@ -9379,7 +9379,7 @@ HTTP `200`; contract shape `{data:{counts,species,height,age,accuracy,layers}}`.
 
 This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: DASH-01.
+**Workflow / UI integration note:** Shared dashboard read-model infrastructure exists, but DASH-01 is still unavailable. Keep this endpoint disabled until DASH-01 and then DASH-02 pass their API verification gates.
 
 ### VIEW-01 — List caller saved filters/map configs.
 
