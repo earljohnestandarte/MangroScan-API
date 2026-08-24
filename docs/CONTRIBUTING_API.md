@@ -110,14 +110,14 @@ These changes are not yet approved as `Done`:
 
 **Endpoint IDs:**
 
-- Completed validation endpoints: `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`
-- Remaining P0: `GT-01`, `MATCH-01`
+- Completed validation endpoints: `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`
+- Remaining P0: `MATCH-01`
 
 **Recommended branch:** `feature/earljohn/validation-core`
 
 **Likely paths:** create `app/Http/Controllers/Api/V1/Validation`, `app/Http/Requests/Validation`, `app/Services/Validation`, and `tests/Feature/Validation` following existing single-action conventions; reuse the existing validation models and `2026_08_12_066000_create_validation_foundation_tables.php`; add only approved additive migrations/DCL.
 
-**Dependencies:** VAL-01 through VAL-04 are complete. GT-01 is now genuinely blocked because `field_code`, `crown_diameter_m`, and `is_tree` have no authoritative columns; an approved additive schema/contract decision is required. After that resolution, preserve `GT-01 → MATCH-01`. `MATCH-01` must write the validation-match evidence consumed by `ACC-01` and `VAL-05`; those downstream endpoints remain blocked until that handoff is implemented and verified.
+**Dependencies:** VAL-01 through GT-01 are complete. GT-01 uses the approved additive `field_code`, `crown_diameter_m`, and default-true `is_tree` columns and preserves the canonical location/measurement/remarks mappings. Implement `MATCH-01` next using its approved direct session lineage and decision evidence. `MATCH-01` must write the evidence consumed by `ACC-01` and `VAL-05`; those downstream endpoints remain blocked until that handoff is implemented and verified.
 
 ### Earljohn Estandarte — transferred reports, exports, and dashboards
 

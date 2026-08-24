@@ -43,7 +43,7 @@ This is the developer reference for the deterministic RBAC data installed by `Da
 | `maps.read` | — | Yes | Yes | — | LAYER-01/02 (planned map-specific enforcement) |
 | `validation.read` | — | Yes | Yes | — | VAL-01, VAL-02, VAL-04 (blocked) |
 | `validation.create` | — | Yes | Yes | — | VAL-03 (blocked) |
-| `validation.record_ground_truth` | — | Yes | Yes | — | GT-01 (blocked) |
+| `validation.record_ground_truth` | — | Yes | Yes | — | GT-01 |
 | `validation.decide` | — | Yes | Yes | — | CONF-02, MATCH-01 (blocked) |
 | `validation.complete` | — | Yes | Yes | — | VAL-05 (blocked) |
 | `accuracy.recompute` | — | — | Yes | — | ACC-01 (blocked) |

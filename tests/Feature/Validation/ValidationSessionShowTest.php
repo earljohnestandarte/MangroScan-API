@@ -50,9 +50,9 @@ class ValidationSessionShowTest extends TestCase
         );
         $this->assertSame(['session', 'mission', 'site', 'plot', 'validator'], array_keys($response->json('data.context')));
         $this->assertSame([
-            'ground_truth_id', 'validation_session_id', 'species_id', 'ground_location',
+            'ground_truth_id', 'validation_session_id', 'field_code', 'species_id', 'ground_location',
             'measured_height_meters', 'estimated_age_years', 'diameter_cm',
-            'health_status', 'remarks', 'created_at',
+            'crown_diameter_m', 'health_status', 'is_tree', 'remarks', 'created_at',
         ], array_keys($response->json('data.ground_truth_records.0')));
         $this->assertSame([
             'validation_match_id', 'ground_truth_id', 'tree_observation_id', 'match_status',

@@ -937,12 +937,15 @@ Stores manually verified trees.
 | ----- | ----- | ----- |
 | ground\_truth\_id | UUID | Primary key |
 | validation\_session\_id | UUID | FK → validation\_sessions.validation\_session\_id |
+| field\_code | VARCHAR(80) | Nullable field identifier |
 | species\_id | UUID | FK → mangrove\_species.species\_id, nullable |
 | ground\_location | GEOMETRY(Point, 4326\) |  |
 | measured\_height\_meters | NUMERIC(8,2) | Nullable |
 | estimated\_age\_years | NUMERIC(8,2) | Nullable |
 | diameter\_cm | NUMERIC(8,2) | Nullable |
+| crown\_diameter\_m | NUMERIC(8,2) | Nullable, non-negative |
 | health\_status | VARCHAR(50) | healthy, stressed, dead, unknown |
+| is\_tree | BOOLEAN | Required, defaults to true |
 | photo\_path | TEXT | Nullable |
 | remarks | TEXT | Nullable |
 | created\_at | TIMESTAMP |  |
@@ -1708,4 +1711,3 @@ For your capstone manuscript, present the database as a **modular geospatial-AI 
 **site → mission → flight → captured image/sensor data → AI model version → tree observation → species/height/age/count result → field validation → report/export**
 
 That makes the schema strong enough for thesis defense and realistic enough for a future MangroScan startup implementation.
-

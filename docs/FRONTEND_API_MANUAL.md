@@ -2,7 +2,7 @@
 
 > **Audience:** React web and React Native/Expo developers
 > **API version:** `v1`
-> **Verified against:** the endpoint tracker, live Laravel routes, controllers, Form Requests, resources, services, RBAC seed data, and feature tests on 2026-08-24.
+> **Verified against:** the endpoint tracker, live Laravel routes, controllers, Form Requests, resources, services, RBAC seed data, and feature tests on 2026-08-25.
 
 ## Purpose and source precedence
 
@@ -36,15 +36,15 @@ For a physical Expo device, `localhost` means the phone itself. Use a reachable 
 | 🚧 UNDER CONSTRUCTION | Planned or actively being built; do not use as a production dependency. |
 | ⛔ BLOCKED / UNDER CONSTRUCTION | Not implemented and waiting on a documented prerequisite or decision. |
 
-Current inventory: **141 endpoints**, **89 available**, **20 under construction**, **18 blocked**, and **14 testing**.
+Current inventory: **141 endpoints**, **90 available**, **21 under construction**, **16 blocked**, and **14 testing**.
 
 ## Currently available endpoints
 
-`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `RPT-01`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
+`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `RPT-01`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
 
 ## Unavailable, testing, and blocked endpoints
 
-`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `DASH-01`, `DASH-02`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
+`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `DASH-01`, `DASH-02`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
 
 Do not integrate the newly routed endpoints above yet. Jessamae Sumanoy's `BAT-01` remains `Working` after schema, DCL, test, and formatting gaps were found. Jason Benabente's P2 endpoints plus `LAYER-02` and `CONF-01/02` are `Testing`: SQLite passes, but PostgreSQL has not run because the test role lacks schema-creation privilege, and the per-endpoint test matrix is incomplete. `ACC-01` and `VAL-05` remain `Blocked` on `MATCH-01`.
 
@@ -159,8 +159,8 @@ Do not integrate the newly routed endpoints above yet. Jessamae Sumanoy's `BAT-0
 | `VAL-02` | GET | `/api/v1/validation-sessions` | P0 | Done | ✅ AVAILABLE |
 | `VAL-03` | POST | `/api/v1/validation-sessions` | P0 | Done | ✅ AVAILABLE |
 | `VAL-04` | GET | `/api/v1/validation-sessions/{id}` | P0 | Done | ✅ AVAILABLE |
-| `GT-01` | POST | `/api/v1/validation-sessions/{id}/ground-truth` | P0 | Blocked | ⛔ BLOCKED — SCHEMA DECISION REQUIRED |
-| `MATCH-01` | POST | `/api/v1/validation-sessions/{id}/decisions` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
+| `GT-01` | POST | `/api/v1/validation-sessions/{id}/ground-truth` | P0 | Done | ✅ AVAILABLE |
+| `MATCH-01` | POST | `/api/v1/validation-sessions/{id}/decisions` | P0 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `ACC-01` | POST | `/api/v1/validation-sessions/{id}/accuracy/recompute` | P0 | Blocked | ⛔ BLOCKED — MATCH-01 REQUIRED |
 | `VAL-05` | POST | `/api/v1/validation-sessions/{id}/complete` | P1 | Blocked | ⛔ BLOCKED — MATCH-01 REQUIRED |
 | `RPT-01` | GET | `/api/v1/reports` | P1 | Done | ✅ AVAILABLE |
@@ -692,8 +692,8 @@ No response body.
 
 ### AUTH-04 — Rotate expiring mobile access credential when refresh-token design is used.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: 🚧 UNDER CONSTRUCTION — CONTRACT APPROVED**
+> The schema and workflow are approved, but the endpoint is not implemented yet. Do not call it until its tracker status becomes `Done`.
 
 | Property | Value |
 | --- | --- |
@@ -707,7 +707,7 @@ No response body.
 | Success | 200 — {access_token,expires_at,refresh_token?} |
 | Relevant errors | 400, 401, 403, 404, 409, 422, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Approved request contract (not implemented)**
 
 `{refresh_token}`
 
@@ -8523,7 +8523,7 @@ The six keys under `data` are exact and always present:
 | --- | --- |
 | `context` | `{session,mission,site,plot,validator}`; `plot` may be `null` |
 | `observations` | Mission-scoped TreeObservation resources, including GeoJSON `tree_location`/`crown_polygon` |
-| `ground_truth_records` | Session records with `ground_truth_id`, `validation_session_id`, `species_id`, GeoJSON `ground_location`, `measured_height_meters`, `estimated_age_years`, `diameter_cm`, `health_status`, `remarks`, `created_at` |
+| `ground_truth_records` | Session records with `ground_truth_id`, `validation_session_id`, `field_code`, `species_id`, GeoJSON `ground_location`, `measured_height_meters`, `estimated_age_years`, `diameter_cm`, `crown_diameter_m`, `health_status`, `is_tree`, `remarks`, `created_at` |
 | `matches` | Session decisions with `validation_match_id`, `ground_truth_id`, `tree_observation_id`, `match_status`, error measurements, `species_correct`, `validated_by`, `validated_at` |
 | `metrics` | Session-consistent AccuracyMetric resources |
 | `layers` | Mission Layer resources; private `storage_key` is excluded |
@@ -8580,12 +8580,12 @@ The six keys under `data` are exact and always present:
 
 Collections use stable identifiers/domain ordering and may be empty. Sessions with foreign, deleted, or inconsistent mission/site/plot/validator lineage return `404`. Ground-truth `photo_path` and layer `storage_key` are never returned; use dedicated media/download flows for private objects.
 
-**Workflow / UI integration note:** Use this as the validation workspace read model. Refresh it after future GT-01 or MATCH-01 mutations and after VAL-05 completion.
+**Workflow / UI integration note:** Use this as the validation workspace read model. Refresh it after GT-01 or future MATCH-01 mutations and after VAL-05 completion.
 
 ### GT-01 — Create manual field tree record.
 
-> **Status: ⛔ BLOCKED — SCHEMA DECISION REQUIRED**
-> VAL-04 is complete, but `field_code`, `crown_diameter_m`, and `is_tree` have no authoritative storage columns. The backend will not silently discard them or invent a response. Approve an additive schema/contract mapping before integration.
+> **Status: ✅ AVAILABLE**
+> Implemented and intended for frontend integration.
 
 | Property | Value |
 | --- | --- |
@@ -8605,25 +8605,25 @@ Collections use stable identifiers/domain ordering and may be empty. Sessions wi
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `{field_code?,species_id?,location:GeoJSON,height_m?,age_years?,diameter_cm?,crown_diameter_m?,health_status,is_tree,photo_path?,notes?}`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `field_code` | `not finalized` | No |
-| `species_id` | `not finalized` | No |
-| `location` | `GeoJSON` | Yes |
-| `height_m` | `not finalized` | No |
-| `age_years` | `not finalized` | No |
-| `diameter_cm` | `not finalized` | No |
-| `crown_diameter_m` | `not finalized` | No |
-| `health_status` | `not finalized` | Yes |
-| `is_tree` | `not finalized` | Yes |
-| `photo_path` | `not finalized` | No |
-| `notes` | `not finalized` | No |
+| `field_code` | String, maximum 80 characters; blank normalizes to `null` | No |
+| `species_id` | UUID of an active species; `null` allowed | No |
+| `location` | GeoJSON Point with exactly `[longitude, latitude]`; longitude -180..180, latitude -90..90 | Yes |
+| `height_m` | Decimal 0..999999.99, maximum 2 decimal places | No |
+| `age_years` | Decimal 0..999999.99, maximum 2 decimal places | No |
+| `diameter_cm` | Decimal 0..999999.99, maximum 2 decimal places | No |
+| `crown_diameter_m` | Decimal 0..999999.99, maximum 2 decimal places | No |
+| `health_status` | `healthy`, `stressed`, `dead`, or `unknown` | Yes |
+| `is_tree` | Boolean | Yes |
+| `photo_path` | Private storage reference, maximum 2048 characters; never returned | No |
+| `notes` | String, maximum 5000 characters; blank normalizes to `null` | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/validation-sessions/<uuid>/ground-truth HTTP/1.1
@@ -8633,21 +8633,47 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-    "field_code": "<field_code>",
-    "location": [],
-    "health_status": "planned",
-    "is_tree": "<is_tree>"
+    "field_code": "FIELD-001",
+    "species_id": "<active-species-uuid>",
+    "location": {"type": "Point", "coordinates": [123.81, 10.31]},
+    "height_m": 4.5,
+    "age_years": 6,
+    "diameter_cm": 22.25,
+    "crown_diameter_m": 3.75,
+    "health_status": "healthy",
+    "is_tree": true,
+    "photo_path": "private/validation/FIELD-001.jpg",
+    "notes": "Verified in the field."
 }
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `201`; contract shape `{data:GroundTruthRecord}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "ground_truth_id": "<uuid>",
+        "validation_session_id": "<uuid>",
+        "field_code": "FIELD-001",
+        "species_id": "<uuid>",
+        "ground_location": {"type": "Point", "coordinates": [123.81, 10.31]},
+        "measured_height_meters": "4.50",
+        "estimated_age_years": "6.00",
+        "diameter_cm": "22.25",
+        "crown_diameter_m": "3.75",
+        "health_status": "healthy",
+        "is_tree": true,
+        "remarks": "Verified in the field.",
+        "created_at": "2026-08-25T00:00:00+00:00"
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: VAL-04.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+The backend maps `location`, `height_m`, `age_years`, and `notes` to the canonical response fields shown above. A missing, inactive, foreign, inconsistent, or malformed reference is hidden with `404`; a completed session returns `409`; invalid bodies return `422`. The private `photo_path` is stored but never returned or copied into audit details.
+
+**Workflow / UI integration note:** Submit only against an open VAL-04 session. After success, refresh that validation workspace so its `ground_truth_records` collection includes the new record.
 
 ### MATCH-01 — Store matched/corrected/false-positive/false-negative decision.
 
@@ -8678,15 +8704,15 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `tree_observation_id` | `not finalized` | No |
-| `ground_truth_id` | `not finalized` | No |
-| `decision` | `not finalized` | Yes |
-| `accepted_species_id` | `not finalized` | No |
-| `accepted_height_m` | `not finalized` | No |
-| `accepted_age_years` | `not finalized` | No |
-| `corrected_geometry` | `not finalized` | No |
-| `notes` | `not finalized` | No |
-| `validation_evidence` | `not finalized` | No |
+| `tree_observation_id` | UUID | Required for `matched`, `corrected`, and `false_positive`; prohibited for `false_negative` |
+| `ground_truth_id` | UUID | Required for `matched`, `corrected`, and `false_negative`; prohibited for `false_positive` |
+| `decision` | `matched`, `corrected`, `false_positive`, or `false_negative` | Yes |
+| `accepted_species_id` | UUID of an active species | No; correction evidence |
+| `accepted_height_m` | Non-negative decimal | No; correction evidence |
+| `accepted_age_years` | Non-negative decimal | No; correction evidence |
+| `corrected_geometry` | GeoJSON Point in EPSG:4326 | No; correction evidence |
+| `notes` | String | No |
+| `validation_evidence` | JSON object | No |
 
 **Planned wire example — do not call yet**
 
@@ -8709,8 +8735,9 @@ HTTP `201`; contract shape `{data:ValidationMatch}`.
 
 This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: VAL-04 + GT-01.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+**Approved workflow semantics:** `matched` marks the tree validated. `corrected` updates supplied canonical tree species/height/age/location values, preserves the decision evidence, and marks the tree corrected. `false_positive` rejects the referenced tree without a ground-truth record. `false_negative` records the missed ground-truth tree without creating a fake tree observation. Distance, species correctness, and height/age errors are calculated by the server.
+
+**Workflow / UI integration note:** GT-01 is complete. After MATCH-01 becomes available, refresh the VAL-04 workspace after every successful decision.
 
 ### ACC-01 — Recompute precision/recall/F1/RMSE/MAE evidence.
 

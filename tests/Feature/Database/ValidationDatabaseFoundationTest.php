@@ -28,13 +28,10 @@ class ValidationDatabaseFoundationTest extends TestCase
         ]));
 
         $this->assertTrue(Schema::hasColumns('ground_truth_tree_records', [
-            'ground_truth_id', 'validation_session_id', 'species_id', 'ground_location',
-            'measured_height_meters', 'estimated_age_years', 'diameter_cm', 'health_status',
-            'photo_path', 'remarks', 'created_at',
+            'ground_truth_id', 'validation_session_id', 'field_code', 'species_id', 'ground_location',
+            'measured_height_meters', 'estimated_age_years', 'diameter_cm', 'crown_diameter_m',
+            'health_status', 'is_tree', 'photo_path', 'remarks', 'created_at',
         ]));
-        foreach (['field_code', 'crown_diameter_m', 'is_tree'] as $unapprovedColumn) {
-            $this->assertFalse(Schema::hasColumn('ground_truth_tree_records', $unapprovedColumn));
-        }
 
         $this->assertTrue(Schema::hasColumns('validation_matches', [
             'validation_match_id', 'ground_truth_id', 'tree_observation_id', 'match_status',
@@ -173,6 +170,7 @@ class ValidationDatabaseFoundationTest extends TestCase
     {
         $dcl = file_get_contents(database_path('sql/dcl/045_validation_foundation_grants.sql'));
         $migration = file_get_contents(database_path('migrations/2026_08_12_066000_create_validation_foundation_tables.php'));
+        $groundTruthMigration = file_get_contents(database_path('migrations/2026_08_25_000100_add_ground_truth_capture_fields.php'));
 
         $this->assertIsString($dcl);
         $this->assertStringContainsString('REVOKE ALL PRIVILEGES ON TABLE', $dcl);
@@ -199,6 +197,9 @@ class ValidationDatabaseFoundationTest extends TestCase
         ] as $invariant) {
             $this->assertStringContainsString($invariant, $migration);
         }
+
+        $this->assertIsString($groundTruthMigration);
+        $this->assertStringContainsString('ground_truth_tree_records_crown_diameter_check', $groundTruthMigration);
 
         $this->assertTrue(collect(Route::getRoutes())->contains(
             fn ($route): bool => $route->uri() === 'api/v1/validation/scopes',

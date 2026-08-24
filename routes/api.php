@@ -101,6 +101,7 @@ use App\Http\Controllers\Api\V1\User\UserUpdateController;
 use App\Http\Controllers\Api\V1\Validation\AccuracyRecomputeController;
 use App\Http\Controllers\Api\V1\Validation\ConfidenceFlagUpdateController;
 use App\Http\Controllers\Api\V1\Validation\ConfidenceReviewIndexController;
+use App\Http\Controllers\Api\V1\Validation\GroundTruthStoreController;
 use App\Http\Controllers\Api\V1\Validation\ValidationScopeController;
 use App\Http\Controllers\Api\V1\Validation\ValidationSessionCompleteController;
 use App\Http\Controllers\Api\V1\Validation\ValidationSessionIndexController;
@@ -686,6 +687,13 @@ Route::prefix('v1')->group(function () {
         ->whereUuid('session')->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:validation.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [GT-01] Create a manual field tree record within a tenant-scoped open session.
+    Route::post('/validation-sessions/{session}/ground-truth', GroundTruthStoreController::class)
+        ->whereUuid('session')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:validation.record_ground_truth', 'throttle:auth.authenticated',
         ]);
 
     // [ACC-01] Recompute authoritative validation-session metrics.
