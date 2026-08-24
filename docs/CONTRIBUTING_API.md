@@ -38,7 +38,7 @@ These changes are not yet approved as `Done`:
 
 - Jessamae's `BAT-01` is `Working`. The route is registered, but the contribution has no endpoint feature test or endpoint DCL, does not match the authoritative `battery_packs` schema, and fails Pint in its PHP files.
 - Jason's P2 endpoints plus `LAYER-02` and `CONF-01/02` are `Testing`. The focused SQLite suites pass 18 tests / 130 assertions and the full SQLite suite passes 657 / 4,278, but PostgreSQL execution is blocked before migrations because the test role lacks `CREATE` on schema `public`. Test coverage also does not yet satisfy the repository's per-endpoint definition of done.
-- Jason's `ACC-01` and `VAL-05` remain `Blocked` on the approved `MATCH-01` dependency chain. A database evidence table is not a substitute for the required endpoint dependency.
+- Jason's `ACC-01` has since passed the completed MATCH-01 handoff, dedicated cross-database tests, and corrective least-privilege DCL, and is approved `Done`. `VAL-05` remains blocked only until its separate protocol-gate verification is complete.
 - Jason's DCL additions currently reuse sequence `046`; allocate a unique sequence before approval.
 
 ### Karlandrei Panday
@@ -132,7 +132,7 @@ These changes are not yet approved as `Done`:
 
 **Likely paths:** `app/Http/Controllers/Api/V1/Report` plus new export/dashboard folders following existing conventions; `app/Http/Requests/Report`; report/export/dashboard services; report models and storage/queue code; `tests/Feature/Report` plus export/dashboard suites; migrations and DCL.
 
-**Dependencies:** preserve `RPT-02 → RPT-03 → RPT-04/05/EXP-01`, `RPT-05 → RPT-06`, `EXP-01 → EXP-02 → EXP-03`, and `DASH-01 → DASH-02`. The V-08/MV-01 dashboard database prerequisite is complete: `v_mission_accuracy_summary` and tenant-keyed `mv_dashboard_mission_metrics` are versioned, indexed, covered by SELECT-only API/report DCL, and refreshed explicitly with `php artisan dashboard:refresh`. The route must treat the materialized relation as a snapshot and still apply server-derived role and organization scope. Report and dashboard endpoint completion continues to depend on Earljohn Estandarte’s canonical tree results and a verified `ACC-01`; Jason Benabente's implementation is currently blocked on `MATCH-01` and is not a finalized integration dependency.
+**Dependencies:** preserve `RPT-02 → RPT-03 → RPT-04/05/EXP-01`, `RPT-05 → RPT-06`, `EXP-01 → EXP-02 → EXP-03`, and `DASH-01 → DASH-02`. The V-08/MV-01 dashboard database prerequisite is complete: `v_mission_accuracy_summary` and tenant-keyed `mv_dashboard_mission_metrics` are versioned, indexed, covered by SELECT-only API/report DCL, and refreshed explicitly with `php artisan dashboard:refresh`. MATCH-01 and the independently verified ACC-01 are also complete. Dashboard routes may proceed but must treat the materialized relation as a snapshot and still apply server-derived role and organization scope.
 
 ## Cross-developer dependency map
 
@@ -149,7 +149,7 @@ flowchart LR
     Jason -- "VAL-05 completion" --> Jessamae
 ```
 
-- MATCH-01 now populates the direct-session evidence consumed by Jason Benabente's `ACC-01` and `VAL-05`. Those endpoints remain unavailable only until their independent handoff verification and tracker promotion are complete. V-08/MV-01 are complete, so ACC-01 promotion is the remaining DASH-01 data dependency.
+- MATCH-01 now populates the direct-session evidence consumed by Jason Benabente's `ACC-01` and `VAL-05`. ACC-01 is independently verified and available; VAL-05 remains unavailable only until its own handoff verification and tracker promotion are complete. V-08/MV-01 and ACC-01 are complete, so DASH-01 may proceed independently.
 - Earljohn Estandarte's transferred validation mutations are complete for Jessamae Sumanoy's `SYNC-04`; Jason Benabente's `VAL-05` promotion remains the completion-state dependency.
 - Preserve MATCH-01's direct `validation_session_id` lineage in accuracy and completion queries so false positives are included without requiring a ground-truth row.
 - Karlandrei Panday’s current assigned rows depend only on completed Earljohn Estandarte endpoints and within-owner chains.

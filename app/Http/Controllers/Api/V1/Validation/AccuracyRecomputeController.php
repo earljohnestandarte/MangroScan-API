@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 
 class AccuracyRecomputeController extends Controller
 {
+    // [ACC-01] Recompute the six authoritative metrics from direct session decisions.
     public function __invoke(
         Request $request,
         string $session,
