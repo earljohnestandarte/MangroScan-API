@@ -104,6 +104,7 @@ use App\Http\Controllers\Api\V1\Validation\ConfidenceReviewIndexController;
 use App\Http\Controllers\Api\V1\Validation\ValidationScopeController;
 use App\Http\Controllers\Api\V1\Validation\ValidationSessionCompleteController;
 use App\Http\Controllers\Api\V1\Validation\ValidationSessionIndexController;
+use App\Http\Controllers\Api\V1\Validation\ValidationSessionShowController;
 use App\Http\Controllers\Api\V1\Validation\ValidationSessionStoreController;
 use App\Http\Middleware\EnsureActiveIdentity;
 use Illuminate\Support\Facades\Route;
@@ -679,6 +680,13 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:validation.create', 'throttle:auth.authenticated',
     ]);
+
+    // [VAL-04] Return validation workspace context, evidence and safe layer metadata.
+    Route::get('/validation-sessions/{session}', ValidationSessionShowController::class)
+        ->whereUuid('session')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:validation.read', 'throttle:auth.authenticated',
+        ]);
 
     // [ACC-01] Recompute authoritative validation-session metrics.
     Route::post('/validation-sessions/{session}/accuracy/recompute', AccuracyRecomputeController::class)
