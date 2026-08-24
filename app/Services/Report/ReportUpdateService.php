@@ -4,6 +4,7 @@ namespace App\Services\Report;
 
 use App\Exceptions\WorkflowConflictException;
 use App\Models\Report;
+use App\Models\ReportGenerationJob;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
 use Illuminate\Support\Arr;
@@ -37,6 +38,13 @@ class ReportUpdateService
                 throw new WorkflowConflictException(
                     'Only draft reports can be edited or archived.',
                     ['report_id' => $report->report_id, 'report_status' => $report->report_status],
+                );
+            }
+            if (ReportGenerationJob::query()->where('report_id', $report->report_id)
+                ->whereIn('job_status', ['queued', 'running'])->exists()) {
+                throw new WorkflowConflictException(
+                    'Reports cannot be edited or archived while generation is active.',
+                    ['report_id' => $report->report_id],
                 );
             }
 

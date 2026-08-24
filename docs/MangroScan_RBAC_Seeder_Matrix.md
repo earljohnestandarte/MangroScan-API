@@ -49,8 +49,8 @@ This is the developer reference for the deterministic RBAC data installed by `Da
 | `accuracy.recompute` | — | — | Yes | — | ACC-01 |
 | `reports.read` | — | Yes | Yes | — | RPT-01, RPT-03 |
 | `reports.create` | — | Yes | Yes | — | RPT-02, RPT-04 |
-| `reports.generate` | — | Yes | Yes | — | RPT-05, EXP-01 (blocked) |
-| `reports.approve` | — | — | Yes | — | RPT-06 (blocked) |
+| `reports.generate` | — | Yes | Yes | — | RPT-05; EXP-01 planned |
+| `reports.approve` | — | — | Yes | — | RPT-06 ready |
 | `exports.download` | — | Yes | Yes | — | EXP-02, EXP-03 (blocked) |
 | `settings.manage` | Yes | — | — | — | SET-01, SET-02 (P2) |
 | `audit.read` | Yes | — | — | — | AUD-01 |

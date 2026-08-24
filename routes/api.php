@@ -71,6 +71,7 @@ use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RolePermissionReplaceController;
 use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
+use App\Http\Controllers\Api\V1\Report\ReportGenerateController;
 use App\Http\Controllers\Api\V1\Report\ReportIndexController;
 use App\Http\Controllers\Api\V1\Report\ReportShowController;
 use App\Http\Controllers\Api\V1\Report\ReportStoreController;
@@ -835,6 +836,14 @@ Route::prefix('v1')->group(function () {
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:reports.create', 'throttle:auth.authenticated',
+        ]);
+
+    // [RPT-05] POST /api/v1/reports/{report}/generate
+    Route::post('/reports/{report}/generate', ReportGenerateController::class)
+        ->whereUuid('report')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:reports.generate', 'throttle:auth.authenticated',
         ]);
 
     // [DASH-01] Return role-scoped dashboard KPI aggregates.
