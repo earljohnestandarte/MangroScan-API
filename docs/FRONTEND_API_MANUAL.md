@@ -2,7 +2,7 @@
 
 > **Audience:** React web and React Native/Expo developers
 > **API version:** `v1`
-> **Verified against:** the endpoint tracker, live Laravel routes, controllers, Form Requests, resources, services, RBAC seed data, and feature tests on 2026-08-15.
+> **Verified against:** the endpoint tracker, live Laravel routes, controllers, Form Requests, resources, services, RBAC seed data, and feature tests on 2026-08-24.
 
 ## Purpose and source precedence
 
@@ -42,9 +42,11 @@ Current inventory: **141 endpoints**, **85 available**, **31 under construction*
 
 `SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `RPT-01`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
 
-## Under construction / blocked endpoints
+## Unavailable, testing, and blocked endpoints
 
 `AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `DASH-01`, `DASH-02`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
+
+Do not integrate the newly routed endpoints above yet. Jessamae Sumanoy's `BAT-01` remains `Working` after schema, DCL, test, and formatting gaps were found. Jason Benabente's P2 endpoints plus `LAYER-02` and `CONF-01/02` are `Testing`: SQLite passes, but PostgreSQL has not run because the test role lacks schema-creation privilege, and the per-endpoint test matrix is incomplete. `ACC-01` and `VAL-05` remain `Blocked` on `MATCH-01`.
 
 ## Complete endpoint availability table
 
@@ -93,7 +95,7 @@ Current inventory: **141 endpoints**, **85 available**, **31 under construction*
 | `SENSOR-01` | POST | `/api/v1/drones/{id}/sensors` | P1 | Done | ✅ AVAILABLE |
 | `SENSOR-02` | PATCH | `/api/v1/sensors/{id}` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `CAL-01` | POST | `/api/v1/sensors/{id}/calibrations` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `BAT-01` | GET | `/api/v1/batteries` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `BAT-01` | GET | `/api/v1/batteries` | P2 | Working | 🚧 IMPLEMENTATION REVIEW |
 | `BAT-02` | POST | `/api/v1/batteries` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `MSN-01` | GET | `/api/v1/missions` | P0 | Done | ✅ AVAILABLE |
 | `MSN-02` | POST | `/api/v1/missions` | P0 | Done | ✅ AVAILABLE |
@@ -133,15 +135,15 @@ Current inventory: **141 endpoints**, **85 available**, **31 under construction*
 | `AISVC-02` | POST | `/api/v1/admin/ai-services` | P1 | Done | ✅ AVAILABLE |
 | `AISVC-03` | POST | `/api/v1/admin/ai-services/{id}/test` | P1 | Done | ✅ AVAILABLE |
 | `AISVC-04` | POST | `/api/v1/admin/ai-services/{id}/synchronize` | P1 | Done | ✅ AVAILABLE |
-| `AISVC-05` | POST | `/api/v1/admin/ai-services/{id}/credentials` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `AISVC-05` | POST | `/api/v1/admin/ai-services/{id}/credentials` | P2 | Testing | 🧪 TESTING — NOT AVAILABLE |
 | `MODEL-01` | GET | `/api/v1/ai-models` | P1 | Done | ✅ AVAILABLE |
 | `MODEL-02` | GET | `/api/v1/ai-models/{id}` | P1 | Done | ✅ AVAILABLE |
-| `MODEL-03` | POST | `/api/v1/ai-models/{id}/versions/{versionId}/deploy` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `MODEL-03` | POST | `/api/v1/ai-models/{id}/versions/{versionId}/deploy` | P2 | Testing | 🧪 TESTING — NOT AVAILABLE |
 | `JOB-01` | GET | `/api/v1/processing-jobs` | P0 | Done | ✅ AVAILABLE |
 | `JOB-02` | POST | `/api/v1/processing-jobs` | P0 | Done | ✅ AVAILABLE |
 | `JOB-03` | GET | `/api/v1/processing-jobs/{id}` | P0 | Done | ✅ AVAILABLE |
 | `JOB-04` | POST | `/api/v1/processing-jobs/{id}/retry` | P1 | Done | ✅ AVAILABLE |
-| `JOB-05` | POST | `/api/v1/processing-jobs/{id}/cancel` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `JOB-05` | POST | `/api/v1/processing-jobs/{id}/cancel` | P2 | Testing | 🧪 TESTING — NOT AVAILABLE |
 | `TREE-01` | GET | `/api/v1/tree-observations` | P0 | Done | ✅ AVAILABLE |
 | `TREE-02` | GET | `/api/v1/tree-observations/{id}` | P0 | Done | ✅ AVAILABLE |
 | `TREE-03` | GET | `/api/v1/missions/{id}/trees.geojson` | P0 | Done | ✅ AVAILABLE |
@@ -150,17 +152,17 @@ Current inventory: **141 endpoints**, **85 available**, **31 under construction*
 | `RESULT-02` | GET | `/api/v1/tree-observations/{id}/heights` | P1 | Done | ✅ AVAILABLE |
 | `RESULT-03` | GET | `/api/v1/tree-observations/{id}/ages` | P1 | Done | ✅ AVAILABLE |
 | `LAYER-01` | GET | `/api/v1/missions/{id}/layers` | P1 | Done | ✅ AVAILABLE |
-| `LAYER-02` | POST | `/api/v1/missions/{id}/layers/build` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `CONF-01` | GET | `/api/v1/confidence-review` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `CONF-02` | PUT | `/api/v1/confidence-review/{resultId}` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
+| `LAYER-02` | POST | `/api/v1/missions/{id}/layers/build` | P1 | Testing | 🧪 TESTING — NOT AVAILABLE |
+| `CONF-01` | GET | `/api/v1/confidence-review` | P1 | Testing | 🧪 TESTING — NOT AVAILABLE |
+| `CONF-02` | PUT | `/api/v1/confidence-review/{resultId}` | P1 | Testing | 🧪 TESTING — NOT AVAILABLE |
 | `VAL-01` | GET | `/api/v1/validation/scopes` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `VAL-02` | GET | `/api/v1/validation-sessions` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `VAL-03` | POST | `/api/v1/validation-sessions` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `VAL-04` | GET | `/api/v1/validation-sessions/{id}` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `GT-01` | POST | `/api/v1/validation-sessions/{id}/ground-truth` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `MATCH-01` | POST | `/api/v1/validation-sessions/{id}/decisions` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `ACC-01` | POST | `/api/v1/validation-sessions/{id}/accuracy/recompute` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `VAL-05` | POST | `/api/v1/validation-sessions/{id}/complete` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
+| `ACC-01` | POST | `/api/v1/validation-sessions/{id}/accuracy/recompute` | P0 | Blocked | ⛔ BLOCKED — MATCH-01 REQUIRED |
+| `VAL-05` | POST | `/api/v1/validation-sessions/{id}/complete` | P1 | Blocked | ⛔ BLOCKED — MATCH-01 REQUIRED |
 | `RPT-01` | GET | `/api/v1/reports` | P1 | Done | ✅ AVAILABLE |
 | `RPT-02` | POST | `/api/v1/reports` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `RPT-03` | GET | `/api/v1/reports/{id}` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
@@ -183,14 +185,14 @@ Current inventory: **141 endpoints**, **85 available**, **31 under construction*
 | `SET-01` | GET | `/api/v1/settings` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `SET-02` | PUT | `/api/v1/settings/{key}` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `AUD-01` | GET | `/api/v1/audit-logs` | P1 | Done | ✅ AVAILABLE |
-| `AUD-02` | GET | `/api/v1/audit-logs/{id}` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `DATASET-01` | GET | `/api/v1/training-datasets` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `DATASET-02` | POST | `/api/v1/training-datasets` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `DATASET-03` | POST | `/api/v1/training-datasets/{id}/items` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `ANN-01` | GET | `/api/v1/annotation/projects` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `ANN-02` | POST | `/api/v1/annotation/projects` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `ANN-03` | PUT | `/api/v1/annotation/items/{id}/objects` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `ANN-04` | POST | `/api/v1/annotation/projects/{id}/exports` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `AUD-02` | GET | `/api/v1/audit-logs/{id}` | P2 | Testing | 🧪 TESTING — NOT AVAILABLE |
+| `DATASET-01` | GET | `/api/v1/training-datasets` | P2 | Testing | 🧪 TESTING — NOT AVAILABLE |
+| `DATASET-02` | POST | `/api/v1/training-datasets` | P2 | Testing | 🧪 TESTING — NOT AVAILABLE |
+| `DATASET-03` | POST | `/api/v1/training-datasets/{id}/items` | P2 | Testing | 🧪 TESTING — NOT AVAILABLE |
+| `ANN-01` | GET | `/api/v1/annotation/projects` | P2 | Testing | 🧪 TESTING — NOT AVAILABLE |
+| `ANN-02` | POST | `/api/v1/annotation/projects` | P2 | Testing | 🧪 TESTING — NOT AVAILABLE |
+| `ANN-03` | PUT | `/api/v1/annotation/items/{id}/objects` | P2 | Testing | 🧪 TESTING — NOT AVAILABLE |
+| `ANN-04` | POST | `/api/v1/annotation/projects/{id}/exports` | P2 | Testing | 🧪 TESTING — NOT AVAILABLE |
 
 ## Authentication and session behavior
 
@@ -3645,8 +3647,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### BAT-01 — List battery packs.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🚧 WORKING — IMPLEMENTATION REVIEW FAILED; DO NOT INTEGRATE**
+> Jessamae Sumanoy's route and implementation exist, but schema, DCL, feature-test, and formatting gaps prevent frontend use.
 
 | Property | Value |
 | --- | --- |
@@ -6843,8 +6845,8 @@ Representative response using only implemented keys (full resource fields are li
 
 ### AISVC-05 — Rotate encrypted FastAPI key.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -7043,8 +7045,8 @@ Representative response using only implemented keys (full resource fields are li
 
 ### MODEL-03 — Mark model version deployed after validation.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -7418,8 +7420,8 @@ Representative response using only implemented keys (full resource fields are li
 
 ### JOB-05 — Cancel queued/running job when supported.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -8058,8 +8060,8 @@ Representative response using only implemented keys (full resource fields are li
 
 ### LAYER-02 — Queue map layer build/refresh.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -8115,8 +8117,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### CONF-01 — Mission-scoped low-confidence queue.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -8162,8 +8164,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### CONF-02 — Create/update review flag/status/assignment.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -8535,8 +8537,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### ACC-01 — Recompute precision/recall/F1/RMSE/MAE evidence.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ⛔ BLOCKED — MATCH-01 REQUIRED; DO NOT INTEGRATE**
+> Jason Benabente's implementation exists, but it is not approved while MATCH-01 and PostgreSQL verification remain outstanding.
 
 | Property | Value |
 | --- | --- |
@@ -8580,8 +8582,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### VAL-05 — Complete validation task.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ⛔ BLOCKED — MATCH-01 REQUIRED; DO NOT INTEGRATE**
+> Jason Benabente's implementation exists, but it is not approved while MATCH-01, the protocol gate, and PostgreSQL verification remain outstanding.
 
 | Property | Value |
 | --- | --- |
@@ -9805,8 +9807,8 @@ Representative response using only implemented keys (full resource fields are li
 
 ### AUD-02 — Audit event detail.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -9851,8 +9853,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### DATASET-01 — List training/validation datasets.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -9895,8 +9897,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### DATASET-02 — Create dataset metadata.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -9949,8 +9951,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### DATASET-03 — Attach labeled media/sample.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -10010,8 +10012,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### ANN-01 — Existing annotation-workspace project list; requires extension tables if retained.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -10053,8 +10055,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### ANN-02 — Create annotation project.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -10106,8 +10108,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### ANN-03 — Replace item annotations transactionally.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |
@@ -10165,8 +10167,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### ANN-04 — Export COCO/YOLO/CSV/GeoJSON labels.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🧪 TESTING — NOT AVAILABLE TO FRONTEND**
+> Jason Benabente's route and implementation exist, but PostgreSQL and the complete per-endpoint acceptance matrix have not passed.
 
 | Property | Value |
 | --- | --- |

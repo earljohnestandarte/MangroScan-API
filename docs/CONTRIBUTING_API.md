@@ -29,6 +29,17 @@ Assignments optimize conflict avoidance and dependency continuity before raw end
 
 The estimate starts with P0 = 3, P1 = 2, and P2 = 1, then accounts for geospatial work, async/storage workflows, validation calculations, transactions, and cross-domain coordination. It is a planning estimate, not a tracker contract.
 
+## Recent contribution review
+
+The 2026-08-24 review attributes commit `3cb4b67` (`feat(BAT-01)`) to Jessamae Sumanoy and the following endpoint/workflow commits through `74fffa2` to Jason Benabente. Ownership is based on the contributor instruction and corroborating Git author email/metadata.
+
+These changes are not yet approved as `Done`:
+
+- Jessamae's `BAT-01` is `Working`. The route is registered, but the contribution has no endpoint feature test or endpoint DCL, does not match the authoritative `battery_packs` schema, and fails Pint in its PHP files.
+- Jason's P2 endpoints plus `LAYER-02` and `CONF-01/02` are `Testing`. The focused SQLite suites pass 18 tests / 130 assertions and the full SQLite suite passes 657 / 4,278, but PostgreSQL execution is blocked before migrations because the test role lacks `CREATE` on schema `public`. Test coverage also does not yet satisfy the repository's per-endpoint definition of done.
+- Jason's `ACC-01` and `VAL-05` remain `Blocked` on the approved `MATCH-01` dependency chain. A database evidence table is not a substitute for the required endpoint dependency.
+- Jason's DCL additions currently reuse sequence `046`; allocate a unique sequence before approval.
+
 ### Karlandrei Panday
 
 **Modules:** authentication refresh; plot and permit extensions; saved views; notification and settings extensions.
@@ -69,7 +80,7 @@ The estimate starts with P0 = 3, P1 = 2, and P2 = 1, then accounts for geospatia
 
 **Likely paths:** `app/Http/Controllers/Api/V1/Drone`, `Flight`, `Mission`, `Mobile`, and `Media`; corresponding requests/services/tests; hardware and sync models/migrations; storage services; `database/sql/dcl`.
 
-**Dependencies:** implement `BAT-01` before `BAT-02/03` and `SYNC-04` before `SYNC-05`. `MEDIA-05` depends on Earljohn Estandarte’s completed metadata-only `MEDIA-04`; it remains the sole temporary download URL/token endpoint. Jason Benabente’s `VAL-05` completion endpoint is available; `SYNC-04` remains blocked until Juneabby Girasol’s remaining mutable validation endpoints are available.
+**Dependencies:** complete and verify `BAT-01` before `BAT-02/03`, and implement `SYNC-04` before `SYNC-05`. `MEDIA-05` depends on Earljohn Estandarte’s completed metadata-only `MEDIA-04`; it remains the sole temporary download URL/token endpoint. `VAL-05` is not available: it remains blocked with `SYNC-04` until Juneabby Girasol's `MATCH-01` and the remaining mutable validation chain are complete.
 
 ### Jason Benabente
 
@@ -90,7 +101,7 @@ The estimate starts with P0 = 3, P1 = 2, and P2 = 1, then accounts for geospatia
 
 **Likely paths:** `app/Http/Controllers/Api/V1/Ai`, `Processing`, `Tree`, `Validation`, and `Audit`; matching requests/services/tests; new confidence/training modules that follow the same convention; AI/tree/validation models; queue/storage integration; module migrations and DCL.
 
-**Dependencies:** `CONF-01` precedes `CONF-02`; `AUD-01` precedes `AUD-02`; `DATASET-01` precedes `DATASET-02/03`; `ANN-01` precedes `ANN-02`, then `ANN-03`, then `ANN-04`. `ACC-01` and `VAL-05` now consume the versioned `validation_matches` evidence foundation; the future `MATCH-01` endpoint can populate the same records without changing their public contracts. `LAYER-02` consumes canonical tree observations and existing photogrammetry products through the durable processing queue.
+**Dependencies:** `CONF-01` precedes `CONF-02`; `AUD-01` precedes `AUD-02`; `DATASET-01` precedes `DATASET-02/03`; `ANN-01` precedes `ANN-02`, then `ANN-03`, then `ANN-04`. Preserve the approved dependencies: `ACC-01` depends on `MATCH-01`, and `VAL-05` depends on `MATCH-01` plus its protocol gate. Existing `validation_matches` tables support implementation and testing but do not satisfy or replace those endpoint dependencies. `LAYER-02` consumes canonical tree observations and existing photogrammetry products through the durable processing queue.
 
 ### Juneabby Girasol
 
@@ -104,7 +115,7 @@ The estimate starts with P0 = 3, P1 = 2, and P2 = 1, then accounts for geospatia
 
 **Likely paths:** create `app/Http/Controllers/Api/V1/Validation`, `app/Http/Requests/Validation`, `app/Services/Validation`, and `tests/Feature/Validation` following existing single-action conventions; reuse the existing validation models and `2026_08_12_066000_create_validation_foundation_tables.php`; add only approved additive migrations/DCL.
 
-**Dependencies:** preserve the chain `VAL-01 → VAL-02/03 → VAL-04 → GT-01/MATCH-01`. `MATCH-01` should write the existing validation-match evidence consumed by the completed `ACC-01` and `VAL-05` endpoints. The remaining public-contract/schema conflicts for Juneabby Girasol’s endpoints must still be resolved before moving those rows from `Blocked` to `Ready`.
+**Dependencies:** preserve the chain `VAL-01 → VAL-02/03 → VAL-04 → GT-01/MATCH-01`. `MATCH-01` must write the validation-match evidence consumed by `ACC-01` and `VAL-05`; those downstream endpoints remain blocked until that handoff is implemented and verified. The remaining public-contract/schema conflicts for Juneabby Girasol’s endpoints must still be resolved before moving those rows from `Blocked` to `Ready`.
 
 ### Joshua Lopez
 
@@ -119,7 +130,7 @@ The estimate starts with P0 = 3, P1 = 2, and P2 = 1, then accounts for geospatia
 
 **Likely paths:** `app/Http/Controllers/Api/V1/Report` plus new export/dashboard folders following existing conventions; `app/Http/Requests/Report`; report/export/dashboard services; report models and storage/queue code; `tests/Feature/Report` plus export/dashboard suites; migrations and DCL.
 
-**Dependencies:** preserve `RPT-02 → RPT-03 → RPT-04/05/EXP-01`, `RPT-05 → RPT-06`, `EXP-01 → EXP-02 → EXP-03`, and `DASH-01 → DASH-02`. Report and dashboard completion depends on Earljohn Estandarte’s canonical tree results and Jason Benabente’s finalized `ACC-01` metrics.
+**Dependencies:** preserve `RPT-02 → RPT-03 → RPT-04/05/EXP-01`, `RPT-05 → RPT-06`, `EXP-01 → EXP-02 → EXP-03`, and `DASH-01 → DASH-02`. Report and dashboard completion depends on Earljohn Estandarte’s canonical tree results and a verified `ACC-01`; Jason Benabente's implementation is currently blocked on `MATCH-01` and is not a finalized integration dependency.
 
 ## Cross-developer dependency map
 
@@ -136,9 +147,9 @@ flowchart LR
     Jason -- "VAL-05 completion" --> Jessamae
 ```
 
-- Jason Benabente’s `ACC-01` is available for Joshua Lopez’s `RPT-02` and `DASH-01` integration against authoritative session-scoped accuracy data.
-- Juneabby Girasol’s remaining mutable validation resources are the outstanding validation condition for Jessamae Sumanoy’s `SYNC-04`; Jason Benabente’s `VAL-05` completion endpoint is available.
-- `MATCH-01` should populate the existing validation-match evidence consumed by the completed `ACC-01` recomputation and `VAL-05` protocol gate.
+- Jason Benabente's `ACC-01` is not yet available to Joshua Lopez's report/dashboard work; it remains blocked on `MATCH-01` and PostgreSQL verification.
+- Juneabby Girasol's mutable validation resources, including `MATCH-01`, remain outstanding conditions for Jessamae Sumanoy's `SYNC-04`; Jason Benabente's `VAL-05` is also blocked on that chain.
+- `MATCH-01` must populate the validation-match evidence consumed by `ACC-01` recomputation and the `VAL-05` protocol gate before either endpoint can be approved.
 - Karlandrei Panday’s current assigned rows depend only on completed Earljohn Estandarte endpoints and within-owner chains.
 - `SITE-05` has no assigned owner in the tracker and is excluded from all developer work packages until ownership is explicitly recorded.
 

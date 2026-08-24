@@ -14,6 +14,14 @@ Migration from direct Supabase access to a dedicated PHP API layer and self-mana
 | **Initial kanban state** | Ready / Blocked / Backlog are planning states; assignees are role placeholders until team names are entered |
 | **Prepared** | 2026-08-10 |
 
+## **Pulled-contribution verification — 2026-08-24**
+
+The `feat(BAT-01)` contribution is attributed to **Jessamae Sumanoy** (commit `3cb4b67`; matching author email). The subsequent Jason endpoint/workflow commits through `74fffa2` are attributed to **Jason Benabente** by their Git author metadata.
+
+Neither contribution set is approved as `Done`. Jason's 18 focused SQLite tests pass with 130 assertions, and the full SQLite suite passes 657 tests with 4,278 assertions and 10 PostgreSQL-only skips. PostgreSQL verification cannot begin because the configured test role is denied `CREATE` on schema `public` while creating the migrations table (`SQLSTATE[42501]`). Jason's implemented P2 endpoints plus `LAYER-02` and `CONF-01/02` therefore remain `Testing`; `ACC-01` and `VAL-05` remain `Blocked` on the approved `MATCH-01` chain.
+
+BAT-01 is `Working`: its route exists, but it has no endpoint feature test or endpoint DCL, its migration diverges from the authoritative `battery_packs` schema, and its PHP files fail Pint. The duplicate DCL sequence number `046` in Jason's changes and the incomplete per-endpoint negative/error test matrix must also be resolved before promotion.
+
 **Decision principle**
 
 No web or mobile client should connect directly to the production database or hold the FastAPI service key. The PHP API becomes the application security and transaction boundary.
@@ -674,7 +682,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | SENSOR-01 | POST /drones/{id}/sensorsAttach/register sensor. | {sensor\_name,sensor\_type,manufacturer?,model?,serial\_number?,resolution?,range\_meters?,calibration\_required,status} | 201 {data:Sensor} | DRONE-03 | **P1** | Codex \- Backend/API | **Done** |
 | SENSOR-02 | PATCH /sensors/{id}Update sensor. | Partial Sensor fields | 200 {data:Sensor} | SENSOR-01 | **P2** | TBD \- Backend/API | Backlog |
 | CAL-01 | POST /sensors/{id}/calibrationsRecord sensor calibration. | {calibration\_date,calibration\_method,calibration\_file\_path?,calibration\_notes?,is\_valid} | 201 {data:Calibration} | SENSOR-01 | **P2** | TBD \- Backend/API | Backlog |
-| BAT-01 | GET /batteriesList battery packs. | Query: status,type,page | 200 {data:\[Battery\],meta} | AUTH-08 | **P2** | TBD \- Backend/API | Backlog |
+| BAT-01 | GET /batteriesList battery packs. | Query: status,type,page | 200 {data:\[Battery\],meta} | AUTH-08 | **P2** | Jessamae Sumanoy | **Working** |
 | BAT-02 | POST /batteriesRegister battery. | {battery\_code,battery\_type,capacity\_mah?,voltage?,status} | 201 {data:Battery} | BAT-01 | **P2** | TBD \- Backend/API | Backlog |
 
 ### **DRONE-01 - GET /api/v1/drones**
@@ -1217,7 +1225,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RESULT-02 | GET /tree-observations/{id}/heightsHeight estimates. | Path: id | 200 {data:\[HeightEstimation\]} | TREE-02 | **P1** | Codex \- Results/API | **Done** |
 | RESULT-03 | GET /tree-observations/{id}/agesAge estimates \+ assumptions. | Path: id | 200 {data:\[AgeEstimation\]} | TREE-02 | **P1** | Codex \- Results/API | **Done** |
 | LAYER-01 | GET /missions/{id}/layersList geospatial/photogrammetry outputs. | Query: type? | 200 {data:\[Layer\]} | JOB-03 | **P1** | Codex \- GIS/API | **Done** |
-| LAYER-02 | POST /missions/{id}/layers/buildQueue map layer build/refresh. | {layer\_types:\[...\],parameters?} | 202 {data:{job\_id}} | TREE-01 \+ photogrammetry inputs | **P1** | Jason Benabente | **Blocked** |
+| LAYER-02 | POST /missions/{id}/layers/buildQueue map layer build/refresh. | {layer\_types:\[...\],parameters?} | 202 {data:{job\_id}} | TREE-01 \+ photogrammetry inputs | **P1** | Jason Benabente | **Testing** |
 
 ### **TREE-01 — GET /api/v1/tree-observations**
 
@@ -1312,8 +1320,8 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| CONF-01 | GET /confidence-reviewMission-scoped low-confidence queue. | Query: mission\_id\*,flight\_id?,result\_type?,status?,severity?,page | 200 {data:\[ReviewRecord\],summary,groups,map,meta} | TREE/RESULT \+ confidence flag extension | **P1** | Jason Benabente | **Blocked** |
-| CONF-02 | PUT /confidence-review/{resultId}Create/update review flag/status/assignment. | {status,review\_note?,assigned\_to?,reason?,resolution\_notes?} | 200 {data:ConfidenceFlag} | CONF-01 | **P1** | Jason Benabente | **Blocked** |
+| CONF-01 | GET /confidence-reviewMission-scoped low-confidence queue. | Query: mission\_id\*,flight\_id?,result\_type?,status?,severity?,page | 200 {data:\[ReviewRecord\],summary,groups,map,meta} | TREE/RESULT \+ confidence flag extension | **P1** | Jason Benabente | **Testing** |
+| CONF-02 | PUT /confidence-review/{resultId}Create/update review flag/status/assignment. | {status,review\_note?,assigned\_to?,reason?,resolution\_notes?} | 200 {data:ConfidenceFlag} | CONF-01 | **P1** | Jason Benabente | **Testing** |
 | VAL-01 | GET /validation/scopesMission/site/plot/species/assignee options. | No body | 200 {data:{missions,species,assignees,sessions}} | MSN/SITE/USR | **P0** | TBD \- Validation/API | **Blocked** |
 | VAL-02 | GET /validation-sessionsList field validation sessions. | Query: mission\_id?,site\_id?,status?,page | 200 {data:\[ValidationSession\],meta} | VAL-01 | **P0** | TBD \- Validation/API | **Blocked** |
 | VAL-03 | POST /validation-sessionsCreate mission-scoped validation activity. | {mission\_id,site\_id,plot\_id?,validated\_by,validation\_date,method,notes?} | 201 {data:ValidationSession} | VAL-01 \+ TREE-01 | **P0** | TBD \- Validation/API | **Blocked** |
