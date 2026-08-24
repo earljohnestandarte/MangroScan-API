@@ -4,24 +4,16 @@ namespace App\Services\Report;
 
 use App\Models\Report;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class ReportDetailService
 {
+    public function __construct(private readonly ScopedReportService $reports) {}
+
     /** @return array{report: Report, source_summary: array<string, mixed>} */
     public function get(User $actor, string $id): array
     {
-        $report = Report::query()
-            ->whereColumn('reports.site_id', 'survey_missions.site_id')
-            ->join('survey_missions', 'survey_missions.mission_id', '=', 'reports.mission_id')
-            ->whereNull('survey_missions.deleted_at')
-            ->whereHas('site', fn (Builder $query) => $query
-                ->where('organization_id', $actor->organization_id))
-            ->whereHas('mission.site', fn (Builder $query) => $query
-                ->where('organization_id', $actor->organization_id))
-            ->select('reports.*')
-            ->findOrFail($id);
+        $report = $this->reports->find($actor, $id);
         $source = DB::table('v_report_source_summary')
             ->where('organization_id', $actor->organization_id)
             ->where('mission_id', $report->mission_id)

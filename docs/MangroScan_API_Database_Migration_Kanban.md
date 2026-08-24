@@ -1338,7 +1338,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RPT-01 | GET /reportsList report records. | Query: mission\_id,site\_id,status,type,page | 200 {data:\[Report\],meta} | AUTH | **P1** | Codex \- Reporting/API | **Done** |
 | RPT-02 | POST /reportsPrepare report definition/draft. | {mission\_id,site\_id,report\_title,report\_type,audience?,summary?,interpretation?,limitations?,recommendations?,formats?} | 201 {data:Report} | TREE/ACC finalized | **P1** | Earljohn Estandarte | **Done** |
 | RPT-03 | GET /reports/{id}Report draft/source metadata. | Path: id | 200 {data:{report,source\_summary}} | RPT-02 | **P1** | Earljohn Estandarte | **Done** |
-| RPT-04 | PATCH /reports/{id}Update report content/status while editable. | Partial report fields | 200 {data:Report} | RPT-03 | **P1** | Earljohn Estandarte | **Blocked** |
+| RPT-04 | PATCH /reports/{id}Update report content/status while editable. | Partial report fields | 200 {data:Report} | RPT-03 | **P1** | Earljohn Estandarte | **Done** |
 | RPT-05 | POST /reports/{id}/generateGenerate professional PDF/report artifact asynchronously. | {format:"PDF",options?} | 202 {data:{job\_id,report\_id,status}} | RPT-03 \+ report routine/storage | **P0** | Earljohn Estandarte | **Blocked** |
 | RPT-06 | POST /reports/{id}/approveApprove generated report. | {decision:"approved"|"rejected",notes?} | 200 {data:Report} | RPT-05 complete | **P1** | Earljohn Estandarte | **Blocked** |
 | EXP-01 | POST /reports/{id}/exportsGenerate CSV/XLSX/GeoJSON/KML/etc. | {format,filters?,options?} | 202 {data:{job\_id,export\_type}} | RPT-03 \+ canonical results | **P0** | Earljohn Estandarte | **Blocked** |
@@ -1382,6 +1382,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | V-09 design | `v_report_source_summary` separately pre-aggregates non-deleted tree observations, validation sessions/ground truth, and deterministic latest V-08 accuracy metrics before joining them to non-deleted mission/site lineage. It is a live view, not MV-01, so report preview does not require dashboard refresh. |
 | Scope / effects | Both direct report site and mission-site lineage must match and belong to the actor's organization. Foreign, missing, malformed, inconsistent, or deleted lineage returns non-enumerable 404. Reads create no audit event or notification. |
 | DCL / tests | `055_report_source_summary_grants.sql` revokes all view access before granting SELECT only to API/report roles; worker/auditor and every mutation remain denied. `ReportShowTest` covers exact/full and empty summaries, latest metrics, lineage hiding, auth, local/foreign RBAC, inactivity, throttling, V-09 DDL/DCL, and both databases. Focused SQLite and PostgreSQL/PostGIS each pass 8 / 68; full SQLite passes 773 / 5366 with thirteen expected skips; full PostgreSQL/PostGIS passes 786 / 5403. |
+
+### **RPT-04 — PATCH /api/v1/reports/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Partially edit a tenant-scoped draft or archive it. Requires active Sanctum authentication and tenant-valid `reports.create`; `reports.read` alone cannot mutate. |
+| Editable contract | At least one of title, type, audience, summary, interpretation, limitations, recommendations, formats, or status is required. RPT-02 normalization and size/format rules apply. Nullable content/formats can be cleared and omitted fields are preserved. Status accepts only `draft` or `archived`. |
+| Lifecycle / protected fields | Only a current `draft` can be edited. Draft→archived is one-way here; generated, approved, and archived rows return 409. Mission/site lineage and generator/approver are never editable, leaving generation and approval to RPT-05/RPT-06. |
+| Transaction / scope | The report is tenant/integrity scoped and row-locked. Update plus immutable `report.update` old/new evidence share one transaction; audit failure rolls back both content and state. Missing, malformed, foreign, inconsistent, or deleted lineage returns 404. |
+| DCL / tests | `056_report_update_grants.sql` grants API UPDATE only on editable columns and `updated_at`; lineage/actor fields, DELETE, and report/worker mutation remain denied. `ReportUpdateTest` covers edits, clearing, archive/conflicts, validation/protected fields, lineage, auth/RBAC/inactivity, audit rollback, throttling, and DCL. Focused SQLite and PostgreSQL/PostGIS each pass 10 / 79; full SQLite passes 783 / 5445 with thirteen expected skips; full PostgreSQL/PostGIS passes 796 / 5482. |
 
 ## **Notifications, settings and audit**
 
