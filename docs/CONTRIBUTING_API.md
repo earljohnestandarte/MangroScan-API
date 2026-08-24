@@ -38,7 +38,7 @@ These changes are not yet approved as `Done`:
 
 - Jessamae's `BAT-01` is `Working`. The route is registered, but the contribution has no endpoint feature test or endpoint DCL, does not match the authoritative `battery_packs` schema, and fails Pint in its PHP files.
 - Jason's P2 endpoints plus `LAYER-02` and `CONF-01/02` are `Testing`. The focused SQLite suites pass 18 tests / 130 assertions and the full SQLite suite passes 657 / 4,278, but PostgreSQL execution is blocked before migrations because the test role lacks `CREATE` on schema `public`. Test coverage also does not yet satisfy the repository's per-endpoint definition of done.
-- Jason's `ACC-01` has since passed the completed MATCH-01 handoff, dedicated cross-database tests, and corrective least-privilege DCL, and is approved `Done`. `VAL-05` remains blocked only until its separate protocol-gate verification is complete.
+- Jason's `ACC-01` and `VAL-05` have since passed the completed MATCH-01 handoff, dedicated cross-database tests, corrective least-privilege DCL, and the fresh-six-metric completion protocol; both are approved `Done`.
 - Jason's DCL additions currently reuse sequence `046`; allocate a unique sequence before approval.
 
 ### Karlandrei Panday
@@ -81,7 +81,7 @@ These changes are not yet approved as `Done`:
 
 **Likely paths:** `app/Http/Controllers/Api/V1/Drone`, `Flight`, `Mission`, `Mobile`, and `Media`; corresponding requests/services/tests; hardware and sync models/migrations; storage services; `database/sql/dcl`.
 
-**Dependencies:** complete and verify `BAT-01` before `BAT-02/03`, and implement `SYNC-04` before `SYNC-05`. `MEDIA-05` depends on Earljohn Estandarte’s completed metadata-only `MEDIA-04`; it remains the sole temporary download URL/token endpoint. `VAL-05` is not available: it remains blocked with `SYNC-04` until Earljohn Estandarte's transferred `MATCH-01` and mutable validation chain are complete.
+**Dependencies:** complete and verify `BAT-01` before `BAT-02/03`, and implement `SYNC-04` before `SYNC-05`. `MEDIA-05` depends on Earljohn Estandarte’s completed metadata-only `MEDIA-04`; it remains the sole temporary download URL/token endpoint. MATCH-01 and VAL-05 are now available, so SYNC-04 may consume the completed mutable validation chain.
 
 ### Jason Benabente
 
@@ -149,7 +149,7 @@ flowchart LR
     Jason -- "VAL-05 completion" --> Jessamae
 ```
 
-- MATCH-01 now populates the direct-session evidence consumed by Jason Benabente's `ACC-01` and `VAL-05`. ACC-01 is independently verified and available; VAL-05 remains unavailable only until its own handoff verification and tracker promotion are complete. V-08/MV-01 and ACC-01 are complete, so DASH-01 may proceed independently.
+- MATCH-01 now populates the direct-session evidence consumed by Jason Benabente's independently verified ACC-01 and VAL-05. V-08/MV-01 and ACC-01 are complete, so DASH-01 may proceed independently.
 - Earljohn Estandarte's transferred validation mutations are complete for Jessamae Sumanoy's `SYNC-04`; Jason Benabente's `VAL-05` promotion remains the completion-state dependency.
 - Preserve MATCH-01's direct `validation_session_id` lineage in accuracy and completion queries so false positives are included without requiring a ground-truth row.
 - Karlandrei Panday’s current assigned rows depend only on completed Earljohn Estandarte endpoints and within-owner chains.

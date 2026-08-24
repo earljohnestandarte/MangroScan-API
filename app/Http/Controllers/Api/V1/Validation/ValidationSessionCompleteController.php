@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 
 class ValidationSessionCompleteController extends Controller
 {
+    // [VAL-05] Complete an open session only after all six metrics are fresh.
     public function __invoke(
         ValidationSessionCompleteRequest $request,
         string $session,
