@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
 use App\Http\Controllers\Api\V1\Drone\DroneStoreController;
+use App\Http\Controllers\Api\V1\Export\ExportDownloadController;
 use App\Http\Controllers\Api\V1\Export\ExportedFileIndexController;
 use App\Http\Controllers\Api\V1\Export\ExportStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightChecklistStoreController;
@@ -871,6 +872,14 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:exports.download', 'throttle:auth.authenticated',
     ]);
+
+    // [EXP-03] Issue one audited short-lived URL for a tenant export artifact.
+    Route::post('/exported-files/{exportedFile}/download', ExportDownloadController::class)
+        ->whereUuid('exportedFile')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:exports.download', 'throttle:auth.authenticated',
+        ]);
 
     // [DASH-01] Return role-scoped dashboard KPI aggregates.
     Route::get('/dashboard/overview', DashboardOverviewController::class)->middleware([

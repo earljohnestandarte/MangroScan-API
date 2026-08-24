@@ -269,6 +269,8 @@ CACHE_STORE=database
 QUEUE_CONNECTION=database
 FILESYSTEM_DISK=local
 MEDIA_UPLOAD_DISK=local
+EXPORT_DISK=local
+EXPORT_DOWNLOAD_URL_TTL_MINUTES=10
 ```
 
 Never commit `.env`, database credentials, or the developer-account password. Generate the Laravel application key and clear any stale cached configuration:
@@ -813,6 +815,8 @@ AUTHENTICATED_REQUESTS_PER_MINUTE=60
 MEDIA_UPLOAD_DISK=local    # local, s3
 MEDIA_UPLOAD_URL_TTL_MINUTES=30
 MEDIA_MAX_UPLOAD_BYTES=5368709120  # 5GB
+EXPORT_DISK=local          # local, s3
+EXPORT_DOWNLOAD_URL_TTL_MINUTES=10
 
 # AI Services
 AI_SERVICE_CONNECT_TIMEOUT_SECONDS=3
@@ -838,6 +842,10 @@ return [
     'media' => [
         'upload_url_ttl_minutes' => 30,
         'max_upload_bytes' => 5_368_709_120,
+    ],
+    'exports' => [
+        'disk' => 'local',
+        'download_url_ttl_minutes' => 10,
     ],
 ];
 ```
@@ -1092,6 +1100,8 @@ QUEUE_CONNECTION=redis
 
 # Storage
 MEDIA_UPLOAD_DISK=s3
+EXPORT_DISK=s3
+EXPORT_DOWNLOAD_URL_TTL_MINUTES=10
 MANGROSCAN_SEED_USER_PASSWORD=
 AWS_ACCESS_KEY_ID=<secure>
 AWS_SECRET_ACCESS_KEY=<secure>

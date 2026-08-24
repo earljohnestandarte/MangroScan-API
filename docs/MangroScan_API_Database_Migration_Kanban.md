@@ -1343,7 +1343,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RPT-06 | POST /reports/{id}/approveApprove generated report. | {decision:"approved"|"rejected",notes?} | 200 {data:Report} | RPT-05 complete | **P1** | Earljohn Estandarte | **Done** |
 | EXP-01 | POST /reports/{id}/exportsGenerate CSV/XLSX/GeoJSON/KML/etc. | {format,filters?,options?} | 202 {data:{job\_id,export\_type}} | RPT-03 \+ canonical results | **P0** | Earljohn Estandarte | **Done** |
 | EXP-02 | GET /exported-filesExport audit registry. | Query: report\_id?,mission\_id?,type?,page | 200 {data:\[ExportedFile\],meta} | EXP-01 | **P1** | Earljohn Estandarte | **Done** |
-| EXP-03 | POST /exported-files/{id}/downloadAuthorized temporary download. | No body | 200 {data:{url,expires\_at}} or stream | EXP-02 \+ storage | **P0** | Earljohn Estandarte | **Ready** |
+| EXP-03 | POST /exported-files/{id}/downloadAuthorized temporary download. | No body | 200 {data:{url,expires\_at}} or stream | EXP-02 \+ storage | **P0** | Earljohn Estandarte | **Done** |
 | DASH-01 | GET /dashboard/overviewRole-scoped KPI overview. | Query: site\_id?,mission\_id?,date range? | 200 {data:{missions,trees,species,validation,processing}} | TREE \+ ACC \+ materialized views | **P1** | Earljohn Estandarte | **Done** |
 | DASH-02 | GET /dashboard/missions/{id}Mission analytics/detail dashboard. | Path: id | 200 {data:{counts,species,height,age,accuracy,layers}} | DASH-01 | **P1** | Earljohn Estandarte | **Done** |
 | VIEW-01 | GET /dashboard/saved-viewsList caller saved filters/map configs. | No body | 200 {data:\[SavedView\]} | AUTH | **P2** | TBD \- Dashboard/API | Backlog |
@@ -1431,6 +1431,15 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Filters / response | Optional tenant-resolved report UUID, organization-resolved mission UUID, normalized type, and positive page. Mismatched report/mission pairs return 404. Response items expose exactly eight metadata fields and never `file_path`; stable pagination is fixed at 25 and sorts exported time/UUID descending. |
 | Scope / effects | Joins require export mission = report mission, report site = mission site, current organization site ownership, and non-deleted mission lineage. Foreign/missing targets are non-enumerable and inconsistent legacy rows are excluded. Reads create no audit or storage call. |
 | DCL / tests | `060_export_registry_grants.sql` grants API SELECT only on the eight safe columns. File path, mutation, report/auditor access, and table-level SELECT remain denied. `ExportedFileIndexTest` covers exact fields/order/pages, filters, anti-enumeration/integrity, validation, auth/RBAC/inactivity, no audit, throttling, route/DCL, and both databases. Focused SQLite and PostgreSQL/PostGIS each pass 7 / 43; full SQLite passes 824 / 5724 with thirteen expected skips; full PostgreSQL 18/PostGIS passes 837 / 5761. |
+
+### **EXP-03 — POST /api/v1/exported-files/{id}/download**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Issue a short-lived signed URL for one tenant-visible private export. Requires active Sanctum authentication and tenant-valid `exports.download`; request body is unused. |
+| Scope / response | Reuses strict export/report/mission/site integrity scope and excludes deleted missions. Exact response is `{data:{url,expires_at}}`; permanent path and file metadata are not returned. Default TTL is 10 minutes through `EXPORT_DOWNLOAD_URL_TTL_MINUTES`, and `EXPORT_DISK` selects local/S3 storage. |
+| Failure / audit semantics | Missing objects, unsupported temporary URLs, signing failures, and invalid targets map to 503. `export.download.issue` records only export type and expiry. Audit insertion precedes issuance inside one transaction: audit failure prevents signing, and issuer failure rolls the insert back. No URL or permanent path enters audit evidence. MEDIA-05 remains solely responsible for media-asset download URLs/tokens. |
+| DCL / tests | `061_export_download_grants.sql` adds only API `file_path` SELECT required by this authorized workflow; UPDATE/DELETE and non-API reads remain denied. `ExportDownloadTest` covers exact TTL/response/audit, scope/integrity, auth/RBAC/inactivity, issuer/audit rollback, throttling, real missing-object mapping, binding/config/DCL, and both databases. Focused SQLite and PostgreSQL/PostGIS each pass 8 / 43; full SQLite passes 832 / 5767 with thirteen expected skips; full PostgreSQL 18/PostGIS passes 845 / 5804. |
 
 ## **Notifications, settings and audit**
 
