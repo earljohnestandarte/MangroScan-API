@@ -51,7 +51,7 @@ This is the developer reference for the deterministic RBAC data installed by `Da
 | `reports.create` | — | Yes | Yes | — | RPT-02, RPT-04 |
 | `reports.generate` | — | Yes | Yes | — | RPT-05, EXP-01 |
 | `reports.approve` | — | — | Yes | — | RPT-06 |
-| `exports.download` | — | Yes | Yes | — | EXP-02 ready; EXP-03 blocked |
+| `exports.download` | — | Yes | Yes | — | EXP-02; EXP-03 ready |
 | `settings.manage` | Yes | — | — | — | SET-01, SET-02 (P2) |
 | `audit.read` | Yes | — | — | — | AUD-01 |
 | `notifications.read` | Yes | Yes | Yes | Yes | NOTIF-01..03 |

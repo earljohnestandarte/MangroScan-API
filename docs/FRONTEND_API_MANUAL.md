@@ -36,15 +36,15 @@ For a physical Expo device, `localhost` means the phone itself. Use a reachable 
 | 🚧 UNDER CONSTRUCTION | Planned or actively being built; do not use as a production dependency. |
 | ⛔ BLOCKED / UNDER CONSTRUCTION | Not implemented and waiting on a documented prerequisite or decision. |
 
-Current inventory: **141 endpoints**, **101 available**, **21 under construction**, **5 blocked**, and **14 testing**.
+Current inventory: **141 endpoints**, **102 available**, **21 under construction**, **4 blocked**, and **14 testing**.
 
 ## Currently available endpoints
 
-`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-01`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `DASH-01`, `DASH-02`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
+`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-01`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `DASH-01`, `DASH-02`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
 
 ## Unavailable, testing, and blocked endpoints
 
-`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `EXP-02`, `EXP-03`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
+`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `EXP-03`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
 
 Do not integrate the unavailable endpoints above yet. Jessamae Sumanoy's `BAT-01` remains `Working` after schema, DCL, test, and formatting gaps were found. Jason Benabente's P2 endpoints plus `LAYER-02` and `CONF-01/02` remain `Testing` under their earlier incomplete per-endpoint review. ACC-01 and VAL-05 have since passed MATCH-01 handoff, protocol, and cross-database verification.
 
@@ -170,8 +170,8 @@ Do not integrate the unavailable endpoints above yet. Jessamae Sumanoy's `BAT-01
 | `RPT-05` | POST | `/api/v1/reports/{id}/generate` | P0 | Done | ✅ AVAILABLE |
 | `RPT-06` | POST | `/api/v1/reports/{id}/approve` | P1 | Done | ✅ AVAILABLE |
 | `EXP-01` | POST | `/api/v1/reports/{id}/exports` | P0 | Done | ✅ AVAILABLE |
-| `EXP-02` | GET | `/api/v1/exported-files` | P1 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `EXP-03` | POST | `/api/v1/exported-files/{id}/download` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
+| `EXP-02` | GET | `/api/v1/exported-files` | P1 | Done | ✅ AVAILABLE |
+| `EXP-03` | POST | `/api/v1/exported-files/{id}/download` | P0 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `DASH-01` | GET | `/api/v1/dashboard/overview` | P1 | Done | ✅ AVAILABLE |
 | `DASH-02` | GET | `/api/v1/dashboard/missions/{id}` | P1 | Done | ✅ AVAILABLE |
 | `VIEW-01` | GET | `/api/v1/dashboard/saved-views` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
@@ -9391,8 +9391,8 @@ HTTP `202`; contract shape `{data:{job_id,export_type}}`.
 
 ### EXP-02 — Export audit registry.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> EXP-01 now populates the registry; this tenant-scoped read endpoint is ready for implementation but must not be called yet.
+> **Status: ✅ AVAILABLE**
+> Lists safe completed-export metadata in current-tenant report and mission scope.
 
 | Property | Value |
 | --- | --- |
@@ -9406,38 +9406,38 @@ HTTP `202`; contract shape `{data:{job_id,export_type}}`.
 | Success | 200 — {data:[ExportedFile],meta} |
 | Relevant errors | 401, 403, 404, 429, 500, 502/503 |
 
-**Planned request contract (not implemented)**
+**Verified query contract**
 
 `Query: report_id?,mission_id?,type?,page`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `report_id` | `not finalized` | No |
-| `mission_id` | `not finalized` | No |
-| `type` | `not finalized` | No |
-| `page` | `not finalized` | Yes |
+| `report_id` | UUID; target must be tenant-visible | No |
+| `mission_id` | UUID; target must belong to the current organization | No |
+| `type` | `csv`, `xlsx`, `geojson`, or `kml`; case-normalized | No |
+| `page` | Positive integer; defaults to 1 | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
-GET /api/v1/exported-files?report_id=%3Cuuid%3E&page=%3Cpage%3E HTTP/1.1
+GET /api/v1/exported-files?report_id=<uuid>&type=geojson&page=1 HTTP/1.1
 Host: localhost:8000
 Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:[ExportedFile],meta}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+Each item has exactly `export_file_id`, `report_id`, `mission_id`, `export_type`, `file_name`, `file_size_bytes`, `exported_by`, and `exported_at`. `file_path` is never returned. Pagination metadata is `{request_id,page,per_page,total,last_page}` with a fixed page size of 25 and newest-first ordering.
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: EXP-01.
+**Workflow / UI integration note:** Foreign/missing filter targets and mismatched report/mission pairs return non-enumerable `404`; inconsistent stored lineage is excluded. The route creates no read audit. Use the returned `export_file_id` with EXP-03 when download controls become available.
 
 ### EXP-03 — Authorized temporary download.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: 🚧 UNDER CONSTRUCTION**
+> EXP-02 and private storage are complete; temporary URL issuance is ready for implementation but must not be called yet.
 
 | Property | Value |
 | --- | --- |

@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
 use App\Http\Controllers\Api\V1\Drone\DroneStoreController;
+use App\Http\Controllers\Api\V1\Export\ExportedFileIndexController;
 use App\Http\Controllers\Api\V1\Export\ExportStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightChecklistStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightCompleteController;
@@ -864,6 +865,12 @@ Route::prefix('v1')->group(function () {
             'permission:results.export', 'permission:reports.generate',
             'throttle:auth.authenticated',
         ]);
+
+    // [EXP-02] List safe completed-export registry metadata in current-tenant scope.
+    Route::get('/exported-files', ExportedFileIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:exports.download', 'throttle:auth.authenticated',
+    ]);
 
     // [DASH-01] Return role-scoped dashboard KPI aggregates.
     Route::get('/dashboard/overview', DashboardOverviewController::class)->middleware([

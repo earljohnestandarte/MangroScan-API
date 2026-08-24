@@ -1342,8 +1342,8 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RPT-05 | POST /reports/{id}/generateGenerate professional PDF/report artifact asynchronously. | {format:"PDF",options?} | 202 {data:{job\_id,report\_id,status}} | RPT-03 \+ report routine/storage | **P0** | Earljohn Estandarte | **Done** |
 | RPT-06 | POST /reports/{id}/approveApprove generated report. | {decision:"approved"|"rejected",notes?} | 200 {data:Report} | RPT-05 complete | **P1** | Earljohn Estandarte | **Done** |
 | EXP-01 | POST /reports/{id}/exportsGenerate CSV/XLSX/GeoJSON/KML/etc. | {format,filters?,options?} | 202 {data:{job\_id,export\_type}} | RPT-03 \+ canonical results | **P0** | Earljohn Estandarte | **Done** |
-| EXP-02 | GET /exported-filesExport audit registry. | Query: report\_id?,mission\_id?,type?,page | 200 {data:\[ExportedFile\],meta} | EXP-01 | **P1** | Earljohn Estandarte | **Ready** |
-| EXP-03 | POST /exported-files/{id}/downloadAuthorized temporary download. | No body | 200 {data:{url,expires\_at}} or stream | EXP-02 \+ storage | **P0** | Earljohn Estandarte | **Blocked** |
+| EXP-02 | GET /exported-filesExport audit registry. | Query: report\_id?,mission\_id?,type?,page | 200 {data:\[ExportedFile\],meta} | EXP-01 | **P1** | Earljohn Estandarte | **Done** |
+| EXP-03 | POST /exported-files/{id}/downloadAuthorized temporary download. | No body | 200 {data:{url,expires\_at}} or stream | EXP-02 \+ storage | **P0** | Earljohn Estandarte | **Ready** |
 | DASH-01 | GET /dashboard/overviewRole-scoped KPI overview. | Query: site\_id?,mission\_id?,date range? | 200 {data:{missions,trees,species,validation,processing}} | TREE \+ ACC \+ materialized views | **P1** | Earljohn Estandarte | **Done** |
 | DASH-02 | GET /dashboard/missions/{id}Mission analytics/detail dashboard. | Path: id | 200 {data:{counts,species,height,age,accuracy,layers}} | DASH-01 | **P1** | Earljohn Estandarte | **Done** |
 | VIEW-01 | GET /dashboard/saved-viewsList caller saved filters/map configs. | No body | 200 {data:\[SavedView\]} | AUTH | **P2** | TBD \- Dashboard/API | Backlog |
@@ -1422,6 +1422,15 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Worker / outputs | A database partial unique index permits one queued/running job per report and format. The `exports` worker reads ordered non-deleted canonical tree rows and writes private CSV (formula-safe), valid XLSX, GeoJSON, or KML. It then atomically creates the schema-approved `exported_files` metadata row, completes the job, and writes audit evidence. No storage path or URL is returned by EXP-01. |
 | Schema / DCL | Adds the approved `exported_files` fields and a separate tenant-keyed async `export_jobs` ledger with lifecycle/idempotency/completion invariants and shared updated-at trigger. `059_export_generation_grants.sql` limits API access to job reads/creation and worker access to canonical sources, job execution, exported-file insertion, and audit insertion. API cannot read file paths here; report/auditor access and all DELETE remain denied. |
 | Tests / status | `ExportStoreTest` covers exact queueing, semantic idempotency, overlap, real four-format private artifacts, filters/geometry, validation, lineage, dual RBAC/inactivity, rollback, throttling, schema/job/DCL, and both databases. Focused SQLite passes 10 / 79; focused PostgreSQL with shared trigger coverage passes 13 / 104; full SQLite passes 817 / 5681 with thirteen expected skips; full PostgreSQL 18/PostGIS passes 830 / 5718. |
+
+### **EXP-02 — GET /api/v1/exported-files**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | List safe completed-export registry metadata for the current tenant. Requires active Sanctum authentication and tenant-valid `exports.download`. |
+| Filters / response | Optional tenant-resolved report UUID, organization-resolved mission UUID, normalized type, and positive page. Mismatched report/mission pairs return 404. Response items expose exactly eight metadata fields and never `file_path`; stable pagination is fixed at 25 and sorts exported time/UUID descending. |
+| Scope / effects | Joins require export mission = report mission, report site = mission site, current organization site ownership, and non-deleted mission lineage. Foreign/missing targets are non-enumerable and inconsistent legacy rows are excluded. Reads create no audit or storage call. |
+| DCL / tests | `060_export_registry_grants.sql` grants API SELECT only on the eight safe columns. File path, mutation, report/auditor access, and table-level SELECT remain denied. `ExportedFileIndexTest` covers exact fields/order/pages, filters, anti-enumeration/integrity, validation, auth/RBAC/inactivity, no audit, throttling, route/DCL, and both databases. Focused SQLite and PostgreSQL/PostGIS each pass 7 / 43; full SQLite passes 824 / 5724 with thirteen expected skips; full PostgreSQL 18/PostGIS passes 837 / 5761. |
 
 ## **Notifications, settings and audit**
 
