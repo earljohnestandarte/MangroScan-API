@@ -36,7 +36,7 @@ For a physical Expo device, `localhost` means the phone itself. Use a reachable 
 | 🚧 UNDER CONSTRUCTION | Planned or actively being built; do not use as a production dependency. |
 | ⛔ BLOCKED / UNDER CONSTRUCTION | Not implemented and waiting on a documented prerequisite or decision. |
 
-Current inventory: **141 endpoints**, **89 available**, **21 under construction**, **17 blocked**, and **14 testing**.
+Current inventory: **141 endpoints**, **89 available**, **20 under construction**, **18 blocked**, and **14 testing**.
 
 ## Currently available endpoints
 
@@ -159,7 +159,7 @@ Do not integrate the newly routed endpoints above yet. Jessamae Sumanoy's `BAT-0
 | `VAL-02` | GET | `/api/v1/validation-sessions` | P0 | Done | ✅ AVAILABLE |
 | `VAL-03` | POST | `/api/v1/validation-sessions` | P0 | Done | ✅ AVAILABLE |
 | `VAL-04` | GET | `/api/v1/validation-sessions/{id}` | P0 | Done | ✅ AVAILABLE |
-| `GT-01` | POST | `/api/v1/validation-sessions/{id}/ground-truth` | P0 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `GT-01` | POST | `/api/v1/validation-sessions/{id}/ground-truth` | P0 | Blocked | ⛔ BLOCKED — SCHEMA DECISION REQUIRED |
 | `MATCH-01` | POST | `/api/v1/validation-sessions/{id}/decisions` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
 | `ACC-01` | POST | `/api/v1/validation-sessions/{id}/accuracy/recompute` | P0 | Blocked | ⛔ BLOCKED — MATCH-01 REQUIRED |
 | `VAL-05` | POST | `/api/v1/validation-sessions/{id}/complete` | P1 | Blocked | ⛔ BLOCKED — MATCH-01 REQUIRED |
@@ -8584,8 +8584,8 @@ Collections use stable identifiers/domain ordering and may be empty. Sessions wi
 
 ### GT-01 — Create manual field tree record.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> VAL-04 is complete. This endpoint is dependency-ready but still requires the documented request/schema field reconciliation. Do not call it yet.
+> **Status: ⛔ BLOCKED — SCHEMA DECISION REQUIRED**
+> VAL-04 is complete, but `field_code`, `crown_diameter_m`, and `is_tree` have no authoritative storage columns. The backend will not silently discard them or invent a response. Approve an additive schema/contract mapping before integration.
 
 | Property | Value |
 | --- | --- |

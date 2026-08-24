@@ -117,7 +117,7 @@ These changes are not yet approved as `Done`:
 
 **Likely paths:** create `app/Http/Controllers/Api/V1/Validation`, `app/Http/Requests/Validation`, `app/Services/Validation`, and `tests/Feature/Validation` following existing single-action conventions; reuse the existing validation models and `2026_08_12_066000_create_validation_foundation_tables.php`; add only approved additive migrations/DCL.
 
-**Dependencies:** VAL-01 through VAL-04 are complete, so GT-01 is dependency-ready. Reconcile GT-01's planned fields with the authoritative table before implementation, then preserve `GT-01 → MATCH-01`. `MATCH-01` must write the validation-match evidence consumed by `ACC-01` and `VAL-05`; those downstream endpoints remain blocked until that handoff is implemented and verified.
+**Dependencies:** VAL-01 through VAL-04 are complete. GT-01 is now genuinely blocked because `field_code`, `crown_diameter_m`, and `is_tree` have no authoritative columns; an approved additive schema/contract decision is required. After that resolution, preserve `GT-01 → MATCH-01`. `MATCH-01` must write the validation-match evidence consumed by `ACC-01` and `VAL-05`; those downstream endpoints remain blocked until that handoff is implemented and verified.
 
 ### Earljohn Estandarte — transferred reports, exports, and dashboards
 
