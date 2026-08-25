@@ -10,8 +10,8 @@ This is the developer reference for the deterministic RBAC data installed by `Da
 | --- | :---: | :---: | :---: | :---: | --- |
 | `organizations.manage` | Yes | — | — | — | ORG-01..04 |
 | `users.manage` | Yes | — | — | — | USR-01..05 |
-| `roles.manage` | Yes | — | — | — | RBAC-01, RBAC-03, RBAC-04 |
-| `permissions.manage` | Yes | — | — | — | RBAC-02, RBAC-04 |
+| `roles.manage` | Yes | — | — | — | RBAC-01, RBAC-03, RBAC-04, RBAC-05 |
+| `permissions.manage` | Yes | — | — | — | RBAC-02, RBAC-04, RBAC-05 |
 | `sites.read` | — | Yes | — | Yes | SITE-01, SITE-03, BOUND-01, PLOT-01, SYNC-03 |
 | `sites.manage` | — | Yes | — | — | SITE-02, SITE-04 |
 | `boundaries.manage` | — | Yes | — | — | BOUND-02, BOUND-03 |
@@ -93,7 +93,17 @@ Then migrate and seed:
 ```bash
 php artisan migrate
 php artisan db:seed
+php artisan mangroscan:qa-users:verify
 ```
+
+The verification command is read-only. It checks the configured password against each stored hash and verifies the active organization, email verification, exact role, and exact effective permission set without printing credentials. Use the identities for browser QA as follows:
+
+| Identity | Browser-QA focus |
+| --- | --- |
+| `admin@mangroscan.test` | Organizations, users, roles, permissions, hardware, AI administration, settings, and audit views |
+| `researcher@mangroscan.test` | Sites, mission planning, flights, processing, results, validation work, reports, and exports |
+| `specialist@mangroscan.test` | Mission approval, scientific validation, accuracy recomputation, report generation, and report approval |
+| `operator@mangroscan.test` | Assigned approved mission/flight, checklist, field media, and notification flows |
 
 Before resetting tests, verify that `.env.testing` names the disposable test database (normally `mangroscan_test`) and defines a testing-only seed password. Confirm the resolved values:
 

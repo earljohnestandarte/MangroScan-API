@@ -332,6 +332,7 @@ Run the complete dependency-safe seed chain:
 
 ```bash
 php artisan db:seed
+php artisan mangroscan:qa-users:verify
 ```
 
 The command is idempotent and may be run repeatedly. It creates or updates:
@@ -343,7 +344,7 @@ The command is idempotent and may be run repeatedly. It creates or updates:
 | `specialist@mangroscan.test` | Environmental Specialist | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
 | `operator@mangroscan.test` | Drone Operator | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
 
-All seeded passwords are hashed. The developer-user seeder refuses a blank password and skips account creation in production. The Drone Operator is a field/mobile role: it can see assigned approved missions and piloted flights, submit checklists, operate flights, upload/read field media, and read its notifications, but it has no management, AI-processing, validation, reporting, audit, or settings permissions. See the [RBAC Seeder Matrix](docs/MangroScan_RBAC_Seeder_Matrix.md) for the exact permission assignments.
+All seeded passwords are hashed. The developer-user seeder refuses a blank password and skips account creation in production. The verification command is read-only, checks the configured password hash plus each account's active organization, verification state, exact role, and exact effective permissions, and never prints the password. The Drone Operator is a field/mobile role: it can see assigned approved missions and piloted flights, submit checklists, operate flights, upload/read field media, and read its notifications, but it has no management, AI-processing, validation, reporting, audit, or settings permissions. See the [RBAC Seeder Matrix](docs/MangroScan_RBAC_Seeder_Matrix.md) for the exact permission assignments.
 
 ### 8. Start and verify the application
 
@@ -642,6 +643,7 @@ POST   /users/{id}/activation     # Activate/deactivate user
 
 GET    /roles                     # List roles
 GET    /permissions               # List permissions
+GET    /roles/{id}/permissions    # Read current role permissions
 PUT    /users/{id}/roles          # Assign user roles
 PUT    /roles/{id}/permissions    # Assign role permissions
 ```
