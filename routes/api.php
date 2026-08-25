@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\Battery\BatteryIndexController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
 use App\Http\Controllers\Api\V1\Drone\DroneStoreController;
+use App\Http\Controllers\Api\V1\Drone\DroneUpdateController;
 use App\Http\Controllers\Api\V1\Flight\FlightChecklistStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightCompleteController;
 use App\Http\Controllers\Api\V1\Flight\FlightFailController;
@@ -410,6 +411,11 @@ Route::prefix('v1')->group(function () {
     // [DRONE-03] GET /api/v1/drones/{id}
     Route::get('/drones/{drone}', DroneShowController::class)->whereUuid('drone')->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:drones.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [DRONE-04] PATCH /api/v1/drones/{id}
+    Route::patch('/drones/{drone}', DroneUpdateController::class) ->whereUuid('drone') ->middleware([
+        'auth:sanctum',  EnsureActiveIdentity::class,  'permission:drones.manage',  'throttle:auth.authenticated',
     ]);
 
     // [SENSOR-01] POST /api/v1/drones/{id}/sensors
