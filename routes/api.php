@@ -73,6 +73,7 @@ use App\Http\Controllers\Api\V1\Processing\ProcessingJobStoreController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RolePermissionReplaceController;
+use App\Http\Controllers\Api\V1\Rbac\RolePermissionShowController;
 use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
 use App\Http\Controllers\Api\V1\Report\ReportApprovalController;
 use App\Http\Controllers\Api\V1\Report\ReportGenerateController;
@@ -245,6 +246,15 @@ Route::prefix('v1')->group(function () {
         'permission:permissions.manage',
         'throttle:auth.authenticated',
     ]);
+
+    // [RBAC-05] GET /api/v1/roles/{id}/permissions
+    Route::get('/roles/{role}/permissions', RolePermissionShowController::class)
+        ->whereUuid('role')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:roles.manage', 'permission:permissions.manage',
+            'throttle:auth.authenticated',
+        ]);
 
     // [RBAC-04] PUT /api/v1/roles/{id}/permissions
     Route::put('/roles/{role}/permissions', RolePermissionReplaceController::class)
