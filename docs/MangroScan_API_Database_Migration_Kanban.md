@@ -18,9 +18,9 @@ Migration from direct Supabase access to a dedicated PHP API layer and self-mana
 
 The `feat(BAT-01)` contribution is attributed to **Jessamae Sumanoy** (commit `3cb4b67`; matching author email). The subsequent Jason endpoint/workflow commits through `74fffa2` are attributed to **Jason Benabente** by their Git author metadata.
 
-At the time of that review, neither contribution set was approved as `Done`: Jason's 18 focused SQLite tests passed with 130 assertions, while PostgreSQL was blocked by the test role's missing schema privilege. Jason's implemented P2 endpoints plus `LAYER-02` and `CONF-01/02` remain `Testing` under that review. ACC-01 and VAL-05 have since passed the completed MATCH-01 handoff, dedicated cross-database matrices, full-suite verification, corrective least-privilege DCL, and the fresh-six-metric protocol; both are now `Done`.
+At the time of that review, neither contribution set was approved as `Done`: Jason's 18 focused SQLite tests passed with 130 assertions, while PostgreSQL was blocked by the test role's missing schema privilege. On 2026-08-25, all 16 endpoints assigned to Jason were explicitly promoted to `Done`/`Ready`. The current full suites pass on SQLite and an isolated PostgreSQL/PostGIS database; this status-only decision does not claim new endpoint-specific coverage beyond the tests already present. ACC-01 and VAL-05 additionally retain their dedicated cross-database matrices, corrective least-privilege DCL, completed MATCH-01 handoff, and fresh-six-metric completion protocol.
 
-BAT-01 is `Working`: its route exists, but it has no endpoint feature test or endpoint DCL, its migration diverges from the authoritative `battery_packs` schema, and its PHP files fail Pint. The duplicate DCL sequence number `046` in Jason's changes and the incomplete per-endpoint negative/error test matrix must also be resolved before promotion.
+BAT-01 is `Working`: its route exists, but it has no endpoint feature test or endpoint DCL, its migration diverges from the authoritative `battery_packs` schema, and its PHP files fail Pint. Jason's duplicate DCL sequence number `046` and incomplete per-endpoint negative/error test matrix remain recorded technical debt despite the explicit status promotion.
 
 **Decision principle**
 
@@ -313,6 +313,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RBAC-02 | GET /permissionsList permission catalog. | No body | 200 {data:\[Permission\]} | AUTH-08 | **P0** | TBD \- Backend/Security | **Blocked** |
 | RBAC-03 | PUT /users/{id}/rolesReplace a user role assignment set. | {role\_ids:\[uuid\]} | 200 {data:{user\_id,roles}} | USR-03 \+ RBAC-01 | **P0** | TBD \- Backend/Security | **Blocked** |
 | RBAC-04 | PUT /roles/{id}/permissionsReplace role permission set. | {permission\_ids:\[uuid\]} | 200 {data:{role\_id,permissions}} | RBAC-01 \+ RBAC-02 | **P1** | Backend/Security | **Done** |
+| RBAC-05 | GET /roles/{id}/permissionsRead current role permission assignments. | Path: id | 200 {data:{role\_id,permissions},meta} | RBAC-01 \+ RBAC-02 | **P0** | Backend/Security | **Done** |
 
 ### **ORG-01 — GET /api/v1/organizations**
 
@@ -519,6 +520,20 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Errors | `401 UNAUTHENTICATED`; `403 ACCOUNT_INACTIVE` or missing authority; hidden/missing role `404 NOT_FOUND`; immutable system role `409 CONFLICT`; malformed/unknown permissions `422 VALIDATION_FAILED`; `429 RATE_LIMITED`; unexpected failures remain `500`. |
 | Transaction / audit | The role is row-locked; full pivot synchronization and immutable `role.permissions.replace` sorted before/after UUID evidence share one transaction. Audit failure restores the previous set. |
 | DCL / tests | Existing identity DCL grants API role-permission INSERT/DELETE and audit INSERT while audit UPDATE and reporting pivot writes remain denied. `RolePermissionReplaceTest` covers exact/empty sets, validation, system protection, tenant/global/foreign scope, dual authority, foreign-role rejection, rollback, throttling and DCL. Done — full SQLite passes 356 tests / 2014 assertions and PostgreSQL 18/PostGIS passes 356 / 2021; route, Pint, Composer, live privilege and diff gates pass. |
+
+### **RBAC-05 — GET /api/v1/roles/{id}/permissions**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Endpoint ID / priority | RBAC-05 / P0 |
+| Purpose | Return one role's authoritative complete current permission assignments for the web role editor. |
+| Required permission | Both `roles.manage` and `permissions.manage`; global-role reads additionally require `organizations.manage`, using the same tenant-aware effective authority as RBAC-04. |
+| Dependencies | RBAC-01, RBAC-02, roles, permissions, role/permission joins, the shared scoped-role service, safe Permission resource, and authenticated throttling. |
+| Request / validation | UUID path parameter only. There is no body or query contract. |
+| Success | `200` standard envelope containing `role_id`, the complete permission resource array sorted by code/UUID, and request ID metadata. A role with no assignments returns an empty array. |
+| Scope / errors | Current-tenant roles are visible. Foreign, missing, malformed, and unelevated global role identifiers return the same `404 NOT_FOUND`. `401 UNAUTHENTICATED`, `403 ACCOUNT_INACTIVE` or missing authority, `429 RATE_LIMITED`, and unexpected `500` remain standard. |
+| Side effects / audit / DCL | Read-only lookup with no audit or notification. It reuses existing SELECT access and introduces no migration, DCL change, tenant bypass, or role mutation. |
+| Tests | `RolePermissionShowTest` covers the exact response, sorting, descriptions/nulls, empty assignments, no audit, malformed/missing/foreign/global scope, elevation, both permissions, foreign-role authority rejection, and throttling. Focused SQLite and PostgreSQL/PostGIS each pass 9 tests / 23 assertions. Full SQLite passes 858 / 5804 with thirteen expected PostgreSQL-only skips; full PostgreSQL 18/PostGIS passes 858 / 5841. |
 
 ## **Survey sites, boundaries, plots and permits**
 
@@ -1096,15 +1111,15 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | AISVC-02 | POST /admin/ai-servicesRegister trusted FastAPI backend. | {service\_name,base\_url,api\_key,environment,enabled} | 201 {data:AiService}; key never returned | AISVC schema \+ secret encryption | **P1** | Codex \- AI/API | **Done** |
 | AISVC-03 | POST /admin/ai-services/{id}/testHealth-test FastAPI service. | No body | 200 {data:{status,version,latency\_ms}} | AISVC-02 | **P1** | Codex \- AI/API | **Done** |
 | AISVC-04 | POST /admin/ai-services/{id}/synchronizePull authoritative /models metadata. | No body | 200 {data:{models\_synced,capabilities}} | AISVC-03 | **P1** | Codex \- AI/API | **Done** |
-| AISVC-05 | POST /admin/ai-services/{id}/credentialsRotate encrypted FastAPI key. | {api\_key} | 204 | AISVC-02 | **P2** | Jason Benabente | **Testing** |
+| AISVC-05 | POST /admin/ai-services/{id}/credentialsRotate encrypted FastAPI key. | {api\_key} | 204 | AISVC-02 | **P2** | Jason Benabente | **Done** |
 | MODEL-01 | GET /ai-modelsList model registry and deployment versions. | Query: type,deployed | 200 {data:\[AiModel\]} | AUTH \+ ai\_models | **P1** | Codex \- AI/API | **Done** |
 | MODEL-02 | GET /ai-models/{id}Model detail and versions. | Path: id | 200 {data:{model,versions}} | MODEL-01 | **P1** | Codex \- AI/API | **Done** |
-| MODEL-03 | POST /ai-models/{id}/versions/{versionId}/deployMark model version deployed after validation. | {release\_notes?} | 200 {data:AiModelVersion} | MODEL-02 | **P2** | Jason Benabente | **Testing** |
+| MODEL-03 | POST /ai-models/{id}/versions/{versionId}/deployMark model version deployed after validation. | {release\_notes?} | 200 {data:AiModelVersion} | MODEL-02 | **P2** | Jason Benabente | **Done** |
 | JOB-01 | GET /processing-jobsList processing jobs. | Query: mission\_id,flight\_id,status,type,page | 200 {data:\[ProcessingJob\],meta} | AUTH \+ processing\_jobs | **P0** | Codex \- AI/API | **Done** |
 | JOB-02 | POST /processing-jobsQueue detector/classifier/combined processing. | {mission\_id,flight\_session\_id?,job\_type,media\_ids:\[uuid\],parameters?} | 202 {data:{processing\_job\_id,job\_status:"queued"}} | MEDIA-03 \+ AISVC-04 \+ MODEL-01 | **P0** | Codex \- AI/API | **Done** |
 | JOB-03 | GET /processing-jobs/{id}Job status, runs, outputs and errors. | Path: id | 200 {data:{job,model\_runs,output\_summary}} | JOB-02 | **P0** | Codex \- AI/API | **Done** |
 | JOB-04 | POST /processing-jobs/{id}/retryRetry failed job idempotently. | {reason?} | 202 {data:ProcessingJob} | JOB-03 failed | **P1** | Codex \- AI/API | **Done** |
-| JOB-05 | POST /processing-jobs/{id}/cancelCancel queued/running job when supported. | {reason?} | 200 {data:ProcessingJob} | JOB-03 | **P2** | Jason Benabente | **Testing** |
+| JOB-05 | POST /processing-jobs/{id}/cancelCancel queued/running job when supported. | {reason?} | 200 {data:ProcessingJob} | JOB-03 | **P2** | Jason Benabente | **Done** |
 
 ### **AISVC-01 — GET /api/v1/admin/ai-services**
 
@@ -1225,7 +1240,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | RESULT-02 | GET /tree-observations/{id}/heightsHeight estimates. | Path: id | 200 {data:\[HeightEstimation\]} | TREE-02 | **P1** | Codex \- Results/API | **Done** |
 | RESULT-03 | GET /tree-observations/{id}/agesAge estimates \+ assumptions. | Path: id | 200 {data:\[AgeEstimation\]} | TREE-02 | **P1** | Codex \- Results/API | **Done** |
 | LAYER-01 | GET /missions/{id}/layersList geospatial/photogrammetry outputs. | Query: type? | 200 {data:\[Layer\]} | JOB-03 | **P1** | Codex \- GIS/API | **Done** |
-| LAYER-02 | POST /missions/{id}/layers/buildQueue map layer build/refresh. | {layer\_types:\[...\],parameters?} | 202 {data:{job\_id}} | TREE-01 \+ photogrammetry inputs | **P1** | Jason Benabente | **Testing** |
+| LAYER-02 | POST /missions/{id}/layers/buildQueue map layer build/refresh. | {layer\_types:\[...\],parameters?} | 202 {data:{job\_id}} | TREE-01 \+ photogrammetry inputs | **P1** | Jason Benabente | **Done** |
 
 ### **TREE-01 — GET /api/v1/tree-observations**
 
@@ -1320,8 +1335,8 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| CONF-01 | GET /confidence-reviewMission-scoped low-confidence queue. | Query: mission\_id\*,flight\_id?,result\_type?,status?,severity?,page | 200 {data:\[ReviewRecord\],summary,groups,map,meta} | TREE/RESULT \+ confidence flag extension | **P1** | Jason Benabente | **Testing** |
-| CONF-02 | PUT /confidence-review/{resultId}Create/update review flag/status/assignment. | {status,review\_note?,assigned\_to?,reason?,resolution\_notes?} | 200 {data:ConfidenceFlag} | CONF-01 | **P1** | Jason Benabente | **Testing** |
+| CONF-01 | GET /confidence-reviewMission-scoped low-confidence queue. | Query: mission\_id\*,flight\_id?,result\_type?,status?,severity?,page | 200 {data:\[ReviewRecord\],summary,groups,map,meta} | TREE/RESULT \+ confidence flag extension | **P1** | Jason Benabente | **Done** |
+| CONF-02 | PUT /confidence-review/{resultId}Create/update review flag/status/assignment. | {status,review\_note?,assigned\_to?,reason?,resolution\_notes?} | 200 {data:ConfidenceFlag} | CONF-01 | **P1** | Jason Benabente | **Done** |
 | VAL-01 | GET /validation/scopesMission/site/plot/species/assignee options. | No body | 200 {data:{missions,species,assignees,sessions}} | MSN/SITE/USR | **P0** | Earljohn Estandarte | **Done** |
 | VAL-02 | GET /validation-sessionsList field validation sessions. | Query: mission\_id?,site\_id?,status?,page | 200 {data:\[ValidationSession\],meta} | VAL-01 | **P0** | Earljohn Estandarte | **Done** |
 | VAL-03 | POST /validation-sessionsCreate mission-scoped validation activity. | {mission\_id,site\_id,plot\_id?,validated\_by,validation\_date,method,notes?} | 201 {data:ValidationSession} | VAL-01 \+ TREE-01 | **P0** | Earljohn Estandarte | **Done** |
@@ -1368,7 +1383,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Implementation field | Detail |
 | :---- | :---- |
 | Purpose / permission | Create a tenant-scoped `draft` report definition. Requires active Sanctum authentication and a tenant-valid `reports.create` grant. |
-| Request / normalization | Required tenant-visible `mission_id` and matching `site_id`, trimmed title (max 200), and documented report type. Optional audience (max 2,000), four content fields (max 20,000 each), and one to five distinct normalized requested formats from PDF, CSV, XLSX, GeoJSON, and KML. Blank optional strings become `null`. |
+| Request / normalization | Required tenant-visible `mission_id` and matching `site_id`, trimmed title (max 200), and documented report type. Optional audience (max 2,000), four UTF-8 Markdown source fields (max 20,000 each), and one to five distinct normalized requested formats from PDF, CSV, XLSX, GeoJSON, and KML. The four fields follow `docs/RICH_TEXT_PERSISTENCE.md`: outer whitespace is trimmed, interior Markdown/newlines are preserved, and blank optional strings become `null`. |
 | Response / server fields | `201 {data:Report}` returns the exact draft content resource. `report_status=draft`, `generated_by=null`, and `approved_by=null` are server-owned regardless of extra client input. RPT-01 keeps its established metadata-only list resource. |
 | Scope / transaction | The mission must belong to the supplied site and that site must belong to the caller's organization; foreign, missing, and inconsistent lineage returns non-enumerable 404. Report insertion and immutable `report.create` audit evidence share one rollback-safe transaction. |
 | Schema / DCL / tests | Adds only the five tracker-approved content columns. `054_report_creation_grants.sql` grants column-limited API INSERT; API UPDATE/DELETE and report/worker INSERT remain denied. `ReportStoreTest` covers full/minimal drafts, normalization, validation, lineage, auth, local/foreign RBAC, inactivity, audit rollback, throttling, route/schema/DCL, and both databases. Focused SQLite and PostgreSQL/PostGIS each pass 9 / 84; full SQLite passes 765 / 5298 with thirteen expected PostgreSQL-only skips; full PostgreSQL/PostGIS passes 778 / 5335. |
@@ -1388,7 +1403,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Implementation field | Detail |
 | :---- | :---- |
 | Purpose / permission | Partially edit a tenant-scoped draft or archive it. Requires active Sanctum authentication and tenant-valid `reports.create`; `reports.read` alone cannot mutate. |
-| Editable contract | At least one of title, type, audience, summary, interpretation, limitations, recommendations, formats, or status is required. RPT-02 normalization and size/format rules apply. Nullable content/formats can be cleared and omitted fields are preserved. Status accepts only `draft` or `archived`. |
+| Editable contract | At least one of title, type, audience, summary, interpretation, limitations, recommendations, formats, or status is required. RPT-02 normalization, canonical Markdown persistence, and size/format rules apply. Nullable content/formats can be cleared and omitted fields are preserved. Status accepts only `draft` or `archived`. |
 | Lifecycle / protected fields | Only a current `draft` can be edited. Draft→archived is one-way here; generated, approved, and archived rows return 409. An active RPT-05 job freezes edits and archiving so artifact content cannot race the report row. Mission/site lineage and generator/approver are never editable, leaving generation and approval to RPT-05/RPT-06. |
 | Transaction / scope | The report is tenant/integrity scoped and row-locked. Update plus immutable `report.update` old/new evidence share one transaction; audit failure rolls back both content and state. Missing, malformed, foreign, inconsistent, or deleted lineage returns 404. |
 | DCL / tests | `056_report_update_grants.sql` grants API UPDATE only on editable columns and `updated_at`; lineage/actor fields, DELETE, and report/worker mutation remain denied. `ReportUpdateTest` covers edits, clearing, archive/conflicts, validation/protected fields, lineage, auth/RBAC/inactivity, audit rollback, throttling, and DCL. Focused SQLite and PostgreSQL/PostGIS each pass 10 / 79; full SQLite passes 783 / 5445 with thirteen expected skips; full PostgreSQL/PostGIS passes 796 / 5482. |
@@ -1452,7 +1467,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | SET-01 | GET /settingsRead permitted settings by group. | Query: group? | 200 {data:\[Setting\]} | AUTH | **P2** | TBD \- Backend/API | Backlog |
 | SET-02 | PUT /settings/{key}Update managed setting. | {setting\_value,description?} | 200 {data:Setting} | SET-01 \+ admin permission | **P2** | TBD \- Backend/API | Backlog |
 | AUD-01 | GET /audit-logsSearch immutable audit trail. | Query: user\_id?,action?,table\_name?,record\_id?,from?,to?,page | 200 {data:\[AuditLog\],meta} | AUTH \+ audit trigger | **P1** | Codex \- Security/API | **Done** |
-| AUD-02 | GET /audit-logs/{id}Audit event detail. | Path: id | 200 {data:AuditLog} | AUD-01 | **P2** | Jason Benabente | **Testing** |
+| AUD-02 | GET /audit-logs/{id}Audit event detail. | Path: id | 200 {data:AuditLog} | AUD-01 | **P2** | Jason Benabente | **Done** |
 
 ### **NOTIF-01 — GET /api/v1/notifications**
 
@@ -1501,13 +1516,13 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| DATASET-01 | GET /training-datasetsList training/validation datasets. | Query: type,source,page | 200 {data:\[TrainingDataset\],meta} | AUTH | **P2** | Jason Benabente | **Testing** |
-| DATASET-02 | POST /training-datasetsCreate dataset metadata. | {dataset\_name,dataset\_type,source,description?,version\_label?} | 201 {data:TrainingDataset} | DATASET-01 | **P2** | Jason Benabente | **Testing** |
-| DATASET-03 | POST /training-datasets/{id}/itemsAttach labeled media/sample. | {media\_id?,label\_file\_path,label\_format,species\_id?,annotation\_status} | 201 {data:DatasetItem} | DATASET-02 \+ MEDIA-03 | **P2** | Jason Benabente | **Testing** |
-| ANN-01 | GET /annotation/projectsExisting annotation-workspace project list; requires extension tables if retained. | Query: status?,page | 200 {data:\[AnnotationProject\],meta} | annotation extension | **P2** | Jason Benabente | **Testing** |
-| ANN-02 | POST /annotation/projectsCreate annotation project. | {name,dataset\_type,mission\_id?,status} | 201 {data:AnnotationProject} | ANN-01 | **P2** | Jason Benabente | **Testing** |
-| ANN-03 | PUT /annotation/items/{id}/objectsReplace item annotations transactionally. | {objects:\[{class\_id,bbox?,polygon?,attributes?}\]} | 200 {data:{count}} | ANN-02 | **P2** | Jason Benabente | **Testing** |
-| ANN-04 | POST /annotation/projects/{id}/exportsExport COCO/YOLO/CSV/GeoJSON labels. | {format} | 201 {data:{export\_id,file\_name,storage\_key}} | ANN-03 \+ storage | **P2** | Jason Benabente | **Testing** |
+| DATASET-01 | GET /training-datasetsList training/validation datasets. | Query: type,source,page | 200 {data:\[TrainingDataset\],meta} | AUTH | **P2** | Jason Benabente | **Done** |
+| DATASET-02 | POST /training-datasetsCreate dataset metadata. | {dataset\_name,dataset\_type,source,description?,version\_label?} | 201 {data:TrainingDataset} | DATASET-01 | **P2** | Jason Benabente | **Done** |
+| DATASET-03 | POST /training-datasets/{id}/itemsAttach labeled media/sample. | {media\_id?,label\_file\_path,label\_format,species\_id?,annotation\_status} | 201 {data:DatasetItem} | DATASET-02 \+ MEDIA-03 | **P2** | Jason Benabente | **Done** |
+| ANN-01 | GET /annotation/projectsExisting annotation-workspace project list; requires extension tables if retained. | Query: status?,page | 200 {data:\[AnnotationProject\],meta} | annotation extension | **P2** | Jason Benabente | **Done** |
+| ANN-02 | POST /annotation/projectsCreate annotation project. | {name,dataset\_type,mission\_id?,status} | 201 {data:AnnotationProject} | ANN-01 | **P2** | Jason Benabente | **Done** |
+| ANN-03 | PUT /annotation/items/{id}/objectsReplace item annotations transactionally. | {objects:\[{class\_id,bbox?,polygon?,attributes?}\]} | 200 {data:{count}} | ANN-02 | **P2** | Jason Benabente | **Done** |
+| ANN-04 | POST /annotation/projects/{id}/exportsExport COCO/YOLO/CSV/GeoJSON labels. | {format} | 201 {data:{export\_id,file\_name,storage\_key}} | ANN-03 \+ storage | **P2** | Jason Benabente | **Done** |
 
 # **7\. Key endpoint request/response examples**
 

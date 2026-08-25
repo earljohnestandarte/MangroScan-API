@@ -13,7 +13,7 @@ This guide coordinates the remaining API work across the six-person team. The au
 | Juneabby Girasol | No current endpoint assignment; validation work transferred to Earljohn Estandarte |
 | Joshua Lopez | No current endpoint assignment; report/export/dashboard work transferred to Earljohn Estandarte |
 
-Assignments optimize conflict avoidance and dependency continuity before raw endpoint-count equality. All 16 endpoints previously assigned to Juneabby Girasol and Joshua Lopez are now assigned to Earljohn Estandarte. The `MATCH-01` handoff from Earljohn to Jason Benabente remains required for validation accuracy/completion, and the report/export/dashboard chains stay with Earljohn.
+Assignments optimize conflict avoidance and dependency continuity before raw endpoint-count equality. All 16 endpoints previously assigned to Juneabby Girasol and Joshua Lopez are now assigned to Earljohn Estandarte. The completed `MATCH-01` handoff from Earljohn supports Jason Benabente's validation accuracy/completion endpoints, and the report/export/dashboard chains stay with Earljohn.
 
 ## Assignment summary
 
@@ -34,12 +34,12 @@ The estimate starts with P0 = 3, P1 = 2, and P2 = 1, then accounts for geospatia
 
 The 2026-08-24 review attributes commit `3cb4b67` (`feat(BAT-01)`) to Jessamae Sumanoy and the following endpoint/workflow commits through `74fffa2` to Jason Benabente. Ownership is based on the contributor instruction and corroborating Git author email/metadata.
 
-These changes are not yet approved as `Done`:
+Current review state:
 
 - Jessamae's `BAT-01` is `Working`. The route is registered, but the contribution has no endpoint feature test or endpoint DCL, does not match the authoritative `battery_packs` schema, and fails Pint in its PHP files.
-- Jason's P2 endpoints plus `LAYER-02` and `CONF-01/02` are `Testing`. The focused SQLite suites pass 18 tests / 130 assertions and the full SQLite suite passes 657 / 4,278, but PostgreSQL execution is blocked before migrations because the test role lacks `CREATE` on schema `public`. Test coverage also does not yet satisfy the repository's per-endpoint definition of done.
-- Jason's `ACC-01` and `VAL-05` have since passed the completed MATCH-01 handoff, dedicated cross-database tests, corrective least-privilege DCL, and the fresh-six-metric completion protocol; both are approved `Done`.
-- Jason's DCL additions currently reuse sequence `046`; allocate a unique sequence before approval.
+- All 16 endpoints assigned to Jason were explicitly promoted to `Done`/`Ready` on 2026-08-25. The current full SQLite and isolated PostgreSQL/PostGIS suites pass. This status-only decision does not claim new endpoint-specific coverage beyond the tests already present.
+- Jason's `ACC-01` and `VAL-05` additionally retain their completed MATCH-01 handoff, dedicated cross-database tests, corrective least-privilege DCL, and fresh-six-metric completion protocol.
+- Jason's DCL additions still reuse sequence `046`; renumbering remains recorded technical debt and should be handled in a dedicated migration-maintenance change.
 
 ### Karlandrei Panday
 
@@ -150,7 +150,7 @@ flowchart LR
 ```
 
 - MATCH-01 now populates the direct-session evidence consumed by Jason Benabente's independently verified ACC-01 and VAL-05. V-08/MV-01 and ACC-01 are complete, so DASH-01 may proceed independently.
-- Earljohn Estandarte's transferred validation mutations are complete for Jessamae Sumanoy's `SYNC-04`; Jason Benabente's `VAL-05` promotion remains the completion-state dependency.
+- Earljohn Estandarte's transferred validation mutations and Jason Benabente's `VAL-05` promotion are complete for Jessamae Sumanoy's `SYNC-04` completion-state dependency.
 - Preserve MATCH-01's direct `validation_session_id` lineage in accuracy and completion queries so false positives are included without requiring a ground-truth row.
 - Karlandrei Panday’s current assigned rows depend only on completed Earljohn Estandarte endpoints and within-owner chains.
 - `SITE-05` has no assigned owner in the tracker and is excluded from all developer work packages until ownership is explicitly recorded.

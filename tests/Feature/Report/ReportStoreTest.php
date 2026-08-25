@@ -66,6 +66,23 @@ class ReportStoreTest extends TestCase
             ->assertJsonPath('data.recommendations', null)->assertJsonPath('data.formats', null);
     }
 
+    // [RPT-02] Canonical Markdown source survives JSON and PostgreSQL TEXT persistence.
+    public function test_it_round_trips_canonical_report_markdown(): void
+    {
+        $graph = $this->graph(prefix: 'markdown-');
+        $markdown = "## Findings\n\n- **12** validated trees\n- [Protocol](https://example.test/protocol)";
+
+        $response = $this->withToken($graph['token'])->postJson('/api/v1/reports',
+            array_replace($this->payload($graph), ['summary' => "  {$markdown}  "])
+        );
+
+        $response->assertCreated()->assertJsonPath('data.summary', $markdown);
+        $this->assertDatabaseHas('reports', [
+            'report_id' => $response->json('data.report_id'),
+            'summary' => $markdown,
+        ]);
+    }
+
     // [RPT-02] Foreign, missing, and inconsistent mission/site lineage is non-enumerable.
     public function test_it_hides_unavailable_lineage(): void
     {
