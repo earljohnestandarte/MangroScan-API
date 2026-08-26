@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\Api\V1\Drone\DroneSensorUpdateController;
+use App\Http\Controllers\Api\V1\Drone\SensorCalibrationStoreController;
 use App\Http\Controllers\Api\V1\Ai\AiModelIndexController;
 use App\Http\Controllers\Api\V1\Ai\AiModelShowController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceHealthTestController;
@@ -430,6 +431,16 @@ Route::patch('/sensors/{sensor}', DroneSensorUpdateController::class)
         'auth:sanctum',
         EnsureActiveIdentity::class,
         'permission:sensors.manage',
+        'throttle:auth.authenticated',
+    ]);
+
+// [CAL-01] POST /api/v1/sensors/{sensor}/calibrations
+Route::post('/sensors/{sensor}/calibrations', SensorCalibrationStoreController::class)
+    ->whereUuid('sensor')
+    ->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:sensor_calibrations.manage',
         'throttle:auth.authenticated',
     ]);
 
