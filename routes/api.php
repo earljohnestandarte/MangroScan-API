@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\Api\V1\Drone\DroneSensorUpdateController;
 use App\Http\Controllers\Api\V1\Ai\AiModelIndexController;
 use App\Http\Controllers\Api\V1\Ai\AiModelShowController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceHealthTestController;
@@ -423,6 +423,16 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:sensors.manage', 'throttle:auth.authenticated',
     ]);
 
+// [SENSOR-02] PATCH /api/v1/sensors/{id}
+Route::patch('/sensors/{sensor}', DroneSensorUpdateController::class)
+    ->whereUuid('sensor')
+    ->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:sensors.manage',
+        'throttle:auth.authenticated',
+    ]);
+
     // [BAT-01] GET /api/v1/batteries
     Route::get('/batteries', BatteryIndexController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:batteries.read', 'throttle:auth.authenticated',
@@ -704,3 +714,4 @@ Route::prefix('v1')->group(function () {
             'permission:ai_services.manage', 'throttle:auth.authenticated',
         ]);
 });
+
