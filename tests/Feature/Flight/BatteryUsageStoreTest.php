@@ -26,7 +26,7 @@ class BatteryUsageStoreTest extends TestCase
                 'notes' => 'Normal sortie battery usage',
             ]);
 
-$response->dump();
+
 
 $response->assertCreated()            ->assertJsonPath('data.flight_session_id', $g['flight'])
             ->assertJsonPath('data.battery_id', $g['battery'])
