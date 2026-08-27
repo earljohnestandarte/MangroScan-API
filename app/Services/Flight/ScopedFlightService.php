@@ -14,28 +14,45 @@ class ScopedFlightService
     {
         return FlightSession::query()
             ->withLocationGeoJson()
-            ->whereHas('mission.site', function (Builder $query) use ($actor): void {
-                $query->where('organization_id', $actor->organization_id);
+            ->where('flight_sessions.flight_session_id', $id)
+            ->whereHas('mission', function (Builder $missionQuery) use ($actor): void {
+                $missionQuery->whereHas('site', function (Builder $siteQuery) use ($actor): void {
+                    $siteQuery->where(
+                        'survey_sites.organization_id',
+                        $actor->organization_id
+                    );
+                });
             })
-            ->findOrFail($id);
+            ->firstOrFail();
     }
 
     /** @return array{waypoint_count: int, media_count: int} */
     public function childCounts(FlightSession $flight): array
     {
         return [
-            'waypoint_count' => $this->countChildren('flight_waypoints', $flight->flight_session_id),
-            'media_count' => $this->countChildren('media_assets', $flight->flight_session_id, softDeletes: true),
+            'waypoint_count' => $this->countChildren(
+                'flight_waypoints',
+                $flight->flight_session_id
+            ),
+            'media_count' => $this->countChildren(
+                'media_assets',
+                $flight->flight_session_id,
+                softDeletes: true
+            ),
         ];
     }
 
-    private function countChildren(string $table, string $flightId, bool $softDeletes = false): int
-    {
+    private function countChildren(
+        string $table,
+        string $flightId,
+        bool $softDeletes = false
+    ): int {
         if (! Schema::hasTable($table)) {
             return 0;
         }
 
-        $query = DB::table($table)->where('flight_session_id', $flightId);
+        $query = DB::table($table)
+            ->where('flight_session_id', $flightId);
 
         if ($softDeletes && Schema::hasColumn($table, 'deleted_at')) {
             $query->whereNull('deleted_at');

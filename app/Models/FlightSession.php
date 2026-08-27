@@ -54,8 +54,12 @@ class FlightSession extends Model
         if (DB::getDriverName() === 'pgsql') {
             $query
                 ->select('flight_sessions.*')
-                ->selectRaw('ST_AsGeoJSON(takeoff_location)::json AS takeoff_location_geojson')
-                ->selectRaw('ST_AsGeoJSON(landing_location)::json AS landing_location_geojson');
+                ->selectRaw(
+                    'ST_AsGeoJSON(takeoff_location)::json AS takeoff_location_geojson'
+                )
+                ->selectRaw(
+                    'ST_AsGeoJSON(landing_location)::json AS landing_location_geojson'
+                );
         }
 
         return $query;
@@ -63,26 +67,64 @@ class FlightSession extends Model
 
     public function mission(): BelongsTo
     {
-        return $this->belongsTo(SurveyMission::class, 'mission_id', 'mission_id');
+        return $this->belongsTo(
+            SurveyMission::class,
+            'mission_id',
+            'mission_id'
+        );
     }
 
     public function drone(): BelongsTo
     {
-        return $this->belongsTo(Drone::class, 'drone_id', 'drone_id');
+        return $this->belongsTo(
+            Drone::class,
+            'drone_id',
+            'drone_id'
+        );
     }
 
     public function pilot(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'pilot_user_id', 'user_id');
+        return $this->belongsTo(
+            User::class,
+            'pilot_user_id',
+            'user_id'
+        );
     }
 
     public function checklists(): HasMany
     {
-        return $this->hasMany(FlightChecklist::class, 'flight_session_id', 'flight_session_id');
+        return $this->hasMany(
+            FlightChecklist::class,
+            'flight_session_id',
+            'flight_session_id'
+        );
     }
 
     public function mediaAssets(): HasMany
     {
-        return $this->hasMany(MediaAsset::class, 'flight_session_id', 'flight_session_id');
+        return $this->hasMany(
+            MediaAsset::class,
+            'flight_session_id',
+            'flight_session_id'
+        );
+    }
+
+    public function environmentLogs(): HasMany
+    {
+        return $this->hasMany(
+            EnvironmentLog::class,
+            'flight_session_id',
+            'flight_session_id'
+        );
+    }
+
+    public function batteryUsages(): HasMany
+    {
+        return $this->hasMany(
+            BatteryUsage::class,
+            'flight_session_id',
+            'flight_session_id'
+        );
     }
 }

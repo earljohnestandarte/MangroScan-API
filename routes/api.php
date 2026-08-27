@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\Api\V1\Flight\EnvironmentLogStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorUpdateController;
 use App\Http\Controllers\Api\V1\Drone\SensorCalibrationStoreController;
 use App\Http\Controllers\Api\V1\Ai\AiModelIndexController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\Api\V1\Flight\FlightFailController;
 use App\Http\Controllers\Api\V1\Flight\FlightShowController;
 use App\Http\Controllers\Api\V1\Flight\FlightStartController;
 use App\Http\Controllers\Api\V1\Flight\FlightUpdateController;
+use App\Http\Controllers\Api\V1\Flight\BatteryUsageStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightWaypointReplaceController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightIndexController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightStoreController;
@@ -485,6 +487,15 @@ Route::post('/sensors/{sensor}/calibrations', SensorCalibrationStoreController::
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:flights.update', 'throttle:auth.authenticated',
         ]);
+// [BAT-03] POST /api/v1/flights/{id}/battery-usage
+Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::class)
+    ->whereUuid('flight')
+    ->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:flights.update',
+        'throttle:auth.authenticated',
+    ]);
 
     // [WPT-01] PUT /api/v1/flights/{id}/waypoints
     Route::put('/flights/{flight}/waypoints', FlightWaypointReplaceController::class)->whereUuid('flight')->middleware([
@@ -730,4 +741,15 @@ Route::post('/sensors/{sensor}/calibrations', SensorCalibrationStoreController::
             'permission:ai_services.manage', 'throttle:auth.authenticated',
         ]);
 });
+
+
+// [ENV-01] POST /api/v1/flights/{flight}/environment-logs
+Route::post('/flights/{flight}/environment-logs', EnvironmentLogStoreController::class)
+    ->whereUuid('flight')
+    ->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:flights.update',
+        'throttle:auth.authenticated',
+    ]);
 
