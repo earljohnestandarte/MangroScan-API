@@ -3,14 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SurveyMission extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes;
+
+    protected $table = 'survey_missions';
 
     protected $primaryKey = 'mission_id';
 
@@ -34,56 +35,23 @@ class SurveyMission extends Model
         'approved_by',
     ];
 
-    /** @return array<string, string> */
-    protected function casts(): array
-    {
-        return [
-            'planned_start_at' => 'datetime',
-            'planned_end_at' => 'datetime',
-            'actual_start_at' => 'datetime',
-            'actual_end_at' => 'datetime',
-            'coverage_target_hectares' => 'decimal:4',
-            'coverage_completed_hectares' => 'decimal:4',
-        ];
-    }
+    protected $casts = [
+        'planned_start_at' => 'datetime',
+        'planned_end_at' => 'datetime',
+        'actual_start_at' => 'datetime',
+        'actual_end_at' => 'datetime',
+        'coverage_target_hectares' => 'decimal:4',
+        'coverage_completed_hectares' => 'decimal:4',
+        'deleted_at' => 'datetime',
+    ];
 
-    public function site(): BelongsTo
-    {
-        return $this->belongsTo(SurveySite::class, 'site_id', 'site_id');
-    }
+   public function site()
+{
+    return $this->belongsTo(SurveySite::class, 'site_id', 'site_id');
+}
 
-    public function creator(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by', 'user_id');
-    }
-
-    public function approver(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'approved_by', 'user_id');
-    }
-
-    public function teamMembers(): HasMany
-    {
-        return $this->hasMany(MissionTeamMember::class, 'mission_id', 'mission_id');
-    }
-
-    public function flightSessions(): HasMany
-    {
-        return $this->hasMany(FlightSession::class, 'mission_id', 'mission_id');
-    }
-
-    public function reports(): HasMany
-    {
-        return $this->hasMany(Report::class, 'mission_id', 'mission_id');
-    }
-
-    public function validationSessions(): HasMany
-    {
-        return $this->hasMany(ValidationSession::class, 'mission_id', 'mission_id');
-    }
-
-    public function accuracyMetrics(): HasMany
-    {
-        return $this->hasMany(AccuracyMetric::class, 'mission_id', 'mission_id');
-    }
+public function teamMembers()
+{
+    return $this->hasMany(MissionTeamMember::class, 'mission_id', 'mission_id');
+}
 }

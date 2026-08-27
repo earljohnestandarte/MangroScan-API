@@ -37,6 +37,7 @@ use App\Http\Controllers\Api\V1\Media\MediaUploadCompleteController;
 use App\Http\Controllers\Api\V1\Media\MediaUploadInitiateController;
 use App\Http\Controllers\Api\V1\Mission\MissionApprovalController;
 use App\Http\Controllers\Api\V1\Mission\MissionCompleteController;
+use App\Http\Controllers\Api\V1\Mission\MissionDeleteController;
 use App\Http\Controllers\Api\V1\Mission\MissionIndexController;
 use App\Http\Controllers\Api\V1\Mission\MissionShowController;
 use App\Http\Controllers\Api\V1\Mission\MissionStartController;
@@ -378,6 +379,10 @@ Route::prefix('v1')->group(function () {
     Route::patch('/missions/{mission}', MissionUpdateController::class)->whereUuid('mission')->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.update', 'throttle:auth.authenticated',
     ]);
+	// [MSN-05] DELETE /api/v1/missions/{id}
+Route::delete('/missions/{mission}', MissionDeleteController::class)->whereUuid('mission')->middleware([
+    'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.delete', 'throttle:auth.authenticated',
+]);
 
     // [TEAM-01] PUT /api/v1/missions/{id}/team
     Route::put('/missions/{mission}/team', MissionTeamReplaceController::class)->whereUuid('mission')->middleware([
