@@ -49,6 +49,7 @@ use App\Http\Controllers\Api\V1\Mission\MissionTeamReplaceController;
 use App\Http\Controllers\Api\V1\Mission\MissionUpdateController;
 use App\Http\Controllers\Api\V1\Mobile\MobileBootstrapController;
 use App\Http\Controllers\Api\V1\Mobile\MobileSyncStatusController;
+use App\Http\Controllers\Api\V1\Mobile\MobileSyncController;
 use App\Http\Controllers\Api\V1\Mobile\MobileMissionBundleController;
 use App\Http\Controllers\Api\V1\Mobile\SyncDeviceRegisterController;
 use App\Http\Controllers\Api\V1\Notification\NotificationIndexController;
@@ -751,6 +752,13 @@ Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::clas
             'permission:ai_services.manage', 'throttle:auth.authenticated',
         ]);
 
+    // [SYNC-04] POST /api/v1/mobile/sync
+    Route::post('/mobile/sync', MobileSyncController::class)->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'throttle:auth.authenticated',
+    ]);
+
     // [SYNC-05] GET /api/v1/mobile/sync/status
     Route::get('/mobile/sync/status', MobileSyncStatusController::class)->middleware([
         'auth:sanctum',
@@ -768,4 +776,6 @@ Route::post('/flights/{flight}/environment-logs', EnvironmentLogStoreController:
         'permission:flights.update',
         'throttle:auth.authenticated',
     ]);
+
+
 
