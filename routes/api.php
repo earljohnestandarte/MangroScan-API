@@ -35,6 +35,7 @@ use App\Http\Controllers\Api\V1\Flight\MissionFlightStoreController;
 use App\Http\Controllers\Api\V1\Media\FlightMediaIndexController;
 use App\Http\Controllers\Api\V1\Media\MediaQualityUpdateController;
 use App\Http\Controllers\Api\V1\Media\MediaShowController;
+use App\Http\Controllers\Api\V1\Media\MediaDownloadController;
 use App\Http\Controllers\Api\V1\Media\MediaUploadCompleteController;
 use App\Http\Controllers\Api\V1\Media\MediaUploadInitiateController;
 use App\Http\Controllers\Api\V1\Mission\MissionApprovalController;
@@ -557,6 +558,14 @@ Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::clas
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:media.upload', 'throttle:auth.authenticated',
+        ]);
+
+    // [MEDIA-05] POST /api/v1/media/{id}/download
+    Route::post('/media/{media}/download', MediaDownloadController::class)
+        ->whereUuid('media')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:media.read', 'throttle:auth.authenticated',
         ]);
 
     // [MEDIA-04] GET /api/v1/media/{id}
