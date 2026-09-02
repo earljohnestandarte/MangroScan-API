@@ -3,5 +3,6 @@
 BEGIN;
 
 GRANT INSERT ON TABLE app.monitoring_plots TO mangroscan_api_rw;
+GRANT UPDATE ON TABLE app.monitoring_plots TO mangroscan_api_rw;
 
 COMMIT;

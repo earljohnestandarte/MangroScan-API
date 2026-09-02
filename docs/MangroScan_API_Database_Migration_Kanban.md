@@ -1463,7 +1463,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | NOTIF-01 | GET /notificationsList durable notifications for current user. | Query: unread\_only?,type?,page | 200 {data:\[Notification\],meta} | AUTH \+ notification\_logs | **P1** | Codex \- Backend/API | **Done** |
 | NOTIF-02 | GET /notifications/unread-countLightweight badge count. | No body | 200 {data:{unread\_count}} | NOTIF-01 | **P1** | Codex \- Backend/API | **Done** |
 | NOTIF-03 | POST /notifications/{id}/readMark one notification read. | No body | 200 {data:Notification} | NOTIF-01 | **P1** | Codex \- Backend/API | **Done** |
-| NOTIF-04 | POST /notifications/read-allMark caller notifications read. | No body | 204 | NOTIF-01 | **P2** | TBD \- Backend/API | Backlog |
+| NOTIF-04 | POST /notifications/read-allMark caller notifications read. | No body | 204 | NOTIF-01 | **P2** | karlandrei panday | **Done** |
 | SET-01 | GET /settingsRead permitted settings by group. | Query: group? | 200 {data:\[Setting\]} | AUTH | **P2** | TBD \- Backend/API | Backlog |
 | SET-02 | PUT /settings/{key}Update managed setting. | {setting\_value,description?} | 200 {data:Setting} | SET-01 \+ admin permission | **P2** | TBD \- Backend/API | Backlog |
 | AUD-01 | GET /audit-logsSearch immutable audit trail. | Query: user\_id?,action?,table\_name?,record\_id?,from?,to?,page | 200 {data:\[AuditLog\],meta} | AUTH \+ audit trigger | **P1** | Codex \- Security/API | **Done** |

@@ -40,11 +40,11 @@ Current inventory: **142 endpoints**, **118 available**, **20 under construction
 
 ## Currently available endpoints
 
-`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `RBAC-05`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `AISVC-05`, `MODEL-01`, `MODEL-02`, `MODEL-03`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `JOB-05`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `LAYER-02`, `CONF-01`, `CONF-02`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-01`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `DASH-01`, `DASH-02`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
+`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-04`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `RBAC-05`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `AISVC-05`, `MODEL-01`, `MODEL-02`, `MODEL-03`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `JOB-05`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `LAYER-02`, `CONF-01`, `CONF-02`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-01`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `DASH-01`, `DASH-02`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `NOTIF-04`, `AUD-01`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
 
 ## Unavailable, testing, and blocked endpoints
 
-`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`.
+`SITE-05`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`.
 
 Do not integrate the unavailable endpoints above yet. Jessamae Sumanoy's `BAT-01` remains `Working` after schema, DCL, test, and formatting gaps were found. All 16 endpoints assigned to Jason Benabente are `Done`/available by explicit product decision on 2026-08-25. The status-only promotion is backed by the passing full SQLite and isolated PostgreSQL/PostGIS suites, but it does not claim new endpoint-specific coverage beyond the tests already present.
 
@@ -57,7 +57,7 @@ Do not integrate the unavailable endpoints above yet. Jessamae Sumanoy's `BAT-01
 | `AUTH-01` | POST | `/api/v1/auth/login` | P0 | Done | ✅ AVAILABLE |
 | `AUTH-02` | GET | `/api/v1/auth/me` | P0 | Done | ✅ AVAILABLE |
 | `AUTH-03` | POST | `/api/v1/auth/logout` | P0 | Done | ✅ AVAILABLE |
-| `AUTH-04` | POST | `/api/v1/auth/refresh` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
+| `AUTH-04` | POST | `/api/v1/auth/refresh` | P1 | Done | ✅ AVAILABLE |
 | `AUTH-05` | PUT | `/api/v1/auth/password` | P1 | Done | ✅ AVAILABLE |
 | `AUTH-06` | POST | `/api/v1/auth/password/forgot` | P1 | Done | ✅ AVAILABLE |
 | `AUTH-07` | POST | `/api/v1/auth/password/reset` | P1 | Done | ✅ AVAILABLE |
@@ -86,9 +86,9 @@ Do not integrate the unavailable endpoints above yet. Jessamae Sumanoy's `BAT-01
 | `BOUND-03` | PATCH | `/api/v1/boundaries/{id}` | P1 | Done | ✅ AVAILABLE |
 | `PLOT-01` | GET | `/api/v1/sites/{id}/plots` | P1 | Done | ✅ AVAILABLE |
 | `PLOT-02` | POST | `/api/v1/sites/{id}/plots` | P1 | Done | ✅ AVAILABLE |
-| `PLOT-03` | PATCH | `/api/v1/plots/{id}` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `PERMIT-01` | GET | `/api/v1/sites/{id}/access-permissions` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `PERMIT-02` | POST | `/api/v1/sites/{id}/access-permissions` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `PLOT-03` | PATCH | `/api/v1/plots/{id}` | P2 | Done | ✅ AVAILABLE |
+| `PERMIT-01` | GET | `/api/v1/sites/{id}/access-permissions` | P2 | Done | ✅ AVAILABLE |
+| `PERMIT-02` | POST | `/api/v1/sites/{id}/access-permissions` | P2 | Done | ✅ AVAILABLE |
 | `DRONE-01` | GET | `/api/v1/drones` | P1 | Done | ✅ AVAILABLE |
 | `DRONE-02` | POST | `/api/v1/drones` | P1 | Done | ✅ AVAILABLE |
 | `DRONE-03` | GET | `/api/v1/drones/{id}` | P1 | Done | ✅ AVAILABLE |
@@ -175,16 +175,16 @@ Do not integrate the unavailable endpoints above yet. Jessamae Sumanoy's `BAT-01
 | `EXP-03` | POST | `/api/v1/exported-files/{id}/download` | P0 | Done | ✅ AVAILABLE |
 | `DASH-01` | GET | `/api/v1/dashboard/overview` | P1 | Done | ✅ AVAILABLE |
 | `DASH-02` | GET | `/api/v1/dashboard/missions/{id}` | P1 | Done | ✅ AVAILABLE |
-| `VIEW-01` | GET | `/api/v1/dashboard/saved-views` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `VIEW-02` | POST | `/api/v1/dashboard/saved-views` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `VIEW-03` | PATCH | `/api/v1/dashboard/saved-views/{id}` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `VIEW-04` | DELETE | `/api/v1/dashboard/saved-views/{id}` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `VIEW-01` | GET | `/api/v1/dashboard/saved-views` | P2 | Done | ✅ AVAILABLE |
+| `VIEW-02` | POST | `/api/v1/dashboard/saved-views` | P2 | Done | ✅ AVAILABLE |
+| `VIEW-03` | PATCH | `/api/v1/dashboard/saved-views/{id}` | P2 | Done | ✅ AVAILABLE |
+| `VIEW-04` | DELETE | `/api/v1/dashboard/saved-views/{id}` | P2 | Done | ✅ AVAILABLE |
 | `NOTIF-01` | GET | `/api/v1/notifications` | P1 | Done | ✅ AVAILABLE |
 | `NOTIF-02` | GET | `/api/v1/notifications/unread-count` | P1 | Done | ✅ AVAILABLE |
 | `NOTIF-03` | POST | `/api/v1/notifications/{id}/read` | P1 | Done | ✅ AVAILABLE |
-| `NOTIF-04` | POST | `/api/v1/notifications/read-all` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `SET-01` | GET | `/api/v1/settings` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `SET-02` | PUT | `/api/v1/settings/{key}` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `NOTIF-04` | POST | `/api/v1/notifications/read-all` | P2 | Done | ✅ AVAILABLE |
+| `SET-01` | GET | `/api/v1/settings` | P2 | Done | ✅ AVAILABLE |
+| `SET-02` | PUT | `/api/v1/settings/{key}` | P2 | Done | ✅ AVAILABLE |
 | `AUD-01` | GET | `/api/v1/audit-logs` | P1 | Done | ✅ AVAILABLE |
 | `AUD-02` | GET | `/api/v1/audit-logs/{id}` | P2 | Done | ✅ AVAILABLE |
 | `DATASET-01` | GET | `/api/v1/training-datasets` | P2 | Done | ✅ AVAILABLE |
@@ -200,7 +200,7 @@ Do not integrate the unavailable endpoints above yet. Jessamae Sumanoy's `BAT-01
 - Authentication uses Laravel Sanctum personal access tokens returned by `AUTH-01`.
 - Protected routes require `Authorization: Bearer <token>` and normally require an active user in an active organization.
 - Tokens expire after **60 minutes by default** (`AUTH_ACCESS_TOKEN_TTL_MINUTES`). Treat `expires_at` from login as authoritative.
-- `AUTH-04` refresh is not implemented. Until it is available, prompt for login again after token expiry.
+- `AUTH-04` returns a rotated refresh token and new expiring access token. Store refresh credentials securely and discard the previous refresh token after a successful rotation.
 - `AUTH-03` revokes the current token. `AUTH-05` password change and `AUTH-07` reset revoke all existing tokens.
 - UI visibility should be based on the effective `permissions` returned by `AUTH-01`, `AUTH-02`, or `AUTH-08`, not only on role names.
 
@@ -10120,8 +10120,8 @@ Representative response using only implemented keys (full resource fields are li
 
 ### NOTIF-04 — Mark caller notifications read.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented for the authenticated caller's own unread durable notifications.
 
 | Property | Value |
 | --- | --- |
@@ -10129,17 +10129,17 @@ Representative response using only implemented keys (full resource fields are li
 | Method | `POST` |
 | Path | `/api/v1/notifications/read-all` |
 | Authentication | Required — Bearer token |
-| Permission | No endpoint-specific permission middleware, or planned permission not finalized |
-| Typical seeded roles | Not finalized in current RBAC matrix |
+| Permission | `notifications.read` |
+| Typical seeded roles | Roles with a tenant-valid `notifications.read` grant |
 | Dependencies | NOTIF-01 |
 | Success | 204 — No response body |
 | Relevant errors | 400, 401, 403, 404, 409, 422, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `No body`
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/notifications/read-all HTTP/1.1
@@ -10148,11 +10148,11 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `204`; contract shape `No response body`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+The response is `204` with no response body. Only unread rows owned by the authenticated user are updated; repeated calls are idempotent.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: NOTIF-01.
  After a successful mutation, invalidate or refresh the affected detail and list queries.

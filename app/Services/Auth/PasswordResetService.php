@@ -32,6 +32,7 @@ class PasswordResetService
             $repository->delete($user);
             $revokedCredentials = $user->tokens()->count();
             $user->tokens()->delete();
+            DB::table('refresh_tokens')->where('user_id', $user->user_id)->delete();
             $this->auditLogger->record(
                 action: 'auth.password.reset.completed', tableName: 'users', recordId: $user->user_id,
                 userId: $user->user_id, oldValues: null,

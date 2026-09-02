@@ -21,9 +21,14 @@ use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\PasswordChangeController;
 use App\Http\Controllers\Api\V1\Auth\PasswordForgotController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
+use App\Http\Controllers\Api\V1\Auth\RefreshTokenController;
 use App\Http\Controllers\Api\V1\Battery\BatteryIndexController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardOverviewController;
 use App\Http\Controllers\Api\V1\Dashboard\MissionDashboardController;
+use App\Http\Controllers\Api\V1\Dashboard\SavedViewDeleteController;
+use App\Http\Controllers\Api\V1\Dashboard\SavedViewIndexController;
+use App\Http\Controllers\Api\V1\Dashboard\SavedViewStoreController;
+use App\Http\Controllers\Api\V1\Dashboard\SavedViewUpdateController;
 use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
@@ -57,6 +62,7 @@ use App\Http\Controllers\Api\V1\Mobile\MobileBootstrapController;
 use App\Http\Controllers\Api\V1\Mobile\MobileMissionBundleController;
 use App\Http\Controllers\Api\V1\Mobile\SyncDeviceRegisterController;
 use App\Http\Controllers\Api\V1\Notification\NotificationIndexController;
+use App\Http\Controllers\Api\V1\Notification\NotificationReadAllController;
 use App\Http\Controllers\Api\V1\Notification\NotificationReadController;
 use App\Http\Controllers\Api\V1\Notification\NotificationUnreadCountController;
 use App\Http\Controllers\Api\V1\Organization\OrganizationIndexController;
@@ -92,6 +98,11 @@ use App\Http\Controllers\Api\V1\Site\SitePlotStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteShowController;
 use App\Http\Controllers\Api\V1\Site\SiteStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteUpdateController;
+use App\Http\Controllers\Api\V1\Setting\SystemSettingIndexController;
+use App\Http\Controllers\Api\V1\Setting\SystemSettingUpdateController;
+use App\Http\Controllers\Api\V1\Site\PlotUpdateController;
+use App\Http\Controllers\Api\V1\Site\SiteAccessPermissionIndexController;
+use App\Http\Controllers\Api\V1\Site\SiteAccessPermissionStoreController;
 use App\Http\Controllers\Api\V1\Training\TrainingDatasetIndexController;
 use App\Http\Controllers\Api\V1\Training\TrainingDatasetItemStoreController;
 use App\Http\Controllers\Api\V1\Training\TrainingDatasetStoreController;
@@ -132,6 +143,9 @@ Route::prefix('v1')->group(function () {
     // [AUTH-01] POST /api/v1/auth/login
     Route::post('/auth/login', LoginController::class)->middleware('throttle:auth.login');
 
+    // [AUTH-04] POST /api/v1/auth/refresh
+    Route::post('/auth/refresh', RefreshTokenController::class)->middleware('throttle:auth.login');
+
     // [AUTH-02] GET /api/v1/auth/me
     Route::get('/auth/me', AuthenticatedProfileController::class)->middleware([
         'auth:sanctum',
@@ -164,6 +178,14 @@ Route::prefix('v1')->group(function () {
     Route::get('/auth/permissions', EffectivePermissionsController::class)->middleware([
         'auth:sanctum',
         EnsureActiveIdentity::class,
+        'throttle:auth.authenticated',
+    ]);
+
+    // [NOTIF-04] POST /api/v1/notifications/read-all
+    Route::post('/notifications/read-all', NotificationReadAllController::class)->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:notifications.read',
         'throttle:auth.authenticated',
     ]);
 
@@ -394,7 +416,25 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:boundaries.manage', 'throttle:auth.authenticated',
     ]);
+    // [PLOT-03] PATCH /api/v1/plots/{id}
+    Route::patch('/plots/{plot}', PlotUpdateController::class)->whereUuid('plot')->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:plots.manage', 'throttle:auth.authenticated',
+    ]);
 
+    // [PERMIT-01] GET /api/v1/sites/{id}/access-permissions
+    Route::get('/sites/{site}/access-permissions', SiteAccessPermissionIndexController::class)
+        ->whereUuid('site')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:site_permissions.manage', 'throttle:auth.authenticated',
+        ]);
+
+    // [PERMIT-02] POST /api/v1/sites/{id}/access-permissions
+    Route::post('/sites/{site}/access-permissions', SiteAccessPermissionStoreController::class)
+        ->whereUuid('site')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:site_permissions.manage', 'throttle:auth.authenticated',
+        ]);
     // [MSN-01] GET /api/v1/missions
     Route::get('/missions', MissionIndexController::class)->middleware([
         'auth:sanctum',
@@ -402,7 +442,6 @@ Route::prefix('v1')->group(function () {
         'permission:missions.read',
         'throttle:auth.authenticated',
     ]);
-
     // [MSN-02] POST /api/v1/missions
     Route::post('/missions', MissionStoreController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class,
@@ -904,6 +943,42 @@ Route::prefix('v1')->group(function () {
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:results.read', 'throttle:auth.authenticated',
         ]);
+
+    // [VIEW-01] GET /api/v1/dashboard/saved-views
+    Route::get('/dashboard/saved-views', SavedViewIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:results.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [VIEW-02] POST /api/v1/dashboard/saved-views
+    Route::post('/dashboard/saved-views', SavedViewStoreController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:results.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [VIEW-03] PATCH /api/v1/dashboard/saved-views/{id}
+    Route::patch('/dashboard/saved-views/{view}', SavedViewUpdateController::class)->whereUuid('view')->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:results.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [VIEW-04] DELETE /api/v1/dashboard/saved-views/{id}
+    Route::delete('/dashboard/saved-views/{view}', SavedViewDeleteController::class)->whereUuid('view')->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:results.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [SET-01] GET /api/v1/settings
+    Route::get('/settings', SystemSettingIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:settings.manage', 'throttle:auth.authenticated',
+    ]);
+
+    // [SET-02] PUT /api/v1/settings/{key}
+    Route::put('/settings/{key}', SystemSettingUpdateController::class)->where('key', '[A-Za-z0-9_.-]+')->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:settings.manage', 'throttle:auth.authenticated',
+    ]);
 
     // [MODEL-01] GET /api/v1/ai-models
     Route::get('/ai-models', AiModelIndexController::class)->middleware([
