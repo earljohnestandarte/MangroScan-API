@@ -19,6 +19,7 @@ class AccuracyMetric extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
+        'validation_session_id',
         'mission_id',
         'model_version_id',
         'metric_type',
@@ -41,6 +42,11 @@ class AccuracyMetric extends Model
     public function mission(): BelongsTo
     {
         return $this->belongsTo(SurveyMission::class, 'mission_id', 'mission_id');
+    }
+
+    public function validationSession(): BelongsTo
+    {
+        return $this->belongsTo(ValidationSession::class, 'validation_session_id', 'validation_session_id');
     }
 
     public function modelVersion(): BelongsTo

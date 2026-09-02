@@ -23,12 +23,15 @@ class GroundTruthTreeRecord extends Model
 
     protected $fillable = [
         'validation_session_id',
+        'field_code',
         'species_id',
         'ground_location',
         'measured_height_meters',
         'estimated_age_years',
         'diameter_cm',
+        'crown_diameter_m',
         'health_status',
+        'is_tree',
         'photo_path',
         'remarks',
         'created_at',
@@ -41,6 +44,8 @@ class GroundTruthTreeRecord extends Model
             'measured_height_meters' => 'decimal:2',
             'estimated_age_years' => 'decimal:2',
             'diameter_cm' => 'decimal:2',
+            'crown_diameter_m' => 'decimal:2',
+            'is_tree' => 'boolean',
             'created_at' => 'datetime',
         ];
     }

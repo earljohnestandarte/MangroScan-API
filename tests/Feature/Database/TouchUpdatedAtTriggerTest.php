@@ -41,7 +41,7 @@ class TouchUpdatedAtTriggerTest extends TestCase
             ORDER BY relation.relname
             SQL))->pluck('table_name');
 
-        $this->assertCount(33, $timestampTables);
+        $this->assertCount(40, $timestampTables);
         $this->assertSame($timestampTables->all(), $triggerTables->all());
     }
 
@@ -80,6 +80,7 @@ class TouchUpdatedAtTriggerTest extends TestCase
     public function test_it_versions_the_trigger_function_and_closed_dcl(): void
     {
         $migration = file_get_contents(database_path('migrations/2026_08_12_070200_create_touch_updated_at_triggers.php'));
+        $batteryMigration = file_get_contents(database_path('migrations/2026_08_24_000000_add_battery_touch_trigger.php'));
         $dcl = file_get_contents(database_path('sql/dcl/043_touch_updated_at_trigger_grants.sql'));
 
         $this->assertIsString($migration);
@@ -87,6 +88,10 @@ class TouchUpdatedAtTriggerTest extends TestCase
             $this->assertStringContainsString($fragment, $migration);
         }
         $this->assertStringNotContainsString('SECURITY DEFINER', $migration);
+        $this->assertIsString($batteryMigration);
+        foreach (['trg_batteries_touch_updated_at', 'BEFORE UPDATE ON app.batteries', 'EXECUTE FUNCTION app.fn_touch_updated_at()'] as $fragment) {
+            $this->assertStringContainsString($fragment, $batteryMigration);
+        }
         $this->assertIsString($dcl);
         $this->assertStringContainsString('REVOKE ALL ON FUNCTION app.fn_touch_updated_at()', $dcl);
         foreach (['PUBLIC', 'mangroscan_api_rw', 'mangroscan_worker', 'mangroscan_report_ro', 'mangroscan_auditor'] as $role) {

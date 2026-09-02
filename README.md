@@ -262,13 +262,15 @@ DB_USERNAME=mangroscan_dev
 DB_PASSWORD="replace-with-the-same-local-database-password"
 DB_SEARCH_PATH="app,public"
 
-# Used only to create the three local developer accounts.
+# Used only to create the four local developer accounts.
 MANGROSCAN_SEED_USER_PASSWORD="choose-a-local-login-password"
 
 CACHE_STORE=database
 QUEUE_CONNECTION=database
 FILESYSTEM_DISK=local
 MEDIA_UPLOAD_DISK=local
+EXPORT_DISK=local
+EXPORT_DOWNLOAD_URL_TTL_MINUTES=10
 ```
 
 Never commit `.env`, database credentials, or the developer-account password. Generate the Laravel application key and clear any stale cached configuration:
@@ -321,15 +323,16 @@ done
 ```mermaid
 flowchart LR
     Org["🏢 Development organization"] --> Permissions["🔑 54 permissions"]
-    Permissions --> Roles["🛡️ 3 primary roles"]
+    Permissions --> Roles["🛡️ 4 primary roles"]
     Roles --> Matrix["🔗 Role-permission matrix"]
-    Matrix --> Users["👥 3 verified developer users"]
+    Matrix --> Users["👥 4 verified developer users"]
 ```
 
 Run the complete dependency-safe seed chain:
 
 ```bash
 php artisan db:seed
+php artisan mangroscan:qa-users:verify
 ```
 
 The command is idempotent and may be run repeatedly. It creates or updates:
@@ -339,8 +342,9 @@ The command is idempotent and may be run repeatedly. It creates or updates:
 | `admin@mangroscan.test` | System Administrator | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
 | `researcher@mangroscan.test` | Researcher | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
 | `specialist@mangroscan.test` | Environmental Specialist | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
+| `operator@mangroscan.test` | Drone Operator | Value of `MANGROSCAN_SEED_USER_PASSWORD` |
 
-All seeded passwords are hashed. The developer-user seeder refuses a blank password and skips account creation in production. See the [RBAC Seeder Matrix](docs/MangroScan_RBAC_Seeder_Matrix.md) for the exact permission assignments.
+All seeded passwords are hashed. The developer-user seeder refuses a blank password and skips account creation in production. The verification command is read-only, checks the configured password hash plus each account's active organization, verification state, exact role, and exact effective permissions, and never prints the password. The Drone Operator is a field/mobile role: it can see assigned approved missions and piloted flights, submit checklists, operate flights, upload/read field media, and read its notifications, but it has no management, AI-processing, validation, reporting, audit, or settings permissions. See the [RBAC Seeder Matrix](docs/MangroScan_RBAC_Seeder_Matrix.md) for the exact permission assignments.
 
 ### 8. Start and verify the application
 
@@ -354,7 +358,7 @@ Or use separate terminals:
 
 ```bash
 php artisan serve
-php artisan queue:listen --tries=1
+php artisan queue:listen --queue=exports,reports,default --tries=1
 php artisan pail --timeout=0
 npm run dev
 ```
@@ -533,7 +537,7 @@ php artisan db:seed
 php artisan tinker --execute="dump(DB::table('organizations')->count(), DB::table('permissions')->count(), DB::table('roles')->count(), DB::table('users')->count());"
 ```
 
-Expected counts in an otherwise empty development database are 1 organization, 54 permissions, 3 primary roles, and 3 developer users. Existing unrelated application data is preserved. Role-permission and user-role pivots are synchronized without duplication.
+Expected counts in an otherwise empty development database are 1 organization, 54 permissions, 4 primary roles, and 4 developer users. Existing unrelated application data is preserved. Role-permission and user-role pivots are synchronized without duplication.
 
 ### Key Tables Overview
 
@@ -639,6 +643,7 @@ POST   /users/{id}/activation     # Activate/deactivate user
 
 GET    /roles                     # List roles
 GET    /permissions               # List permissions
+GET    /roles/{id}/permissions    # Read current role permissions
 PUT    /users/{id}/roles          # Assign user roles
 PUT    /roles/{id}/permissions    # Assign role permissions
 ```
@@ -812,6 +817,8 @@ AUTHENTICATED_REQUESTS_PER_MINUTE=60
 MEDIA_UPLOAD_DISK=local    # local, s3
 MEDIA_UPLOAD_URL_TTL_MINUTES=30
 MEDIA_MAX_UPLOAD_BYTES=5368709120  # 5GB
+EXPORT_DISK=local          # local, s3
+EXPORT_DOWNLOAD_URL_TTL_MINUTES=10
 
 # AI Services
 AI_SERVICE_CONNECT_TIMEOUT_SECONDS=3
@@ -837,6 +844,10 @@ return [
     'media' => [
         'upload_url_ttl_minutes' => 30,
         'max_upload_bytes' => 5_368_709_120,
+    ],
+    'exports' => [
+        'disk' => 'local',
+        'download_url_ttl_minutes' => 10,
     ],
 ];
 ```
@@ -871,7 +882,7 @@ Runs concurrently:
 php artisan serve
 
 # Terminal 2: Queue Worker
-php artisan queue:listen --tries=1
+php artisan queue:listen --queue=exports,reports,default --tries=1
 
 # Terminal 3: Log Viewer
 php artisan pail --timeout=0
@@ -1091,6 +1102,8 @@ QUEUE_CONNECTION=redis
 
 # Storage
 MEDIA_UPLOAD_DISK=s3
+EXPORT_DISK=s3
+EXPORT_DOWNLOAD_URL_TTL_MINUTES=10
 MANGROSCAN_SEED_USER_PASSWORD=
 AWS_ACCESS_KEY_ID=<secure>
 AWS_SECRET_ACCESS_KEY=<secure>

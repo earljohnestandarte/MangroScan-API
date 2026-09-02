@@ -4,11 +4,18 @@ use App\Http\Controllers\Api\V1\Drone\DroneSensorUpdateController;
 use App\Http\Controllers\Api\V1\Drone\SensorCalibrationStoreController;
 use App\Http\Controllers\Api\V1\Ai\AiModelIndexController;
 use App\Http\Controllers\Api\V1\Ai\AiModelShowController;
+use App\Http\Controllers\Api\V1\Ai\AiModelVersionDeployController;
+use App\Http\Controllers\Api\V1\Ai\AiServiceCredentialRotateController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceHealthTestController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceOverviewController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceStoreController;
 use App\Http\Controllers\Api\V1\Ai\AiServiceSynchronizeController;
+use App\Http\Controllers\Api\V1\Annotation\AnnotationExportStoreController;
+use App\Http\Controllers\Api\V1\Annotation\AnnotationObjectReplaceController;
+use App\Http\Controllers\Api\V1\Annotation\AnnotationProjectIndexController;
+use App\Http\Controllers\Api\V1\Annotation\AnnotationProjectStoreController;
 use App\Http\Controllers\Api\V1\Audit\AuditLogIndexController;
+use App\Http\Controllers\Api\V1\Audit\AuditLogShowController;
 use App\Http\Controllers\Api\V1\Auth\AuthenticatedProfileController;
 use App\Http\Controllers\Api\V1\Auth\EffectivePermissionsController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
@@ -16,12 +23,17 @@ use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\PasswordChangeController;
 use App\Http\Controllers\Api\V1\Auth\PasswordForgotController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
-use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Battery\BatteryIndexController;
+use App\Http\Controllers\Api\V1\Dashboard\DashboardOverviewController;
+use App\Http\Controllers\Api\V1\Dashboard\MissionDashboardController;
+use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
 use App\Http\Controllers\Api\V1\Drone\DroneStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneUpdateController;
+use App\Http\Controllers\Api\V1\Export\ExportDownloadController;
+use App\Http\Controllers\Api\V1\Export\ExportedFileIndexController;
+use App\Http\Controllers\Api\V1\Export\ExportStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightChecklistStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightCompleteController;
 use App\Http\Controllers\Api\V1\Flight\FlightFailController;
@@ -61,6 +73,7 @@ use App\Http\Controllers\Api\V1\Organization\OrganizationStoreController;
 use App\Http\Controllers\Api\V1\Organization\OrganizationUpdateController;
 use App\Http\Controllers\Api\V1\Platform\HealthController;
 use App\Http\Controllers\Api\V1\Platform\MetaCapabilitiesController;
+use App\Http\Controllers\Api\V1\Processing\ProcessingJobCancelController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobIndexController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobRetryController;
 use App\Http\Controllers\Api\V1\Processing\ProcessingJobShowController;
@@ -68,8 +81,14 @@ use App\Http\Controllers\Api\V1\Processing\ProcessingJobStoreController;
 use App\Http\Controllers\Api\V1\Rbac\PermissionIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RoleIndexController;
 use App\Http\Controllers\Api\V1\Rbac\RolePermissionReplaceController;
+use App\Http\Controllers\Api\V1\Rbac\RolePermissionShowController;
 use App\Http\Controllers\Api\V1\Rbac\UserRoleReplaceController;
+use App\Http\Controllers\Api\V1\Report\ReportApprovalController;
+use App\Http\Controllers\Api\V1\Report\ReportGenerateController;
 use App\Http\Controllers\Api\V1\Report\ReportIndexController;
+use App\Http\Controllers\Api\V1\Report\ReportShowController;
+use App\Http\Controllers\Api\V1\Report\ReportStoreController;
+use App\Http\Controllers\Api\V1\Report\ReportUpdateController;
 use App\Http\Controllers\Api\V1\Sensor\SensorDatasetUploadCompleteController;
 use App\Http\Controllers\Api\V1\Sensor\SensorDatasetUploadInitiateController;
 use App\Http\Controllers\Api\V1\Site\SiteBoundaryIndexController;
@@ -81,6 +100,10 @@ use App\Http\Controllers\Api\V1\Site\SitePlotStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteShowController;
 use App\Http\Controllers\Api\V1\Site\SiteStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteUpdateController;
+use App\Http\Controllers\Api\V1\Training\TrainingDatasetIndexController;
+use App\Http\Controllers\Api\V1\Training\TrainingDatasetItemStoreController;
+use App\Http\Controllers\Api\V1\Training\TrainingDatasetStoreController;
+use App\Http\Controllers\Api\V1\Tree\MissionLayerBuildController;
 use App\Http\Controllers\Api\V1\Tree\MissionLayerIndexController;
 use App\Http\Controllers\Api\V1\Tree\MissionTreeCountController;
 use App\Http\Controllers\Api\V1\Tree\MissionTreeGeoJsonController;
@@ -94,6 +117,16 @@ use App\Http\Controllers\Api\V1\User\UserIndexController;
 use App\Http\Controllers\Api\V1\User\UserShowController;
 use App\Http\Controllers\Api\V1\User\UserStoreController;
 use App\Http\Controllers\Api\V1\User\UserUpdateController;
+use App\Http\Controllers\Api\V1\Validation\AccuracyRecomputeController;
+use App\Http\Controllers\Api\V1\Validation\ConfidenceFlagUpdateController;
+use App\Http\Controllers\Api\V1\Validation\ConfidenceReviewIndexController;
+use App\Http\Controllers\Api\V1\Validation\GroundTruthStoreController;
+use App\Http\Controllers\Api\V1\Validation\ValidationDecisionStoreController;
+use App\Http\Controllers\Api\V1\Validation\ValidationScopeController;
+use App\Http\Controllers\Api\V1\Validation\ValidationSessionCompleteController;
+use App\Http\Controllers\Api\V1\Validation\ValidationSessionIndexController;
+use App\Http\Controllers\Api\V1\Validation\ValidationSessionShowController;
+use App\Http\Controllers\Api\V1\Validation\ValidationSessionStoreController;
 use App\Http\Middleware\EnsureActiveIdentity;
 use Illuminate\Support\Facades\Route;
 
@@ -221,6 +254,15 @@ Route::prefix('v1')->group(function () {
         'permission:permissions.manage',
         'throttle:auth.authenticated',
     ]);
+
+    // [RBAC-05] GET /api/v1/roles/{id}/permissions
+    Route::get('/roles/{role}/permissions', RolePermissionShowController::class)
+        ->whereUuid('role')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:roles.manage', 'permission:permissions.manage',
+            'throttle:auth.authenticated',
+        ]);
 
     // [RBAC-04] PUT /api/v1/roles/{id}/permissions
     Route::put('/roles/{role}/permissions', RolePermissionReplaceController::class)
@@ -612,6 +654,13 @@ Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::clas
             'permission:processing_jobs.create', 'throttle:auth.authenticated',
         ]);
 
+    // [JOB-05] POST /api/v1/processing-jobs/{id}/cancel
+    Route::post('/processing-jobs/{job}/cancel', ProcessingJobCancelController::class)
+        ->whereUuid('job')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:processing_jobs.manage', 'throttle:auth.authenticated',
+        ]);
+
     // [TREE-01] GET /api/v1/tree-observations
     Route::get('/tree-observations', TreeObservationIndexController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class,
@@ -670,6 +719,79 @@ Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::clas
             'permission:results.read', 'throttle:auth.authenticated',
         ]);
 
+    // [LAYER-02] Queue a durable geospatial layer build.
+    Route::post('/missions/{mission}/layers/build', MissionLayerBuildController::class)
+        ->whereUuid('mission')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:processing_jobs.manage', 'throttle:auth.authenticated',
+        ]);
+
+    // [CONF-01] List the mission-scoped low-confidence review queue.
+    Route::get('/confidence-review', ConfidenceReviewIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:results.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [CONF-02] Create or update a confidence review flag.
+    Route::put('/confidence-review/{result}', ConfidenceFlagUpdateController::class)
+        ->whereUuid('result')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:validation.decide', 'throttle:auth.authenticated',
+        ]);
+
+    // [VAL-01] Return tenant-scoped mission, species, assignee and session options.
+    Route::get('/validation/scopes', ValidationScopeController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:validation.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [VAL-02] List field validation sessions visible through current-tenant lineage.
+    Route::get('/validation-sessions', ValidationSessionIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:validation.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [VAL-03] Create a mission-scoped field validation session.
+    Route::post('/validation-sessions', ValidationSessionStoreController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:validation.create', 'throttle:auth.authenticated',
+    ]);
+
+    // [VAL-04] Return validation workspace context, evidence and safe layer metadata.
+    Route::get('/validation-sessions/{session}', ValidationSessionShowController::class)
+        ->whereUuid('session')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:validation.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [GT-01] Create a manual field tree record within a tenant-scoped open session.
+    Route::post('/validation-sessions/{session}/ground-truth', GroundTruthStoreController::class)
+        ->whereUuid('session')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:validation.record_ground_truth', 'throttle:auth.authenticated',
+        ]);
+
+    // [MATCH-01] Store a matched, corrected, false-positive, or false-negative decision.
+    Route::post('/validation-sessions/{session}/decisions', ValidationDecisionStoreController::class)
+        ->whereUuid('session')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:validation.decide', 'throttle:auth.authenticated',
+        ]);
+
+    // [ACC-01] Recompute authoritative validation-session metrics.
+    Route::post('/validation-sessions/{session}/accuracy/recompute', AccuracyRecomputeController::class)
+        ->whereUuid('session')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:accuracy.recompute', 'throttle:auth.authenticated',
+        ]);
+
+    // [VAL-05] Complete a validation session after decisions and fresh metrics.
+    Route::post('/validation-sessions/{session}/complete', ValidationSessionCompleteController::class)
+        ->whereUuid('session')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:validation.complete', 'throttle:auth.authenticated',
+        ]);
+
     // [SDS-01] POST /api/v1/flights/{id}/sensor-datasets/uploads
     Route::post('/flights/{flight}/sensor-datasets/uploads', SensorDatasetUploadInitiateController::class)
         ->whereUuid('flight')->middleware(['auth:sanctum', EnsureActiveIdentity::class, 'permission:media.upload', 'throttle:auth.authenticated']);
@@ -683,6 +805,58 @@ Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::clas
         'auth:sanctum', EnsureActiveIdentity::class,
         'permission:audit.read', 'throttle:auth.authenticated',
     ]);
+
+    // [AUD-02] GET /api/v1/audit-logs/{id}
+    Route::get('/audit-logs/{audit}', AuditLogShowController::class)
+        ->whereUuid('audit')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:audit.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [DATASET-01] GET /api/v1/training-datasets
+    Route::get('/training-datasets', TrainingDatasetIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:ai_models.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [DATASET-02] POST /api/v1/training-datasets
+    Route::post('/training-datasets', TrainingDatasetStoreController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:ai_models.manage', 'throttle:auth.authenticated',
+    ]);
+
+    // [DATASET-03] POST /api/v1/training-datasets/{id}/items
+    Route::post('/training-datasets/{dataset}/items', TrainingDatasetItemStoreController::class)
+        ->whereUuid('dataset')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_models.manage', 'throttle:auth.authenticated',
+        ]);
+
+    // [ANN-01] GET /api/v1/annotation/projects
+    Route::get('/annotation/projects', AnnotationProjectIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:ai_models.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [ANN-02] POST /api/v1/annotation/projects
+    Route::post('/annotation/projects', AnnotationProjectStoreController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:ai_models.manage', 'throttle:auth.authenticated',
+    ]);
+
+    // [ANN-03] PUT /api/v1/annotation/items/{id}/objects
+    Route::put('/annotation/items/{item}/objects', AnnotationObjectReplaceController::class)
+        ->whereUuid('item')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_models.manage', 'throttle:auth.authenticated',
+        ]);
+
+    // [ANN-04] POST /api/v1/annotation/projects/{id}/exports
+    Route::post('/annotation/projects/{project}/exports', AnnotationExportStoreController::class)
+        ->whereUuid('project')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_models.manage', 'throttle:auth.authenticated',
+        ]);
 
     // [NOTIF-01] GET /api/v1/notifications
     Route::get('/notifications', NotificationIndexController::class)->middleware([
@@ -710,6 +884,81 @@ Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::clas
         'permission:reports.read', 'throttle:auth.authenticated',
     ]);
 
+    // [RPT-02] POST /api/v1/reports
+    Route::post('/reports', ReportStoreController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:reports.create', 'throttle:auth.authenticated',
+    ]);
+
+    // [RPT-03] GET /api/v1/reports/{report}
+    Route::get('/reports/{report}', ReportShowController::class)
+        ->whereUuid('report')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:reports.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [RPT-04] PATCH /api/v1/reports/{report}
+    Route::patch('/reports/{report}', ReportUpdateController::class)
+        ->whereUuid('report')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:reports.create', 'throttle:auth.authenticated',
+        ]);
+
+    // [RPT-05] POST /api/v1/reports/{report}/generate
+    Route::post('/reports/{report}/generate', ReportGenerateController::class)
+        ->whereUuid('report')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:reports.generate', 'throttle:auth.authenticated',
+        ]);
+
+    // [RPT-06] POST /api/v1/reports/{report}/approve
+    Route::post('/reports/{report}/approve', ReportApprovalController::class)
+        ->whereUuid('report')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:reports.approve', 'throttle:auth.authenticated',
+        ]);
+
+    // [EXP-01] Queue a canonical mission-result export for one tenant report.
+    Route::post('/reports/{report}/exports', ExportStoreController::class)
+        ->whereUuid('report')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:results.export', 'permission:reports.generate',
+            'throttle:auth.authenticated',
+        ]);
+
+    // [EXP-02] List safe completed-export registry metadata in current-tenant scope.
+    Route::get('/exported-files', ExportedFileIndexController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:exports.download', 'throttle:auth.authenticated',
+    ]);
+
+    // [EXP-03] Issue one audited short-lived URL for a tenant export artifact.
+    Route::post('/exported-files/{exportedFile}/download', ExportDownloadController::class)
+        ->whereUuid('exportedFile')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:exports.download', 'throttle:auth.authenticated',
+        ]);
+
+    // [DASH-01] Return role-scoped dashboard KPI aggregates.
+    Route::get('/dashboard/overview', DashboardOverviewController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class,
+        'permission:results.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [DASH-02] Return tenant-scoped analytics for one visible mission.
+    Route::get('/dashboard/missions/{mission}', MissionDashboardController::class)
+        ->whereUuid('mission')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:results.read', 'throttle:auth.authenticated',
+        ]);
+
     // [MODEL-01] GET /api/v1/ai-models
     Route::get('/ai-models', AiModelIndexController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class,
@@ -722,6 +971,13 @@ Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::clas
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:ai_models.read', 'throttle:auth.authenticated',
+        ]);
+
+    // [MODEL-03] POST /api/v1/ai-models/{id}/versions/{versionId}/deploy
+    Route::post('/ai-models/{model}/versions/{version}/deploy', AiModelVersionDeployController::class)
+        ->whereUuid('model')->whereUuid('version')->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_models.manage', 'throttle:auth.authenticated',
         ]);
 
     // [AISVC-01] GET /api/v1/admin/ai-services
@@ -765,17 +1021,23 @@ Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::clas
         EnsureActiveIdentity::class,
         'throttle:auth.authenticated',
     ]);
+    // [AISVC-05] POST /api/v1/admin/ai-services/{id}/credentials
+    Route::post('/admin/ai-services/{service}/credentials', AiServiceCredentialRotateController::class)
+        ->whereUuid('service')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:ai_services.manage', 'throttle:auth.authenticated',
+        ]);
+
+    // [ENV-01] POST /api/v1/flights/{flight}/environment-logs
+    Route::post('/flights/{flight}/environment-logs', EnvironmentLogStoreController::class)
+        ->whereUuid('flight')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:flights.update',
+            'throttle:auth.authenticated',
+        ]);
 });
-
-// [ENV-01] POST /api/v1/flights/{flight}/environment-logs
-Route::post('/flights/{flight}/environment-logs', EnvironmentLogStoreController::class)
-    ->whereUuid('flight')
-    ->middleware([
-        'auth:sanctum',
-        EnsureActiveIdentity::class,
-        'permission:flights.update',
-        'throttle:auth.authenticated',
-    ]);
-
 
 

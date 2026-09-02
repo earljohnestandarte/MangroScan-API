@@ -18,38 +18,37 @@ class ValidationDatabaseFoundationTest extends TestCase
 {
     use RefreshDatabase;
 
-    // [VAL-DB] The authoritative base validation schema is reproducible without endpoint-only extensions.
+    // [VAL-DB] The authoritative validation schema includes the approved completion and metric lineage extensions.
     public function test_it_provisions_the_documented_base_tables(): void
     {
         $this->assertTrue(Schema::hasColumns('validation_sessions', [
             'validation_session_id', 'mission_id', 'site_id', 'plot_id', 'validated_by',
-            'validation_date', 'method', 'notes', 'created_at', 'updated_at',
+            'validation_date', 'method', 'status', 'notes', 'completed_at', 'completed_by',
+            'created_at', 'updated_at',
         ]));
-        $this->assertFalse(Schema::hasColumn('validation_sessions', 'status'));
 
         $this->assertTrue(Schema::hasColumns('ground_truth_tree_records', [
-            'ground_truth_id', 'validation_session_id', 'species_id', 'ground_location',
-            'measured_height_meters', 'estimated_age_years', 'diameter_cm', 'health_status',
-            'photo_path', 'remarks', 'created_at',
+            'ground_truth_id', 'validation_session_id', 'field_code', 'species_id', 'ground_location',
+            'measured_height_meters', 'estimated_age_years', 'diameter_cm', 'crown_diameter_m',
+            'health_status', 'is_tree', 'photo_path', 'remarks', 'created_at',
         ]));
-        foreach (['field_code', 'crown_diameter_m', 'is_tree'] as $unapprovedColumn) {
-            $this->assertFalse(Schema::hasColumn('ground_truth_tree_records', $unapprovedColumn));
-        }
 
         $this->assertTrue(Schema::hasColumns('validation_matches', [
-            'validation_match_id', 'ground_truth_id', 'tree_observation_id', 'match_status',
+            'validation_match_id', 'validation_session_id', 'ground_truth_id', 'tree_observation_id', 'match_status',
+            'accepted_species_id', 'accepted_height_m', 'accepted_age_years', 'corrected_geometry',
+            'notes', 'validation_evidence',
             'distance_error_meters', 'species_correct', 'height_error_meters', 'age_error_years',
             'validated_by', 'validated_at',
         ]));
-        foreach (['accepted_species_id', 'accepted_height_m', 'accepted_age_years', 'corrected_geometry', 'validation_evidence'] as $unapprovedColumn) {
-            $this->assertFalse(Schema::hasColumn('validation_matches', $unapprovedColumn));
-        }
 
         $this->assertTrue(Schema::hasColumns('accuracy_metrics', [
-            'accuracy_metric_id', 'mission_id', 'model_version_id', 'metric_type',
+            'accuracy_metric_id', 'validation_session_id', 'mission_id', 'model_version_id', 'metric_type',
             'metric_value', 'sample_size', 'computed_at', 'notes',
         ]));
-        $this->assertFalse(Schema::hasColumn('accuracy_metrics', 'validation_session_id'));
+        $this->assertTrue(Schema::hasColumns('confidence_flags', [
+            'confidence_flag_id', 'mission_id', 'result_id', 'result_type', 'status', 'severity',
+            'review_note', 'assigned_to', 'reason', 'resolution_notes', 'created_by', 'created_at', 'updated_at',
+        ]));
     }
 
     // [VAL-DB] UUID models, documented relations and cascade ownership behave consistently.
@@ -83,6 +82,7 @@ class ValidationDatabaseFoundationTest extends TestCase
         ]);
 
         $match = ValidationMatch::query()->create([
+            'validation_session_id' => $session->validation_session_id,
             'ground_truth_id' => $groundTruthId,
             'tree_observation_id' => null,
             'match_status' => 'false_negative',
@@ -100,7 +100,7 @@ class ValidationDatabaseFoundationTest extends TestCase
 
         $session->load(['mission', 'site', 'plot', 'validator', 'groundTruthRecords.species']);
         $groundTruth = GroundTruthTreeRecord::query()->findOrFail($groundTruthId);
-        $match->load(['groundTruthRecord', 'validator']);
+        $match->load(['validationSession', 'groundTruthRecord', 'validator']);
         $metric->load('mission');
 
         $this->assertTrue(Str::isUuid($session->validation_session_id));
@@ -111,6 +111,7 @@ class ValidationDatabaseFoundationTest extends TestCase
         $this->assertSame($groundTruthId, $session->groundTruthRecords->sole()->ground_truth_id);
         $this->assertSame($graph['species_id'], $groundTruth->species->species_id);
         $this->assertSame($groundTruthId, $match->groundTruthRecord->ground_truth_id);
+        $this->assertSame($session->validation_session_id, $match->validationSession->validation_session_id);
         $this->assertNull($match->treeObservation);
         $this->assertSame($graph['mission_id'], $metric->mission->mission_id);
 
@@ -165,11 +166,13 @@ class ValidationDatabaseFoundationTest extends TestCase
         ]);
     }
 
-    // [VAL-DB] Runtime roles remain closed until their endpoint-specific grants are approved.
-    public function test_it_versions_a_closed_validation_dcl_and_registers_no_endpoint(): void
+    // [VAL-DB] The foundation remains closed while endpoint-specific grants and routes are additive.
+    public function test_it_versions_a_closed_foundation_dcl_and_the_validation_scope_route(): void
     {
         $dcl = file_get_contents(database_path('sql/dcl/045_validation_foundation_grants.sql'));
         $migration = file_get_contents(database_path('migrations/2026_08_12_066000_create_validation_foundation_tables.php'));
+        $groundTruthMigration = file_get_contents(database_path('migrations/2026_08_25_000100_add_ground_truth_capture_fields.php'));
+        $decisionMigration = file_get_contents(database_path('migrations/2026_08_25_000200_add_validation_decision_fields.php'));
 
         $this->assertIsString($dcl);
         $this->assertStringContainsString('REVOKE ALL PRIVILEGES ON TABLE', $dcl);
@@ -197,7 +200,14 @@ class ValidationDatabaseFoundationTest extends TestCase
             $this->assertStringContainsString($invariant, $migration);
         }
 
-        $this->assertFalse(collect(Route::getRoutes())->contains(
+        $this->assertIsString($groundTruthMigration);
+        $this->assertStringContainsString('ground_truth_tree_records_crown_diameter_check', $groundTruthMigration);
+        $this->assertIsString($decisionMigration);
+        foreach (['validation_matches_accepted_values_check', 'validation_matches_reference_shape_check', "->spatialIndex('corrected_geometry')"] as $invariant) {
+            $this->assertStringContainsString($invariant, $decisionMigration);
+        }
+
+        $this->assertTrue(collect(Route::getRoutes())->contains(
             fn ($route): bool => $route->uri() === 'api/v1/validation/scopes',
         ));
     }

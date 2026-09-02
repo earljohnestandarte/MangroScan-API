@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\Contracts\Ai\AiInferenceClient;
+use App\Contracts\Export\PrivateDownloadUrlIssuer;
 use App\Contracts\Media\PrivateObjectInspector;
 use App\Contracts\Media\PrivateDownloadUrlIssuer;
 use App\Contracts\Media\PrivateUploadUrlIssuer;
 use App\Models\PersonalAccessToken;
 use App\Services\Ai\HttpAiInferenceClient;
+use App\Services\Export\FilesystemPrivateDownloadUrlIssuer;
 use App\Services\Media\FilesystemPrivateObjectInspector;
 use App\Services\Media\FilesystemPrivateDownloadUrlIssuer;
 use App\Services\Media\FilesystemPrivateUploadUrlIssuer;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(AiInferenceClient::class, HttpAiInferenceClient::class);
+        $this->app->bind(PrivateDownloadUrlIssuer::class, FilesystemPrivateDownloadUrlIssuer::class);
         $this->app->bind(PrivateUploadUrlIssuer::class, FilesystemPrivateUploadUrlIssuer::class);
         $this->app->bind(PrivateDownloadUrlIssuer::class, FilesystemPrivateDownloadUrlIssuer::class);
         $this->app->bind(PrivateObjectInspector::class, FilesystemPrivateObjectInspector::class);

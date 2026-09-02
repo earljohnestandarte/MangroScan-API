@@ -5,6 +5,7 @@ namespace App\Services\Mobile;
 use App\Models\FlightSession;
 use App\Models\SurveyMission;
 use App\Models\User;
+use App\Services\Auth\DroneOperatorScope;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 class MobileBootstrapService
 {
+    public function __construct(private readonly DroneOperatorScope $operatorScope) {}
+
     /**
      * @return array{
      *     missions: Collection<int, SurveyMission>,
@@ -30,17 +33,18 @@ class MobileBootstrapService
                 ->whereHas('site', fn (Builder $site) => $site
                     ->where('organization_id', $actor->organization_id));
 
-            $missions = SurveyMission::query()
-                ->where($missionScope)
+            $missionQuery = SurveyMission::query()->where($missionScope);
+            $missions = $this->operatorScope->missions($missionQuery, $actor)
                 ->when($afterValue, fn (Builder $query) => $query->where('updated_at', '>', $afterValue))
                 ->where('updated_at', '<=', $serverTimeValue)
                 ->orderBy('mission_id')
                 ->get();
 
-            $flights = FlightSession::query()
+            $flightQuery = FlightSession::query()
                 ->withLocationGeoJson()
                 ->whereHas('mission.site', fn (Builder $site) => $site
-                    ->where('organization_id', $actor->organization_id))
+                    ->where('organization_id', $actor->organization_id));
+            $flights = $this->operatorScope->flights($flightQuery, $actor)
                 ->when($afterValue, fn (Builder $query) => $query->where('updated_at', '>', $afterValue))
                 ->where('updated_at', '<=', $serverTimeValue)
                 ->orderBy('flight_session_id')
@@ -49,10 +53,11 @@ class MobileBootstrapService
             $tombstones = collect();
 
             if ($after !== null) {
-                $tombstones = SurveyMission::query()
+                $tombstoneQuery = SurveyMission::query()
                     ->onlyTrashed()
                     ->whereHas('site', fn (Builder $site) => $site
-                        ->where('organization_id', $actor->organization_id))
+                        ->where('organization_id', $actor->organization_id));
+                $tombstones = $this->operatorScope->missions($tombstoneQuery, $actor)
                     ->where('deleted_at', '>', $afterValue)
                     ->where('deleted_at', '<=', $serverTimeValue)
                     ->orderBy('mission_id')

@@ -23,6 +23,11 @@ final class RbacSeedData
             'name' => 'Environmental Specialist',
             'description' => 'Approves missions and performs environmental review, ground-truth validation, accuracy analysis, and reporting.',
         ],
+        'drone_operator' => [
+            'id' => '20000000-0000-4000-8000-000000000004',
+            'name' => 'Drone Operator',
+            'description' => 'Operates assigned approved field flights and their mobile, checklist, media, and notification workflows.',
+        ],
     ];
 
     /** @var array<string, string> */
@@ -165,6 +170,19 @@ final class RbacSeedData
             'notifications.read',
             'species.manage',
         ],
+        'drone_operator' => [
+            'sites.read',
+            'missions.read',
+            'flights.read',
+            'flights.start',
+            'flights.complete',
+            'checklists.submit',
+            'media.read',
+            'media.upload',
+            'notifications.read',
+            'drones.read',
+            'batteries.read',
+        ],
     ];
 
     /** @var array<string, array{id: string, first_name: string, last_name: string, position_title: string, role: string}> */
@@ -189,6 +207,13 @@ final class RbacSeedData
             'last_name' => 'Environmental Specialist',
             'position_title' => 'Environmental Specialist',
             'role' => 'environmental_specialist',
+        ],
+        'operator@mangroscan.test' => [
+            'id' => '30000000-0000-4000-8000-000000000004',
+            'first_name' => 'Test',
+            'last_name' => 'Drone Operator',
+            'position_title' => 'Drone Operator',
+            'role' => 'drone_operator',
         ],
     ];
 }

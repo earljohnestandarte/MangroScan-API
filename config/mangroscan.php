@@ -33,4 +33,9 @@ return [
         'upload_url_ttl_minutes' => (int) env('MEDIA_UPLOAD_URL_TTL_MINUTES', 30),
         'max_upload_bytes' => (int) env('MEDIA_MAX_UPLOAD_BYTES', 5_368_709_120),
     ],
+
+    'exports' => [
+        'disk' => env('EXPORT_DISK', env('FILESYSTEM_DISK', 'local')),
+        'download_url_ttl_minutes' => (int) env('EXPORT_DOWNLOAD_URL_TTL_MINUTES', 10),
+    ],
 ];

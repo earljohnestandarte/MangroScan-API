@@ -25,7 +25,18 @@ class Report extends Model
         'generated_by',
         'approved_by',
         'summary',
+        'audience',
+        'interpretation',
+        'limitations',
+        'recommendations',
+        'formats',
     ];
+
+    /** @return array<string, string> */
+    protected function casts(): array
+    {
+        return ['formats' => 'array'];
+    }
 
     public function mission(): BelongsTo
     {

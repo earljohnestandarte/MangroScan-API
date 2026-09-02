@@ -2,7 +2,7 @@
 
 > **Audience:** React web and React Native/Expo developers
 > **API version:** `v1`
-> **Verified against:** the endpoint tracker, live Laravel routes, controllers, Form Requests, resources, services, RBAC seed data, and feature tests on 2026-08-15.
+> **Verified against:** the endpoint tracker, live Laravel routes, controllers, Form Requests, resources, services, RBAC seed data, and feature tests on 2026-08-25.
 
 ## Purpose and source precedence
 
@@ -36,15 +36,17 @@ For a physical Expo device, `localhost` means the phone itself. Use a reachable 
 | 🚧 UNDER CONSTRUCTION | Planned or actively being built; do not use as a production dependency. |
 | ⛔ BLOCKED / UNDER CONSTRUCTION | Not implemented and waiting on a documented prerequisite or decision. |
 
-Current inventory: **141 endpoints**, **85 available**, **31 under construction**, **25 blocked in manual planning**, and **0 testing**.
+Current inventory: **142 endpoints**, **118 available**, **20 under construction**, **4 blocked**, and **0 testing**.
 
 ## Currently available endpoints
 
-`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `MODEL-01`, `MODEL-02`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `RPT-01`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`.
+`SYS-01`, `SYS-02`, `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-08`, `ORG-01`, `ORG-02`, `ORG-03`, `ORG-04`, `USR-01`, `USR-02`, `USR-03`, `USR-04`, `USR-05`, `RBAC-01`, `RBAC-02`, `RBAC-03`, `RBAC-04`, `RBAC-05`, `SITE-01`, `SITE-02`, `SITE-03`, `SITE-04`, `BOUND-01`, `BOUND-02`, `BOUND-03`, `PLOT-01`, `PLOT-02`, `DRONE-01`, `DRONE-02`, `DRONE-03`, `SENSOR-01`, `MSN-01`, `MSN-02`, `MSN-03`, `MSN-04`, `TEAM-01`, `MSN-06`, `MSN-07`, `MSN-08`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `CHK-01`, `FLT-05`, `FLT-06`, `FLT-07`, `WPT-01`, `SYNC-01`, `SYNC-02`, `SYNC-03`, `MEDIA-01`, `MEDIA-02`, `MEDIA-03`, `MEDIA-04`, `MEDIA-06`, `SDS-01`, `SDS-02`, `AISVC-01`, `AISVC-02`, `AISVC-03`, `AISVC-04`, `AISVC-05`, `MODEL-01`, `MODEL-02`, `MODEL-03`, `JOB-01`, `JOB-02`, `JOB-03`, `JOB-04`, `JOB-05`, `TREE-01`, `TREE-02`, `TREE-03`, `COUNT-01`, `RESULT-01`, `RESULT-02`, `RESULT-03`, `LAYER-01`, `LAYER-02`, `CONF-01`, `CONF-02`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-01`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `DASH-01`, `DASH-02`, `NOTIF-01`, `NOTIF-02`, `NOTIF-03`, `AUD-01`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
 
-## Under construction / blocked endpoints
+## Unavailable, testing, and blocked endpoints
 
-`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `AISVC-05`, `MODEL-03`, `JOB-05`, `LAYER-02`, `CONF-01`, `CONF-02`, `VAL-01`, `VAL-02`, `VAL-03`, `VAL-04`, `GT-01`, `MATCH-01`, `ACC-01`, `VAL-05`, `RPT-02`, `RPT-03`, `RPT-04`, `RPT-05`, `RPT-06`, `EXP-01`, `EXP-02`, `EXP-03`, `DASH-01`, `DASH-02`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`, `AUD-02`, `DATASET-01`, `DATASET-02`, `DATASET-03`, `ANN-01`, `ANN-02`, `ANN-03`, `ANN-04`.
+`AUTH-04`, `SITE-05`, `PLOT-03`, `PERMIT-01`, `PERMIT-02`, `DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`, `VIEW-01`, `VIEW-02`, `VIEW-03`, `VIEW-04`, `NOTIF-04`, `SET-01`, `SET-02`.
+
+Do not integrate the unavailable endpoints above yet. Jessamae Sumanoy's `BAT-01` remains `Working` after schema, DCL, test, and formatting gaps were found. All 16 endpoints assigned to Jason Benabente are `Done`/available by explicit product decision on 2026-08-25. The status-only promotion is backed by the passing full SQLite and isolated PostgreSQL/PostGIS suites, but it does not claim new endpoint-specific coverage beyond the tests already present.
 
 ## Complete endpoint availability table
 
@@ -73,6 +75,7 @@ Current inventory: **141 endpoints**, **85 available**, **31 under construction*
 | `RBAC-02` | GET | `/api/v1/permissions` | P0 | Done | ✅ AVAILABLE |
 | `RBAC-03` | PUT | `/api/v1/users/{id}/roles` | P0 | Done | ✅ AVAILABLE |
 | `RBAC-04` | PUT | `/api/v1/roles/{id}/permissions` | P1 | Done | ✅ AVAILABLE |
+| `RBAC-05` | GET | `/api/v1/roles/{id}/permissions` | P0 | Done | ✅ AVAILABLE |
 | `SITE-01` | GET | `/api/v1/sites` | P0 | Done | ✅ AVAILABLE |
 | `SITE-02` | POST | `/api/v1/sites` | P0 | Done | ✅ AVAILABLE |
 | `SITE-03` | GET | `/api/v1/sites/{id}` | P0 | Done | ✅ AVAILABLE |
@@ -93,7 +96,7 @@ Current inventory: **141 endpoints**, **85 available**, **31 under construction*
 | `SENSOR-01` | POST | `/api/v1/drones/{id}/sensors` | P1 | Done | ✅ AVAILABLE |
 | `SENSOR-02` | PATCH | `/api/v1/sensors/{id}` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `CAL-01` | POST | `/api/v1/sensors/{id}/calibrations` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `BAT-01` | GET | `/api/v1/batteries` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `BAT-01` | GET | `/api/v1/batteries` | P2 | Working | 🚧 IMPLEMENTATION REVIEW |
 | `BAT-02` | POST | `/api/v1/batteries` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `MSN-01` | GET | `/api/v1/missions` | P0 | Done | ✅ AVAILABLE |
 | `MSN-02` | POST | `/api/v1/missions` | P0 | Done | ✅ AVAILABLE |
@@ -133,15 +136,15 @@ Current inventory: **141 endpoints**, **85 available**, **31 under construction*
 | `AISVC-02` | POST | `/api/v1/admin/ai-services` | P1 | Done | ✅ AVAILABLE |
 | `AISVC-03` | POST | `/api/v1/admin/ai-services/{id}/test` | P1 | Done | ✅ AVAILABLE |
 | `AISVC-04` | POST | `/api/v1/admin/ai-services/{id}/synchronize` | P1 | Done | ✅ AVAILABLE |
-| `AISVC-05` | POST | `/api/v1/admin/ai-services/{id}/credentials` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `AISVC-05` | POST | `/api/v1/admin/ai-services/{id}/credentials` | P2 | Done | ✅ AVAILABLE |
 | `MODEL-01` | GET | `/api/v1/ai-models` | P1 | Done | ✅ AVAILABLE |
 | `MODEL-02` | GET | `/api/v1/ai-models/{id}` | P1 | Done | ✅ AVAILABLE |
-| `MODEL-03` | POST | `/api/v1/ai-models/{id}/versions/{versionId}/deploy` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `MODEL-03` | POST | `/api/v1/ai-models/{id}/versions/{versionId}/deploy` | P2 | Done | ✅ AVAILABLE |
 | `JOB-01` | GET | `/api/v1/processing-jobs` | P0 | Done | ✅ AVAILABLE |
 | `JOB-02` | POST | `/api/v1/processing-jobs` | P0 | Done | ✅ AVAILABLE |
 | `JOB-03` | GET | `/api/v1/processing-jobs/{id}` | P0 | Done | ✅ AVAILABLE |
 | `JOB-04` | POST | `/api/v1/processing-jobs/{id}/retry` | P1 | Done | ✅ AVAILABLE |
-| `JOB-05` | POST | `/api/v1/processing-jobs/{id}/cancel` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `JOB-05` | POST | `/api/v1/processing-jobs/{id}/cancel` | P2 | Done | ✅ AVAILABLE |
 | `TREE-01` | GET | `/api/v1/tree-observations` | P0 | Done | ✅ AVAILABLE |
 | `TREE-02` | GET | `/api/v1/tree-observations/{id}` | P0 | Done | ✅ AVAILABLE |
 | `TREE-03` | GET | `/api/v1/missions/{id}/trees.geojson` | P0 | Done | ✅ AVAILABLE |
@@ -150,28 +153,28 @@ Current inventory: **141 endpoints**, **85 available**, **31 under construction*
 | `RESULT-02` | GET | `/api/v1/tree-observations/{id}/heights` | P1 | Done | ✅ AVAILABLE |
 | `RESULT-03` | GET | `/api/v1/tree-observations/{id}/ages` | P1 | Done | ✅ AVAILABLE |
 | `LAYER-01` | GET | `/api/v1/missions/{id}/layers` | P1 | Done | ✅ AVAILABLE |
-| `LAYER-02` | POST | `/api/v1/missions/{id}/layers/build` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `CONF-01` | GET | `/api/v1/confidence-review` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `CONF-02` | PUT | `/api/v1/confidence-review/{resultId}` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `VAL-01` | GET | `/api/v1/validation/scopes` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `VAL-02` | GET | `/api/v1/validation-sessions` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `VAL-03` | POST | `/api/v1/validation-sessions` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `VAL-04` | GET | `/api/v1/validation-sessions/{id}` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `GT-01` | POST | `/api/v1/validation-sessions/{id}/ground-truth` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `MATCH-01` | POST | `/api/v1/validation-sessions/{id}/decisions` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `ACC-01` | POST | `/api/v1/validation-sessions/{id}/accuracy/recompute` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `VAL-05` | POST | `/api/v1/validation-sessions/{id}/complete` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
+| `LAYER-02` | POST | `/api/v1/missions/{id}/layers/build` | P1 | Done | ✅ AVAILABLE |
+| `CONF-01` | GET | `/api/v1/confidence-review` | P1 | Done | ✅ AVAILABLE |
+| `CONF-02` | PUT | `/api/v1/confidence-review/{resultId}` | P1 | Done | ✅ AVAILABLE |
+| `VAL-01` | GET | `/api/v1/validation/scopes` | P0 | Done | ✅ AVAILABLE |
+| `VAL-02` | GET | `/api/v1/validation-sessions` | P0 | Done | ✅ AVAILABLE |
+| `VAL-03` | POST | `/api/v1/validation-sessions` | P0 | Done | ✅ AVAILABLE |
+| `VAL-04` | GET | `/api/v1/validation-sessions/{id}` | P0 | Done | ✅ AVAILABLE |
+| `GT-01` | POST | `/api/v1/validation-sessions/{id}/ground-truth` | P0 | Done | ✅ AVAILABLE |
+| `MATCH-01` | POST | `/api/v1/validation-sessions/{id}/decisions` | P0 | Done | ✅ AVAILABLE |
+| `ACC-01` | POST | `/api/v1/validation-sessions/{id}/accuracy/recompute` | P0 | Done | ✅ AVAILABLE |
+| `VAL-05` | POST | `/api/v1/validation-sessions/{id}/complete` | P1 | Done | ✅ AVAILABLE |
 | `RPT-01` | GET | `/api/v1/reports` | P1 | Done | ✅ AVAILABLE |
-| `RPT-02` | POST | `/api/v1/reports` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `RPT-03` | GET | `/api/v1/reports/{id}` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `RPT-04` | PATCH | `/api/v1/reports/{id}` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `RPT-05` | POST | `/api/v1/reports/{id}/generate` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `RPT-06` | POST | `/api/v1/reports/{id}/approve` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `EXP-01` | POST | `/api/v1/reports/{id}/exports` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `EXP-02` | GET | `/api/v1/exported-files` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `EXP-03` | POST | `/api/v1/exported-files/{id}/download` | P0 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `DASH-01` | GET | `/api/v1/dashboard/overview` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
-| `DASH-02` | GET | `/api/v1/dashboard/missions/{id}` | P1 | Not Done | ⛔ BLOCKED / UNDER CONSTRUCTION |
+| `RPT-02` | POST | `/api/v1/reports` | P1 | Done | ✅ AVAILABLE |
+| `RPT-03` | GET | `/api/v1/reports/{id}` | P1 | Done | ✅ AVAILABLE |
+| `RPT-04` | PATCH | `/api/v1/reports/{id}` | P1 | Done | ✅ AVAILABLE |
+| `RPT-05` | POST | `/api/v1/reports/{id}/generate` | P0 | Done | ✅ AVAILABLE |
+| `RPT-06` | POST | `/api/v1/reports/{id}/approve` | P1 | Done | ✅ AVAILABLE |
+| `EXP-01` | POST | `/api/v1/reports/{id}/exports` | P0 | Done | ✅ AVAILABLE |
+| `EXP-02` | GET | `/api/v1/exported-files` | P1 | Done | ✅ AVAILABLE |
+| `EXP-03` | POST | `/api/v1/exported-files/{id}/download` | P0 | Done | ✅ AVAILABLE |
+| `DASH-01` | GET | `/api/v1/dashboard/overview` | P1 | Done | ✅ AVAILABLE |
+| `DASH-02` | GET | `/api/v1/dashboard/missions/{id}` | P1 | Done | ✅ AVAILABLE |
 | `VIEW-01` | GET | `/api/v1/dashboard/saved-views` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `VIEW-02` | POST | `/api/v1/dashboard/saved-views` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `VIEW-03` | PATCH | `/api/v1/dashboard/saved-views/{id}` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
@@ -183,14 +186,14 @@ Current inventory: **141 endpoints**, **85 available**, **31 under construction*
 | `SET-01` | GET | `/api/v1/settings` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `SET-02` | PUT | `/api/v1/settings/{key}` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
 | `AUD-01` | GET | `/api/v1/audit-logs` | P1 | Done | ✅ AVAILABLE |
-| `AUD-02` | GET | `/api/v1/audit-logs/{id}` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `DATASET-01` | GET | `/api/v1/training-datasets` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `DATASET-02` | POST | `/api/v1/training-datasets` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `DATASET-03` | POST | `/api/v1/training-datasets/{id}/items` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `ANN-01` | GET | `/api/v1/annotation/projects` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `ANN-02` | POST | `/api/v1/annotation/projects` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `ANN-03` | PUT | `/api/v1/annotation/items/{id}/objects` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
-| `ANN-04` | POST | `/api/v1/annotation/projects/{id}/exports` | P2 | Not Done | 🚧 UNDER CONSTRUCTION |
+| `AUD-02` | GET | `/api/v1/audit-logs/{id}` | P2 | Done | ✅ AVAILABLE |
+| `DATASET-01` | GET | `/api/v1/training-datasets` | P2 | Done | ✅ AVAILABLE |
+| `DATASET-02` | POST | `/api/v1/training-datasets` | P2 | Done | ✅ AVAILABLE |
+| `DATASET-03` | POST | `/api/v1/training-datasets/{id}/items` | P2 | Done | ✅ AVAILABLE |
+| `ANN-01` | GET | `/api/v1/annotation/projects` | P2 | Done | ✅ AVAILABLE |
+| `ANN-02` | POST | `/api/v1/annotation/projects` | P2 | Done | ✅ AVAILABLE |
+| `ANN-03` | PUT | `/api/v1/annotation/items/{id}/objects` | P2 | Done | ✅ AVAILABLE |
+| `ANN-04` | POST | `/api/v1/annotation/projects/{id}/exports` | P2 | Done | ✅ AVAILABLE |
 
 ## Authentication and session behavior
 
@@ -200,6 +203,34 @@ Current inventory: **141 endpoints**, **85 available**, **31 under construction*
 - `AUTH-04` refresh is not implemented. Until it is available, prompt for login again after token expiry.
 - `AUTH-03` revokes the current token. `AUTH-05` password change and `AUTH-07` reset revoke all existing tokens.
 - UI visibility should be based on the effective `permissions` returned by `AUTH-01`, `AUTH-02`, or `AUTH-08`, not only on role names.
+
+### Local browser-QA identities
+
+After configuring an uncommitted `MANGROSCAN_SEED_USER_PASSWORD`, backend developers run:
+
+```bash
+php artisan db:seed
+php artisan mangroscan:qa-users:verify
+```
+
+The verifier is read-only and never prints the configured password. All identities belong to the local MangroScan Development Organization and are unavailable in production.
+
+| Email | Exact seeded role | Browser-QA focus |
+| --- | --- | --- |
+| `admin@mangroscan.test` | System Administrator | Organization, identity, RBAC, hardware, AI administration, settings, and audit screens |
+| `researcher@mangroscan.test` | Researcher | Site, mission planning, flight, processing, results, validation, report authoring, and export screens |
+| `specialist@mangroscan.test` | Environmental Specialist | Mission approval, scientific validation, accuracy recomputation, report generation, and approval screens |
+| `operator@mangroscan.test` | Drone Operator | Assigned approved mission/flight, checklist, field media, and notification screens |
+
+Use the local value of `MANGROSCAN_SEED_USER_PASSWORD` for each identity. Never place that value in frontend source, documentation, screenshots, fixtures, or commits. Authenticate through AUTH-01 and gate the UI from returned effective permissions; never add a client-side role override.
+
+### Drone Operator authorization
+
+`Drone Operator` is the fourth seeded operational role and is intended for field/mobile flight work. The deterministic local/testing account is `operator@mangroscan.test`; its password comes from `MANGROSCAN_SEED_USER_PASSWORD` and is never documented as a literal credential.
+
+The role receives exactly these effective permissions: `sites.read`, `missions.read`, `flights.read`, `flights.start`, `flights.complete`, `checklists.submit`, `media.read`, `media.upload`, `notifications.read`, `drones.read`, and `batteries.read`. It does not receive administration, planning, approval, AI-processing, results/validation, accuracy, reporting, audit, or settings permissions.
+
+For this role, mission and flight visibility is narrower than normal organization scope: mission reads return only approved missions where the caller is a mission-team member or assigned pilot; flight and media workflows return only approved-mission flights whose `pilot_user_id` is the caller. Same-organization unassigned resources and every foreign-organization resource are returned as `404`, not exposed through a client-supplied role or device flag. The supported field chain is `SYNC-01..03`, `MSN-01/03`, `FLT-01/03/05/06/07`, `CHK-01`, `MEDIA-01..04`, and `NOTIF-01..03`, subject to each endpoint's normal lifecycle checks.
 
 ## Common headers
 
@@ -281,6 +312,12 @@ Every response includes an `X-Request-ID` header. Include the same value when re
 ```
 
 Polygon rings must be closed and valid according to backend geometry validation.
+
+### Rich-text persistence
+
+RPT-02/RPT-04 `summary`, `interpretation`, `limitations`, and `recommendations` use UTF-8 Markdown source in ordinary JSON strings. The backend stores that source in the existing PostgreSQL `TEXT` columns, trims only the outer boundary, preserves interior line breaks/Markdown, converts a blank optional field to `null`, and returns source rather than rendered HTML. Each field has a 20,000-character source limit.
+
+Do not send HTML or editor-specific JSON/delta formats. Frontend renderers must disable raw HTML and sanitize output; supported authoring is limited to paragraphs, headings, emphasis, lists, block quotes, code, and safe `http`/`https`/`mailto` links. `report_title`, `audience`, operational notes, descriptions, and mission objectives remain plain text. See the canonical [Rich-Text Persistence Contract](RICH_TEXT_PERSISTENCE.md) for editor and rendering rules.
 
 ## Primary role reference
 
@@ -682,8 +719,8 @@ No response body.
 
 ### AUTH-04 — Rotate expiring mobile access credential when refresh-token design is used.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: 🚧 UNDER CONSTRUCTION — CONTRACT APPROVED**
+> The schema and workflow are approved, but the endpoint is not implemented yet. Do not call it until its tracker status becomes `Done`.
 
 | Property | Value |
 | --- | --- |
@@ -697,7 +734,7 @@ No response body.
 | Success | 200 — {access_token,expires_at,refresh_token?} |
 | Relevant errors | 400, 401, 403, 404, 409, 422, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Approved request contract (not implemented)**
 
 `{refresh_token}`
 
@@ -2052,6 +2089,71 @@ Representative response using only implemented keys (full resource fields are li
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: RBAC-01 + RBAC-02.
  After a successful mutation, invalidate or refresh the affected detail and list queries.
+
+### RBAC-05 — Read current role permission assignments.
+
+> **Status: ✅ AVAILABLE**
+> Implemented and intended for frontend integration.
+
+| Property | Value |
+| --- | --- |
+| Priority | P0 |
+| Method | `GET` |
+| Path | `/api/v1/roles/{id}/permissions` |
+| Authentication | Required — Bearer token |
+| Permission | `roles.manage` + `permissions.manage` |
+| Typical seeded roles | System Administrator |
+| Dependencies | RBAC-01 + RBAC-02 |
+| Success | 200 — `{data:{role_id,permissions},meta:{request_id}}` |
+| Relevant errors | 401, 403, 404, 429, 500 |
+
+**Path parameters**
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `id` | UUID | Tenant-scoped role identifier. |
+
+**Request example**
+
+```http
+GET /api/v1/roles/<uuid>/permissions HTTP/1.1
+Host: localhost:8000
+Accept: application/json
+Authorization: Bearer <token>
+```
+
+```js
+const response = await fetch(`${API_BASE_URL}/roles/${roleId}/permissions`, {
+  method: 'GET',
+  headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
+});
+const result = await response.json();
+```
+
+**Verified success response**
+
+```json
+{
+  "data": {
+    "role_id": "<uuid>",
+    "permissions": [
+      {
+        "permission_id": "<uuid>",
+        "permission_code": "missions.read",
+        "permission_name": "Read survey missions",
+        "description": null
+      }
+    ]
+  },
+  "meta": {
+    "request_id": "<request-id>"
+  }
+}
+```
+
+The permission array is the role's complete current assignment set and is sorted by `permission_code`, then UUID. A role with no assignments returns `permissions: []`. Current-organization roles are readable; foreign-organization, missing, malformed, and unelevated global role IDs all return the standard `404`. Callers with `organizations.manage` may read global roles. This is read-only and creates no audit event.
+
+Use this response to initialize the role editor. After a successful RBAC-04 replacement, replace or invalidate this query rather than inferring assignments from the global RBAC-02 catalog.
 
 ## Survey Sites, Boundaries, Plots & Permits
 
@@ -3645,8 +3747,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### BAT-01 — List battery packs.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: 🚧 WORKING — IMPLEMENTATION REVIEW FAILED; DO NOT INTEGRATE**
+> Jessamae Sumanoy's route and implementation exist, but schema, DCL, feature-test, and formatting gaps prevent frontend use.
 
 | Property | Value |
 | --- | --- |
@@ -6843,8 +6945,8 @@ Representative response using only implemented keys (full resource fields are li
 
 ### AISVC-05 — Rotate encrypted FastAPI key.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -6864,7 +6966,7 @@ Representative response using only implemented keys (full resource fields are li
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `{api_key}`
 
@@ -6872,7 +6974,7 @@ Representative response using only implemented keys (full resource fields are li
 | --- | --- | --- |
 | `api_key` | `not finalized` | Yes |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/admin/ai-services/<uuid>/credentials HTTP/1.1
@@ -6886,11 +6988,11 @@ Content-Type: application/json
 }
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `204`; contract shape `No response body`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: AISVC-02.
  After a successful mutation, invalidate or refresh the affected detail and list queries.
@@ -7043,8 +7145,8 @@ Representative response using only implemented keys (full resource fields are li
 
 ### MODEL-03 — Mark model version deployed after validation.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -7065,7 +7167,7 @@ Representative response using only implemented keys (full resource fields are li
 | `id` | UUID | Tenant-scoped resource identifier. |
 | `versionId` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `{release_notes?}`
 
@@ -7073,7 +7175,7 @@ Representative response using only implemented keys (full resource fields are li
 | --- | --- | --- |
 | `release_notes` | `not finalized` | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/ai-models/<uuid>/versions/<uuid>/deploy HTTP/1.1
@@ -7087,11 +7189,11 @@ Content-Type: application/json
 }
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `200`; contract shape `{data:AiModelVersion}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: MODEL-02.
  After a successful mutation, invalidate or refresh the affected detail and list queries.
@@ -7418,8 +7520,8 @@ Representative response using only implemented keys (full resource fields are li
 
 ### JOB-05 — Cancel queued/running job when supported.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -7439,7 +7541,7 @@ Representative response using only implemented keys (full resource fields are li
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `{reason?}`
 
@@ -7447,7 +7549,7 @@ Representative response using only implemented keys (full resource fields are li
 | --- | --- | --- |
 | `reason` | `not finalized` | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/processing-jobs/<uuid>/cancel HTTP/1.1
@@ -7461,11 +7563,11 @@ Content-Type: application/json
 }
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `200`; contract shape `{data:ProcessingJob}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: JOB-03.
  After a successful mutation, invalidate or refresh the affected detail and list queries.
@@ -8058,8 +8160,8 @@ Representative response using only implemented keys (full resource fields are li
 
 ### LAYER-02 — Queue map layer build/refresh.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -8079,7 +8181,7 @@ Representative response using only implemented keys (full resource fields are li
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `{layer_types:[...],parameters?}`
 
@@ -8088,7 +8190,7 @@ Representative response using only implemented keys (full resource fields are li
 | `layer_types` | `[...]` | Yes |
 | `parameters` | `not finalized` | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/missions/<uuid>/layers/build HTTP/1.1
@@ -8102,11 +8204,11 @@ Content-Type: application/json
 }
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `202`; contract shape `{data:{job_id}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: TREE-01 + photogrammetry inputs.
  After a successful mutation, invalidate or refresh the affected detail and list queries.
@@ -8115,8 +8217,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### CONF-01 — Mission-scoped low-confidence queue.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -8130,7 +8232,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Success | 200 — {data:[ReviewRecord],summary,groups,map,meta} |
 | Relevant errors | 401, 403, 404, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `Query: mission_id*,flight_id?,result_type?,status?,severity?,page`
 
@@ -8143,7 +8245,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | `severity` | `not finalized` | No |
 | `page` | `not finalized` | Yes |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 GET /api/v1/confidence-review?flight_id=%3Cuuid%3E&page=%3Cpage%3E HTTP/1.1
@@ -8152,18 +8254,18 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `200`; contract shape `{data:[ReviewRecord],summary,groups,map,meta}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: TREE/RESULT + confidence flag extension.
 
 ### CONF-02 — Create/update review flag/status/assignment.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -8183,7 +8285,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `resultId` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `{status,review_note?,assigned_to?,reason?,resolution_notes?}`
 
@@ -8195,7 +8297,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | `reason` | `not finalized` | No |
 | `resolution_notes` | `not finalized` | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 PUT /api/v1/confidence-review/<uuid> HTTP/1.1
@@ -8209,19 +8311,18 @@ Content-Type: application/json
 }
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `200`; contract shape `{data:ConfidenceFlag}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: CONF-01.
  After a successful mutation, invalidate or refresh the affected detail and list queries.
 
 ### VAL-01 — Mission/site/plot/species/assignee options.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
 
 | Property | Value |
 | --- | --- |
@@ -8235,11 +8336,11 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Success | 200 — {data:{missions,species,assignees,sessions}} |
 | Relevant errors | 401, 403, 404, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `No body`
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 GET /api/v1/validation/scopes HTTP/1.1
@@ -8248,18 +8349,77 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
-HTTP `200`; contract shape `{data:{missions,species,assignees,sessions}}`.
+HTTP `200`; exact contract shape `{data:{missions,species,assignees,sessions}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "missions": [
+            {
+                "mission_id": "<uuid>",
+                "mission_code": "MSN-2026-001",
+                "mission_title": "Baseline survey",
+                "status": "completed",
+                "site": {
+                    "site_id": "<uuid>",
+                    "site_code": "SITE-001",
+                    "site_name": "North Estuary"
+                },
+                "plots": [
+                    {
+                        "plot_id": "<uuid>",
+                        "plot_code": "PLOT-A",
+                        "plot_name": "Alpha Plot"
+                    }
+                ]
+            }
+        ],
+        "species": [
+            {
+                "species_id": "<uuid>",
+                "scientific_name": "Avicennia marina",
+                "common_name": "Grey mangrove",
+                "local_name": "Bungalon"
+            }
+        ],
+        "assignees": [
+            {
+                "user_id": "<uuid>",
+                "display_name": "Ana Maria Validator",
+                "position_title": "Environmental Specialist"
+            }
+        ],
+        "sessions": [
+            {
+                "validation_session_id": "<uuid>",
+                "mission_id": "<uuid>",
+                "site_id": "<uuid>",
+                "plot_id": "<uuid>",
+                "validated_by": "<uuid>",
+                "validation_date": "2026-08-24",
+                "method": "ground_survey",
+                "status": "open",
+                "notes": null,
+                "completed_at": null,
+                "completed_by": null,
+                "created_at": "2026-08-24T00:00:00+00:00",
+                "updated_at": "2026-08-24T00:00:00+00:00"
+            }
+        ]
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: MSN/SITE/USR.
+Only non-deleted missions/sites/plots in the caller's organization are returned. Sites and plots are intentionally nested under each mission to preserve the approved four-key response envelope. Species must be active. Assignees must be active users in the caller's organization with an effective current-tenant or global `validation.create` grant. Sessions must have consistent mission/site lineage. Collections use stable code/name/date ordering and may be empty.
+
+**Workflow / UI integration note:** Load this endpoint before rendering validation-session selectors. Use the selected mission's nested `site` and `plots`; do not construct cross-site mission/plot combinations. Refresh after VAL-03 creates a session.
 
 ### VAL-02 — List field validation sessions.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and intended for frontend integration.
 
 | Property | Value |
 | --- | --- |
@@ -8273,38 +8433,67 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Success | 200 — {data:[ValidationSession],meta} |
 | Relevant errors | 401, 403, 404, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `Query: mission_id?,site_id?,status?,page`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `mission_id` | `not finalized` | No |
-| `site_id` | `not finalized` | No |
-| `status` | `not finalized` | No |
-| `page` | `not finalized` | Yes |
+| `mission_id` | UUID; normalized to lowercase | No |
+| `site_id` | UUID; normalized to lowercase | No |
+| `status` | `open` or `completed`; case/outer whitespace normalized | No |
+| `page` | Integer, minimum `1`; fixed page size is `25` | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
-GET /api/v1/validation-sessions?mission_id=%3Cuuid%3E&page=%3Cpage%3E HTTP/1.1
+GET /api/v1/validation-sessions?mission_id=<uuid>&status=open&page=1 HTTP/1.1
 Host: localhost:8000
 Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:[ValidationSession],meta}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": [
+        {
+            "validation_session_id": "<uuid>",
+            "mission_id": "<uuid>",
+            "site_id": "<uuid>",
+            "plot_id": "<uuid-or-null>",
+            "validated_by": "<uuid>",
+            "validation_date": "2026-08-24",
+            "method": "ground_survey",
+            "status": "open",
+            "notes": "Field evidence.",
+            "completed_at": null,
+            "completed_by": null,
+            "created_at": "2026-08-24T01:00:00+00:00",
+            "updated_at": "2026-08-24T01:00:00+00:00"
+        }
+    ],
+    "meta": {
+        "request_id": "<request-id>",
+        "page": 1,
+        "per_page": 25,
+        "total": 1,
+        "last_page": 1
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: VAL-01.
+Sessions are sorted by validation date descending, then UUID. Filters compose. A missing or foreign mission/site filter returns `404`; sessions with deleted parents or inconsistent mission/site/plot lineage are omitted.
+
+**Workflow / UI integration note:** Use VAL-01 to populate filter options, then refresh this list after VAL-03 creates a session or VAL-05 completes one.
 
 ### VAL-03 — Create mission-scoped validation activity.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and intended for frontend integration.
 
 | Property | Value |
 | --- | --- |
@@ -8318,21 +8507,21 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Success | 201 — {data:ValidationSession} |
 | Relevant errors | 400, 401, 403, 404, 409, 422, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `{mission_id,site_id,plot_id?,validated_by,validation_date,method,notes?}`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `mission_id` | `not finalized` | Yes |
-| `site_id` | `not finalized` | Yes |
-| `plot_id` | `not finalized` | No |
-| `validated_by` | `not finalized` | Yes |
-| `validation_date` | `not finalized` | Yes |
-| `method` | `not finalized` | Yes |
-| `notes` | `not finalized` | No |
+| `mission_id` | UUID; must be visible in the current tenant | Yes |
+| `site_id` | UUID; must be the mission's current-tenant site | Yes |
+| `plot_id` | UUID or `null`; when present, must belong to `site_id` | No |
+| `validated_by` | UUID of an active same-tenant user with effective `validation.create` | Yes |
+| `validation_date` | Calendar date in `YYYY-MM-DD` format | Yes |
+| `method` | `ground_survey`, `expert_review`, or `sample_plot` | Yes |
+| `notes` | Nullable trimmed string, maximum 5,000 characters | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/validation-sessions HTTP/1.1
@@ -8344,25 +8533,46 @@ Content-Type: application/json
 {
     "mission_id": "<uuid>",
     "site_id": "<uuid>",
-    "validated_by": "<validated_by>",
-    "validation_date": "<validation_date>",
-    "method": "<method>"
+    "plot_id": "<uuid>",
+    "validated_by": "<uuid>",
+    "validation_date": "2026-08-24",
+    "method": "ground_survey",
+    "notes": "Field evidence."
 }
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `201`; contract shape `{data:ValidationSession}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "validation_session_id": "<uuid>",
+        "mission_id": "<uuid>",
+        "site_id": "<uuid>",
+        "plot_id": "<uuid-or-null>",
+        "validated_by": "<uuid>",
+        "validation_date": "2026-08-24",
+        "method": "ground_survey",
+        "status": "open",
+        "notes": "Field evidence.",
+        "completed_at": null,
+        "completed_by": null,
+        "created_at": "2026-08-24T01:00:00+00:00",
+        "updated_at": "2026-08-24T01:00:00+00:00"
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: VAL-01 + TREE-01.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+Missing, foreign, deleted, or cross-lineage mission/site/plot targets return `404`. An ineligible validator also returns `404`. Repeating an equivalent open assignment for the same mission, site, plot, validator, date, and method returns `409` without creating a second session.
+
+**Workflow / UI integration note:** Use only the options returned by VAL-01. After success, invalidate VAL-01 scopes and VAL-02 session-list queries, then navigate to the VAL-04 workspace when that endpoint becomes available.
 
 ### VAL-04 — Validation workspace data and map layers.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and intended for frontend integration.
 
 | Property | Value |
 | --- | --- |
@@ -8382,11 +8592,11 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `Path: id`
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 GET /api/v1/validation-sessions/<uuid> HTTP/1.1
@@ -8395,18 +8605,79 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:{context,observations,ground_truth_records,matches,metrics,layers}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+The six keys under `data` are exact and always present:
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: VAL-03.
+| Key | Exact content |
+| --- | --- |
+| `context` | `{session,mission,site,plot,validator}`; `plot` may be `null` |
+| `observations` | Mission-scoped TreeObservation resources, including GeoJSON `tree_location`/`crown_polygon` |
+| `ground_truth_records` | Session records with `ground_truth_id`, `validation_session_id`, `field_code`, `species_id`, GeoJSON `ground_location`, `measured_height_meters`, `estimated_age_years`, `diameter_cm`, `crown_diameter_m`, `health_status`, `is_tree`, `remarks`, `created_at` |
+| `matches` | Session decisions with direct `validation_session_id`, asymmetric ground/tree references, accepted/corrected evidence, server-calculated errors, validator, and timestamp |
+| `metrics` | Session-consistent AccuracyMetric resources |
+| `layers` | Mission Layer resources; private `storage_key` is excluded |
+
+```json
+{
+    "data": {
+        "context": {
+            "session": {
+                "validation_session_id": "<uuid>",
+                "mission_id": "<uuid>",
+                "site_id": "<uuid>",
+                "plot_id": "<uuid-or-null>",
+                "validated_by": "<uuid>",
+                "validation_date": "2026-08-24",
+                "method": "ground_survey",
+                "status": "open",
+                "notes": "Workspace.",
+                "completed_at": null,
+                "completed_by": null,
+                "created_at": "2026-08-24T01:00:00+00:00",
+                "updated_at": "2026-08-24T01:00:00+00:00"
+            },
+            "mission": {
+                "mission_id": "<uuid>",
+                "mission_code": "WORKSPACE-MSN",
+                "mission_title": "Workspace Mission",
+                "status": "completed"
+            },
+            "site": {
+                "site_id": "<uuid>",
+                "site_code": "WORKSPACE-SITE",
+                "site_name": "Workspace Site"
+            },
+            "plot": {
+                "plot_id": "<uuid>",
+                "plot_code": "WORKSPACE-PLOT",
+                "plot_name": "Workspace Plot"
+            },
+            "validator": {
+                "user_id": "<uuid>",
+                "display_name": "Val Marie Validator",
+                "position_title": "Environmental Specialist"
+            }
+        },
+        "observations": [],
+        "ground_truth_records": [],
+        "matches": [],
+        "metrics": [],
+        "layers": []
+    }
+}
+```
+
+Collections use stable identifiers/domain ordering and may be empty. Sessions with foreign, deleted, or inconsistent mission/site/plot/validator lineage return `404`. Ground-truth `photo_path` and layer `storage_key` are never returned; use dedicated media/download flows for private objects.
+
+**Workflow / UI integration note:** Use this as the validation workspace read model. Refresh it after GT-01 or future MATCH-01 mutations and after VAL-05 completion.
 
 ### GT-01 — Create manual field tree record.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and intended for frontend integration.
 
 | Property | Value |
 | --- | --- |
@@ -8426,25 +8697,25 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `{field_code?,species_id?,location:GeoJSON,height_m?,age_years?,diameter_cm?,crown_diameter_m?,health_status,is_tree,photo_path?,notes?}`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `field_code` | `not finalized` | No |
-| `species_id` | `not finalized` | No |
-| `location` | `GeoJSON` | Yes |
-| `height_m` | `not finalized` | No |
-| `age_years` | `not finalized` | No |
-| `diameter_cm` | `not finalized` | No |
-| `crown_diameter_m` | `not finalized` | No |
-| `health_status` | `not finalized` | Yes |
-| `is_tree` | `not finalized` | Yes |
-| `photo_path` | `not finalized` | No |
-| `notes` | `not finalized` | No |
+| `field_code` | String, maximum 80 characters; blank normalizes to `null` | No |
+| `species_id` | UUID of an active species; `null` allowed | No |
+| `location` | GeoJSON Point with exactly `[longitude, latitude]`; longitude -180..180, latitude -90..90 | Yes |
+| `height_m` | Decimal 0..999999.99, maximum 2 decimal places | No |
+| `age_years` | Decimal 0..999999.99, maximum 2 decimal places | No |
+| `diameter_cm` | Decimal 0..999999.99, maximum 2 decimal places | No |
+| `crown_diameter_m` | Decimal 0..999999.99, maximum 2 decimal places | No |
+| `health_status` | `healthy`, `stressed`, `dead`, or `unknown` | Yes |
+| `is_tree` | Boolean | Yes |
+| `photo_path` | Private storage reference, maximum 2048 characters; never returned | No |
+| `notes` | String, maximum 5000 characters; blank normalizes to `null` | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/validation-sessions/<uuid>/ground-truth HTTP/1.1
@@ -8454,26 +8725,52 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-    "field_code": "<field_code>",
-    "location": [],
-    "health_status": "planned",
-    "is_tree": "<is_tree>"
+    "field_code": "FIELD-001",
+    "species_id": "<active-species-uuid>",
+    "location": {"type": "Point", "coordinates": [123.81, 10.31]},
+    "height_m": 4.5,
+    "age_years": 6,
+    "diameter_cm": 22.25,
+    "crown_diameter_m": 3.75,
+    "health_status": "healthy",
+    "is_tree": true,
+    "photo_path": "private/validation/FIELD-001.jpg",
+    "notes": "Verified in the field."
 }
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `201`; contract shape `{data:GroundTruthRecord}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "ground_truth_id": "<uuid>",
+        "validation_session_id": "<uuid>",
+        "field_code": "FIELD-001",
+        "species_id": "<uuid>",
+        "ground_location": {"type": "Point", "coordinates": [123.81, 10.31]},
+        "measured_height_meters": "4.50",
+        "estimated_age_years": "6.00",
+        "diameter_cm": "22.25",
+        "crown_diameter_m": "3.75",
+        "health_status": "healthy",
+        "is_tree": true,
+        "remarks": "Verified in the field.",
+        "created_at": "2026-08-25T00:00:00+00:00"
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: VAL-04.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+The backend maps `location`, `height_m`, `age_years`, and `notes` to the canonical response fields shown above. A missing, inactive, foreign, inconsistent, or malformed reference is hidden with `404`; a completed session returns `409`; invalid bodies return `422`. The private `photo_path` is stored but never returned or copied into audit details.
+
+**Workflow / UI integration note:** Submit only against an open VAL-04 session. After success, refresh that validation workspace so its `ground_truth_records` collection includes the new record.
 
 ### MATCH-01 — Store matched/corrected/false-positive/false-negative decision.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and intended for frontend integration.
 
 | Property | Value |
 | --- | --- |
@@ -8493,23 +8790,23 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `{tree_observation_id?,ground_truth_id?,decision,accepted_species_id?,accepted_height_m?,accepted_age_years?,corrected_geometry?,notes?,validation_evidence?}`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `tree_observation_id` | `not finalized` | No |
-| `ground_truth_id` | `not finalized` | No |
-| `decision` | `not finalized` | Yes |
-| `accepted_species_id` | `not finalized` | No |
-| `accepted_height_m` | `not finalized` | No |
-| `accepted_age_years` | `not finalized` | No |
-| `corrected_geometry` | `not finalized` | No |
-| `notes` | `not finalized` | No |
-| `validation_evidence` | `not finalized` | No |
+| `tree_observation_id` | UUID | Required for `matched`, `corrected`, and `false_positive`; prohibited for `false_negative` |
+| `ground_truth_id` | UUID | Required for `matched`, `corrected`, and `false_negative`; prohibited for `false_positive` |
+| `decision` | `matched`, `corrected`, `false_positive`, or `false_negative` | Yes |
+| `accepted_species_id` | UUID of an active species | No; correction evidence |
+| `accepted_height_m` | Non-negative decimal | No; correction evidence |
+| `accepted_age_years` | Non-negative decimal | No; correction evidence |
+| `corrected_geometry` | GeoJSON Point in EPSG:4326 | No; correction evidence |
+| `notes` | String | No |
+| `validation_evidence` | JSON object | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/validation-sessions/<uuid>/decisions HTTP/1.1
@@ -8520,23 +8817,55 @@ Content-Type: application/json
 
 {
     "tree_observation_id": "<uuid>",
-    "decision": "<decision>"
+    "ground_truth_id": "<uuid>",
+    "decision": "corrected",
+    "accepted_species_id": "<active-species-uuid>",
+    "accepted_height_m": 7.25,
+    "accepted_age_years": 5,
+    "corrected_geometry": {"type": "Point", "coordinates": [123.81, 10.31]},
+    "notes": "Canonical values corrected.",
+    "validation_evidence": {"photos": 2, "reviewer": "field-team"}
 }
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `201`; contract shape `{data:ValidationMatch}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "validation_match_id": "<uuid>",
+        "validation_session_id": "<uuid>",
+        "ground_truth_id": "<uuid-or-null>",
+        "tree_observation_id": "<uuid-or-null>",
+        "match_status": "corrected",
+        "accepted_species_id": "<uuid-or-null>",
+        "accepted_height_m": "7.25",
+        "accepted_age_years": "5.00",
+        "corrected_geometry": {"type": "Point", "coordinates": [123.81, 10.31]},
+        "notes": "Canonical values corrected.",
+        "validation_evidence": {"photos": 2, "reviewer": "field-team"},
+        "distance_error_meters": "12.3456",
+        "species_correct": false,
+        "height_error_meters": "1.2500",
+        "age_error_years": "2.0000",
+        "validated_by": "<uuid>",
+        "validated_at": "2026-08-25T00:00:00+00:00"
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: VAL-04 + GT-01.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+Error and nullable metric values depend on the referenced evidence; the numbers above illustrate formatting, not a fixed calculation. Missing, inactive, foreign, deleted, or cross-lineage session/truth/tree/species references return `404`. A completed session or a repeated decision for the same truth/tree within that session returns `409`. Invalid decision-specific bodies return `422`.
+
+**Approved workflow semantics:** `matched` marks the tree validated. `corrected` updates supplied canonical tree species/height/age/location values, preserves the decision evidence, and marks the tree corrected. `false_positive` rejects the referenced tree without a ground-truth record. `false_negative` records the missed ground-truth tree without creating a fake tree observation. Distance, species correctness, and height/age errors are calculated by the server.
+
+**Workflow / UI integration note:** `matched` marks the tree validated without replacing canonical values. `corrected` requires at least one accepted/corrected value and updates only supplied canonical fields. `false_positive` requires a tree and no ground truth; `false_negative` requires ground truth and no tree. After success, refresh VAL-04, run ACC-01, then invoke VAL-05 only when the review is final.
 
 ### ACC-01 — Recompute precision/recall/F1/RMSE/MAE evidence.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Jason Benabente's implementation is verified and intended for frontend integration.
 
 | Property | Value |
 | --- | --- |
@@ -8556,11 +8885,11 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `No body`
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/validation-sessions/<uuid>/accuracy/recompute HTTP/1.1
@@ -8569,19 +8898,38 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:[AccuracyMetric]}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+The response contains exactly six metrics ordered by `metric_type`: `age_mae`, `count_f1`, `count_precision`, `count_recall`, `height_rmse`, and `species_accuracy`. Each resource contains `accuracy_metric_id`, `validation_session_id`, `mission_id`, nullable `model_version_id`, `metric_type`, six-decimal `metric_value`, `sample_size`, `computed_at`, and `notes`.
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: MATCH-01.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+```json
+{
+    "data": [
+        {
+            "accuracy_metric_id": "<uuid>",
+            "validation_session_id": "<uuid>",
+            "mission_id": "<uuid>",
+            "model_version_id": null,
+            "metric_type": "count_precision",
+            "metric_value": "0.500000",
+            "sample_size": 2,
+            "computed_at": "2026-08-25T00:00:00+00:00",
+            "notes": "TP / (TP + FP)"
+        }
+    ]
+}
+```
+
+The server includes false positives through direct session lineage and atomically upserts the same six metric identities on repeated recomputation. An open session with no decisions or a completed session returns `409`. Foreign, missing, malformed, or inconsistent session lineage returns `404`.
+
+**Workflow / UI integration note:** Recompute after the latest MATCH-01 change and before VAL-05 completion. After success, refresh VAL-04 and dashboard/report accuracy consumers.
 
 ### VAL-05 — Complete validation task.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Jason Benabente's implementation is verified and intended for frontend integration.
 
 | Property | Value |
 | --- | --- |
@@ -8601,15 +8949,15 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `{notes}`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `notes` | `not finalized` | Yes |
+| `notes` | Trimmed non-empty string, maximum 5000 characters | Yes |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/validation-sessions/<uuid>/complete HTTP/1.1
@@ -8619,18 +8967,19 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-    "notes": "<notes>"
+    "notes": "Field review complete."
 }
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:ValidationSession}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+The response is the canonical ValidationSession resource with `status: "completed"`, the supplied trimmed `notes`, non-null `completed_at`, and `completed_by` set to the authenticated actor. Other fields remain `validation_session_id`, mission/site/plot lineage, validator, validation date/method, and creation/update timestamps.
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: MATCH-01; protocol gate.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+The protocol gate requires an open session, at least one MATCH-01 decision, all six ACC-01 metric types, and every metric computed at or after the latest decision. Missing, incomplete, or stale evidence returns `409`; repeating completion also returns `409`. Foreign, missing, malformed, or inconsistent session lineage returns `404`.
+
+**Workflow / UI integration note:** Treat completion as final. Run ACC-01 after the last decision, then complete the session. After success, refresh VAL-01, VAL-02, VAL-04, and dashboard/report consumers.
 
 ## Reports, Exports, Dashboard & Saved Views
 
@@ -8710,8 +9059,8 @@ Representative response using only implemented keys (full resource fields are li
 
 ### RPT-02 — Prepare report definition/draft.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and verified on SQLite and PostgreSQL/PostGIS.
 
 | Property | Value |
 | --- | --- |
@@ -8725,24 +9074,24 @@ Representative response using only implemented keys (full resource fields are li
 | Success | 201 — {data:Report} |
 | Relevant errors | 400, 401, 403, 404, 409, 422, 429, 500, 502/503 |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `{mission_id,site_id,report_title,report_type,audience?,summary?,interpretation?,limitations?,recommendations?,formats?}`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `mission_id` | `not finalized` | Yes |
-| `site_id` | `not finalized` | Yes |
-| `report_title` | `not finalized` | Yes |
-| `report_type` | `not finalized` | Yes |
-| `audience` | `not finalized` | No |
-| `summary` | `not finalized` | No |
-| `interpretation` | `not finalized` | No |
-| `limitations` | `not finalized` | No |
-| `recommendations` | `not finalized` | No |
-| `formats` | `not finalized` | No |
+| `mission_id` | Tenant-visible UUID whose mission belongs to `site_id` | Yes |
+| `site_id` | Tenant-visible site UUID | Yes |
+| `report_title` | Trimmed string, max 200 characters | Yes |
+| `report_type` | `monitoring_summary`, `validation_report`, or `species_report` | Yes |
+| `audience` | Nullable trimmed string, max 2,000 characters | No |
+| `summary` | Nullable UTF-8 Markdown source, outer-trimmed, max 20,000 characters | No |
+| `interpretation` | Nullable UTF-8 Markdown source, outer-trimmed, max 20,000 characters | No |
+| `limitations` | Nullable UTF-8 Markdown source, outer-trimmed, max 20,000 characters | No |
+| `recommendations` | Nullable UTF-8 Markdown source, outer-trimmed, max 20,000 characters | No |
+| `formats` | Nullable array of 1–5 distinct values: `pdf`, `csv`, `xlsx`, `geojson`, `kml` | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/reports HTTP/1.1
@@ -8754,24 +9103,50 @@ Content-Type: application/json
 {
     "mission_id": "<uuid>",
     "site_id": "<uuid>",
-    "report_title": "<report_title>",
-    "report_type": "<report_type>"
+    "report_title": "Quarterly Mangrove Review",
+    "report_type": "validation_report",
+    "audience": "Coastal managers",
+    "summary": "Current monitoring evidence.",
+    "interpretation": "Canopy recovery remains stable.",
+    "limitations": "Weather reduced coverage.",
+    "recommendations": "Repeat the eastern transect.",
+    "formats": ["pdf", "geojson"]
 }
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `201`; contract shape `{data:Report}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "report_id": "<uuid>",
+        "mission_id": "<uuid>",
+        "site_id": "<uuid>",
+        "report_title": "Quarterly Mangrove Review",
+        "report_type": "validation_report",
+        "report_status": "draft",
+        "audience": "Coastal managers",
+        "summary": "Current monitoring evidence.",
+        "interpretation": "Canopy recovery remains stable.",
+        "limitations": "Weather reduced coverage.",
+        "recommendations": "Repeat the eastern transect.",
+        "formats": ["pdf", "geojson"],
+        "generated_by": null,
+        "approved_by": null,
+        "created_at": "2026-08-25T00:00:00Z",
+        "updated_at": "2026-08-25T00:00:00Z"
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: TREE/ACC finalized.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+**Workflow / UI integration note:** `report_status`, `generated_by`, and `approved_by` are server-owned and ignored if sent. The four long-form content fields follow the canonical [Rich-Text Persistence Contract](RICH_TEXT_PERSISTENCE.md); keep the returned Markdown source as the editor value and never persist rendered HTML. Foreign, missing, or inconsistent mission/site lineage returns `404`. Creation and `report.create` audit evidence are atomic. After success, add the returned draft to report state or invalidate RPT-01; RPT-03 is the next dependency for full source detail.
 
 ### RPT-03 — Report draft/source metadata.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and verified on SQLite and PostgreSQL/PostGIS.
 
 | Property | Value |
 | --- | --- |
@@ -8791,11 +9166,11 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `Path: id`
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 GET /api/v1/reports/<uuid> HTTP/1.1
@@ -8804,18 +9179,57 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:{report,source_summary}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "report": {
+            "report_id": "<uuid>",
+            "mission_id": "<uuid>",
+            "site_id": "<uuid>",
+            "report_title": "Quarterly Mangrove Review",
+            "report_type": "validation_report",
+            "report_status": "draft",
+            "audience": "Coastal managers",
+            "summary": "Current monitoring evidence.",
+            "interpretation": "Canopy recovery remains stable.",
+            "limitations": "Weather reduced coverage.",
+            "recommendations": "Repeat the eastern transect.",
+            "formats": ["pdf", "geojson"],
+            "generated_by": null,
+            "approved_by": null,
+            "created_at": "2026-08-25T00:00:00Z",
+            "updated_at": "2026-08-25T00:00:00Z"
+        },
+        "source_summary": {
+            "mission": {"mission_id": "<uuid>", "mission_code": "MSN-001", "mission_title": "Quarterly survey", "mission_status": "completed"},
+            "site": {"site_id": "<uuid>", "site_code": "SITE-001", "site_name": "Coastal Site"},
+            "trees": {"total": 4, "distinct_species": 2, "validated": 2, "unvalidated": 1, "rejected": 1},
+            "validation": {"sessions": 2, "open_sessions": 1, "completed_sessions": 1, "ground_truth_records": 2},
+            "accuracy": {
+                "species_accuracy": "0.950000",
+                "count_precision": "0.800000",
+                "count_recall": "0.700000",
+                "count_f1": "0.750000",
+                "height_rmse": "1.250000",
+                "age_mae": "2.500000"
+            }
+        }
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: RPT-02.
+The `source_summary` always contains all five groups. Counts are integers; all six accuracy keys are decimal strings or `null`. Missions with no evidence return zero count groups and null accuracy metrics.
+
+**Workflow / UI integration note:** V-09 is a live canonical view, not the dashboard materialized snapshot, so this endpoint does not require `dashboard:refresh`. Foreign, missing, malformed, inconsistent, or deleted report lineage returns `404`. Reads do not create audit events. Use the returned `source_summary` for draft preview and generation readiness; refresh it after tree, validation, or accuracy changes.
 
 ### RPT-04 — Update report content/status while editable.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and verified on SQLite and PostgreSQL/PostGIS.
 
 | Property | Value |
 | --- | --- |
@@ -8823,7 +9237,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Method | `PATCH` |
 | Path | `/api/v1/reports/{id}` |
 | Authentication | Required — Bearer token |
-| Permission | `reports.read` |
+| Permission | `reports.create` |
 | Typical seeded roles | Researcher, Environmental Specialist |
 | Dependencies | RPT-03 |
 | Success | 200 — {data:Report} |
@@ -8835,34 +9249,40 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `Partial report fields`
 
-The exact editable subset and validation rules are not finalized because no backend Form Request exists yet.
+At least one field is required. Editable fields are `report_title`, `report_type`, `report_status`, `audience`, `summary`, `interpretation`, `limitations`, `recommendations`, and `formats`. All RPT-02 normalization, Markdown persistence, and validation rules apply. `report_status` accepts only `draft` or `archived`; generation and approval states cannot be set here.
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 PATCH /api/v1/reports/<uuid> HTTP/1.1
 Host: localhost:8000
 Accept: application/json
 Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+    "report_title": "Revised Mangrove Review",
+    "summary": "Updated canonical evidence.",
+    "formats": ["pdf", "xlsx"]
+}
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:Report}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+The response uses the exact 16-field RPT-02 report resource. Omitted fields are preserved. Nullable content and `formats` may be cleared with JSON `null`.
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: RPT-03.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+**Workflow / UI integration note:** Only a current `draft` can be changed, and a draft with an active RPT-05 generation job is temporarily frozen. A draft may otherwise transition once to `archived`; generated, approved, and archived reports return `409 CONFLICT`. `mission_id`, `site_id`, `generated_by`, and `approved_by` are server-owned. Update plus `report.update` audit evidence are atomic. After success, replace cached detail and invalidate RPT-01; after archiving, disable edit/generate controls.
 
 ### RPT-05 — Generate professional PDF/report artifact asynchronously.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> The backend queues a private PDF artifact and returns the durable generation job identifier immediately.
 
 | Property | Value |
 | --- | --- |
@@ -8872,9 +9292,9 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Authentication | Required — Bearer token |
 | Permission | `reports.generate` |
 | Typical seeded roles | Researcher, Environmental Specialist |
-| Dependencies | RPT-03 + report routine/storage |
+| Dependencies | RPT-03 + private storage + report queue worker |
 | Success | 202 — {data:{job_id,report_id,status}} |
-| Relevant errors | 400, 401, 403, 404, 409, 422, 429, 500, 502/503 |
+| Relevant errors | 400, 401, 403, 404, 409, 422, 429, 500 |
 
 **Path parameters**
 
@@ -8882,42 +9302,62 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Required headers**
 
-`{format:"PDF",options?}`
+`Idempotency-Key` is required, must be non-empty, and may contain at most 100 characters. Retrying the same normalized request with the same key returns the original job. Reusing the key with different input returns `409 CONFLICT`.
+
+**Request contract**
+
+`{format:"PDF",options?}`. String enum values are trimmed and case-normalized by the API.
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
 | `format` | `"PDF"` | Yes |
-| `options` | `not finalized` | No |
+| `options` | Object containing only the fields below; maximum encoded size is 4 KiB | No |
+| `options.page_size` | `"a4"` or `"letter"` | No; defaults to `"a4"` |
+| `options.orientation` | `"portrait"` or `"landscape"` | No; defaults to `"portrait"` |
+| `options.include_source_summary` | Boolean | No; defaults to `true` |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/reports/<uuid>/generate HTTP/1.1
 Host: localhost:8000
 Accept: application/json
 Authorization: Bearer <token>
+Idempotency-Key: report-<uuid>-pdf-v1
 Content-Type: application/json
 
 {
-    "format": "<format>"
+    "format": "PDF",
+    "options": {
+        "page_size": "a4",
+        "orientation": "portrait",
+        "include_source_summary": true
+    }
 }
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `202`; contract shape `{data:{job_id,report_id,status}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "job_id": "<uuid>",
+        "report_id": "<uuid>",
+        "status": "queued"
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: RPT-03 + report routine/storage.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+**Workflow / UI integration note:** Only a tenant-visible `draft` report can be queued, and a database invariant permits only one `queued` or `running` job for it. Draft edit/archive requests conflict while generation is active, so the persisted report and artifact cannot diverge. A worker consumes the `reports` queue, writes the PDF to private storage, records its checksum and size, and changes the report to `generated` only after storage succeeds. A failed job remains recorded as `failed` and the report remains `draft`. Run `php artisan queue:work --queue=exports,reports,default` when the worker is not already managed by the local development process. This endpoint never returns a storage key or temporary download URL; use the dedicated export/download workflow once available. After `202`, retain `job_id` for diagnostics and refresh RPT-03 until `report.report_status` becomes `generated` before enabling RPT-06.
 
 ### RPT-06 — Approve generated report.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Reviewers can approve a verified generated artifact or reject it back to an editable draft.
 
 | Property | Value |
 | --- | --- |
@@ -8937,16 +9377,16 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Verified request contract**
 
 `{decision:"approved"|"rejected",notes?}`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
 | `decision` | `"approved"\|"rejected"` | Yes |
-| `notes` | `not finalized` | No |
+| `notes` | String, trimmed, maximum 2,000 characters; blank becomes `null` | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/reports/<uuid>/approve HTTP/1.1
@@ -8956,23 +9396,23 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-    "decision": "<decision>"
+    "decision": "approved",
+    "notes": "Reviewed against the validation evidence."
 }
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:Report}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+The response is the exact 16-field report resource used by RPT-02/RPT-04. For `approved`, `report_status` becomes `approved`, `approved_by` is the current reviewer, and `generated_by` remains the artifact generator. For `rejected`, `report_status` becomes `draft` and both actor fields are cleared so the definition can be revised and regenerated.
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: RPT-05 complete.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+**Workflow / UI integration note:** Only `generated` reports backed by a completed RPT-05 job can receive a decision. Approval additionally verifies that the private PDF still exists and returns `503 SERVICE_UNAVAILABLE` without changing state when it does not. A decision, optional notes, generation job reference, actor fields, and state transition are captured atomically in `report.approval` audit evidence. Approved reports cannot be decided again. Rejected reports return to the RPT-04/RPT-05 revision cycle; the old completed job remains immutable evidence. After success, replace cached report detail and invalidate RPT-01.
 
 ### EXP-01 — Generate CSV/XLSX/GeoJSON/KML/etc.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> The endpoint queues a private canonical tree-result export and returns its durable job identifier.
 
 | Property | Value |
 | --- | --- |
@@ -8992,43 +9432,59 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Required headers**
+
+`Idempotency-Key` is required, non-empty, and limited to 100 characters. Same-key retries with semantically identical input replay one job; changed input returns `409 CONFLICT`.
+
+**Verified request contract**
 
 `{format,filters?,options?}`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `format` | `not finalized` | Yes |
-| `filters` | `not finalized` | No |
-| `options` | `not finalized` | No |
+| `format` | `"csv"`, `"xlsx"`, `"geojson"`, or `"kml"`; case-normalized | Yes |
+| `filters` | Object containing only the fields below | No |
+| `filters.species_id` | UUID or `null`; matches canonical `final_species_id` | No |
+| `filters.validation_status` | `"unvalidated"`, `"validated"`, `"corrected"`, `"rejected"`, or `null` | No |
+| `options` | Reserved empty object; non-empty input is rejected until an option is approved | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/reports/<uuid>/exports HTTP/1.1
 Host: localhost:8000
 Accept: application/json
 Authorization: Bearer <token>
+Idempotency-Key: report-<uuid>-validated-geojson-v1
 Content-Type: application/json
 
 {
-    "format": "<format>"
+    "format": "geojson",
+    "filters": {
+        "validation_status": "validated"
+    }
 }
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `202`; contract shape `{data:{job_id,export_type}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "job_id": "<uuid>",
+        "export_type": "geojson"
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: RPT-03 + canonical results.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+**Workflow / UI integration note:** Both `results.export` and `reports.generate` are required. CSV/XLSX/GeoJSON/KML contain deterministic, soft-delete-aware canonical mission tree rows with species, measurement, validation, and point coordinates; CSV formula prefixes are neutralized. PDF remains exclusively RPT-05. One active job is allowed per report and format, while different formats may run independently. The `exports` worker writes private storage first, then atomically creates the schema-approved `exported_files` record and completion audit. Run `php artisan queue:work --queue=exports,reports,default` if the local combined process is not running. EXP-01 returns no file path or URL; wait for EXP-02/EXP-03 to expose authorized retrieval.
 
 ### EXP-02 — Export audit registry.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Lists safe completed-export metadata in current-tenant report and mission scope.
 
 | Property | Value |
 | --- | --- |
@@ -9042,38 +9498,38 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Success | 200 — {data:[ExportedFile],meta} |
 | Relevant errors | 401, 403, 404, 429, 500, 502/503 |
 
-**Planned request contract (not implemented)**
+**Verified query contract**
 
 `Query: report_id?,mission_id?,type?,page`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `report_id` | `not finalized` | No |
-| `mission_id` | `not finalized` | No |
-| `type` | `not finalized` | No |
-| `page` | `not finalized` | Yes |
+| `report_id` | UUID; target must be tenant-visible | No |
+| `mission_id` | UUID; target must belong to the current organization | No |
+| `type` | `csv`, `xlsx`, `geojson`, or `kml`; case-normalized | No |
+| `page` | Positive integer; defaults to 1 | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
-GET /api/v1/exported-files?report_id=%3Cuuid%3E&page=%3Cpage%3E HTTP/1.1
+GET /api/v1/exported-files?report_id=<uuid>&type=geojson&page=1 HTTP/1.1
 Host: localhost:8000
 Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:[ExportedFile],meta}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+Each item has exactly `export_file_id`, `report_id`, `mission_id`, `export_type`, `file_name`, `file_size_bytes`, `exported_by`, and `exported_at`. `file_path` is never returned. Pagination metadata is `{request_id,page,per_page,total,last_page}` with a fixed page size of 25 and newest-first ordering.
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: EXP-01.
+**Workflow / UI integration note:** Foreign/missing filter targets and mismatched report/mission pairs return non-enumerable `404`; inconsistent stored lineage is excluded. The route creates no read audit. Use the returned `export_file_id` with EXP-03 when download controls become available.
 
 ### EXP-03 — Authorized temporary download.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Issues an audited short-lived URL for one tenant-visible private export artifact.
 
 | Property | Value |
 | --- | --- |
@@ -9093,11 +9549,11 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Verified request contract**
 
 `No body`
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/exported-files/<uuid>/download HTTP/1.1
@@ -9106,19 +9562,25 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:{url,expires_at}} or stream`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "url": "<short-lived signed URL>",
+        "expires_at": "2026-08-25T10:07:00+00:00"
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: EXP-02 + storage.
- After a successful mutation, invalidate or refresh the affected detail and list queries.
+**Workflow / UI integration note:** The default TTL is 10 minutes and is configured by `EXPORT_DOWNLOAD_URL_TTL_MINUTES`; the storage disk is `EXPORT_DISK`. Missing private objects or URL-signing failures return `503 SERVICE_UNAVAILABLE`. The response and `export.download.issue` audit never contain the permanent `file_path`; the audit records only export type and expiry. Audit failure prevents URL issuance, while issuer failure rolls the pending audit back. This endpoint is export-only—MEDIA-05 remains the sole temporary-download URL/token endpoint for media assets.
 
 ### DASH-01 — Role-scoped KPI overview.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and intended for frontend integration.
 
 | Property | Value |
 | --- | --- |
@@ -9132,36 +9594,53 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Success | 200 — {data:{missions,trees,species,validation,processing}} |
 | Relevant errors | 401, 403, 404, 429, 500, 502/503 |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
-`Query: site_id?,mission_id?,date range?`
+`Query: site_id?,mission_id?,from?,to?`
 
 | Field / parameter | Documented type/value | Required |
 | --- | --- | --- |
-| `site_id` | `not finalized` | No |
-| `mission_id` | `not finalized` | No |
+| `site_id` | Tenant-visible site UUID | No |
+| `mission_id` | Tenant/role-visible mission UUID; must belong to `site_id` when both are supplied | No |
+| `from` | `Y-m-d`; inclusive mission actual/planned start lower bound | No |
+| `to` | `Y-m-d`; inclusive upper bound and not earlier than `from` | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
-GET /api/v1/dashboard/overview?site_id=%3Cuuid%3E HTTP/1.1
+GET /api/v1/dashboard/overview?site_id=<uuid>&from=2026-08-01&to=2026-08-31 HTTP/1.1
 Host: localhost:8000
 Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:{missions,trees,species,validation,processing}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "missions": {
+            "total": 2,
+            "by_status": {"planned": 1, "in_progress": 0, "completed": 1, "cancelled": 0, "failed": 0}
+        },
+        "trees": {"total": 3, "validated": 1, "unvalidated": 1, "rejected": 1},
+        "species": {"distinct": 2},
+        "validation": {"sessions": 2, "open_sessions": 1, "completed_sessions": 1, "ground_truth_records": 2},
+        "processing": {"jobs": 3, "queued": 1, "running": 0, "completed": 1, "failed": 1, "cancelled": 0}
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: TREE + ACC + materialized views.
+All five groups and their nested keys are always present; an in-scope filter with no matching dated missions returns zero-filled groups. Foreign, missing, or inconsistent site/mission references return `404`. Scope always starts with the authenticated organization. If a Drone Operator is explicitly granted `results.read`, it is further limited to assigned or piloted approved missions.
+
+**Workflow / UI integration note:** PostgreSQL serves MV-01 as a snapshot. Reads never refresh it; run the documented `php artisan dashboard:refresh` workflow after canonical result or validation changes. Refresh overview queries when filters or server-side data change.
 
 ### DASH-02 — Mission analytics/detail dashboard.
 
-> **Status: ⛔ BLOCKED / UNDER CONSTRUCTION**
-> The approved endpoint is not implemented and its planning state is blocked. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Implemented and verified on SQLite and PostgreSQL/PostGIS.
 
 | Property | Value |
 | --- | --- |
@@ -9181,11 +9660,11 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Request contract**
 
 `Path: id`
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 GET /api/v1/dashboard/missions/<uuid> HTTP/1.1
@@ -9194,13 +9673,61 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Success response**
 
 HTTP `200`; contract shape `{data:{counts,species,height,age,accuracy,layers}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+```json
+{
+    "data": {
+        "counts": {
+            "trees": 3,
+            "validated_trees": 2,
+            "unvalidated_trees": 1,
+            "rejected_trees": 0,
+            "validation_sessions": 1,
+            "ground_truth_records": 1,
+            "processing_jobs": 2
+        },
+        "species": [
+            {
+                "species_id": "<uuid>",
+                "scientific_name": "Rhizophora apiculata",
+                "common_name": "Bakawan lalaki",
+                "tree_count": 2,
+                "percentage": "66.67"
+            }
+        ],
+        "height": {"sample_size": 2, "minimum": "6.00", "maximum": "10.00", "average": "8.00", "unit": "m"},
+        "age": {"sample_size": 2, "minimum": "4.00", "maximum": "8.00", "average": "6.00", "unit": "years"},
+        "accuracy": {
+            "species_accuracy": "0.950000",
+            "count_precision": "0.800000",
+            "count_recall": "0.700000",
+            "count_f1": "0.750000",
+            "height_rmse": "1.250000",
+            "age_mae": "2.500000"
+        },
+        "layers": [
+            {
+                "layer_id": "<uuid>",
+                "mission_id": "<uuid>",
+                "layer_name": "Species Map",
+                "layer_type": "species_map",
+                "style_config": {"color": "green"},
+                "is_visible_default": true,
+                "created_by": "<uuid>",
+                "created_at": "2026-08-25T00:00:00Z",
+                "updated_at": "2026-08-25T00:00:00Z"
+            }
+        ]
+    }
+}
+```
 
-**Workflow / UI integration note:** Dependency recorded by the approved contract: DASH-01.
+All six groups and every accuracy key are always present. Empty missions return zero counts, empty species/layer arrays, and `null` measurement and accuracy values. Decimal measurements, percentages, and metrics are strings. The layers collection intentionally omits private `storage_key`; use the dedicated download workflow for authorized object access.
+
+**Workflow / UI integration note:** Organization and Drone Operator assignment scope are server-derived. Missing, foreign, deleted, malformed, and role-hidden mission IDs return `404`. PostgreSQL counts come from MV-01, while species, measurements, accuracy, and layers come from canonical read-only data. Reads never refresh MV-01 or create audit events. If a visible mission has not reached the latest snapshot, the endpoint returns `503 SERVICE_UNAVAILABLE`; refresh with `php artisan dashboard:refresh` through the authorized deployment workflow, then retry.
 
 ### VIEW-01 — List caller saved filters/map configs.
 
@@ -9805,8 +10332,8 @@ Representative response using only implemented keys (full resource fields are li
 
 ### AUD-02 — Audit event detail.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -9826,11 +10353,11 @@ Representative response using only implemented keys (full resource fields are li
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `Path: id`
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 GET /api/v1/audit-logs/<uuid> HTTP/1.1
@@ -9839,11 +10366,11 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `200`; contract shape `{data:AuditLog}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: AUD-01.
 
@@ -9851,8 +10378,8 @@ This response is not verified. Exact resource fields are not finalized in the cu
 
 ### DATASET-01 — List training/validation datasets.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -9866,7 +10393,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Success | 200 — {data:[TrainingDataset],meta} |
 | Relevant errors | 401, 403, 404, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `Query: type,source,page`
 
@@ -9876,7 +10403,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | `source` | `not finalized` | Yes |
 | `page` | `not finalized` | Yes |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 GET /api/v1/training-datasets?type=%3Ctype%3E&source=%3Csource%3E&page=%3Cpage%3E HTTP/1.1
@@ -9885,18 +10412,18 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `200`; contract shape `{data:[TrainingDataset],meta}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: AUTH.
 
 ### DATASET-02 — Create dataset metadata.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -9910,7 +10437,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Success | 201 — {data:TrainingDataset} |
 | Relevant errors | 400, 401, 403, 404, 409, 422, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `{dataset_name,dataset_type,source,description?,version_label?}`
 
@@ -9922,7 +10449,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | `description` | `not finalized` | No |
 | `version_label` | `not finalized` | No |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/training-datasets HTTP/1.1
@@ -9938,19 +10465,19 @@ Content-Type: application/json
 }
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `201`; contract shape `{data:TrainingDataset}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: DATASET-01.
  After a successful mutation, invalidate or refresh the affected detail and list queries.
 
 ### DATASET-03 — Attach labeled media/sample.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -9970,7 +10497,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `{media_id?,label_file_path,label_format,species_id?,annotation_status}`
 
@@ -9982,7 +10509,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | `species_id` | `not finalized` | No |
 | `annotation_status` | `not finalized` | Yes |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/training-datasets/<uuid>/items HTTP/1.1
@@ -9999,19 +10526,19 @@ Content-Type: application/json
 }
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `201`; contract shape `{data:DatasetItem}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: DATASET-02 + MEDIA-03.
  After a successful mutation, invalidate or refresh the affected detail and list queries.
 
 ### ANN-01 — Existing annotation-workspace project list; requires extension tables if retained.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -10025,7 +10552,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Success | 200 — {data:[AnnotationProject],meta} |
 | Relevant errors | 401, 403, 404, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `Query: status?,page`
 
@@ -10034,7 +10561,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | `status` | `not finalized` | No |
 | `page` | `not finalized` | Yes |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 GET /api/v1/annotation/projects?status=planned&page=%3Cpage%3E HTTP/1.1
@@ -10043,18 +10570,18 @@ Accept: application/json
 Authorization: Bearer <token>
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `200`; contract shape `{data:[AnnotationProject],meta}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: annotation extension.
 
 ### ANN-02 — Create annotation project.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -10068,7 +10595,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | Success | 201 — {data:AnnotationProject} |
 | Relevant errors | 400, 401, 403, 404, 409, 422, 429, 500 |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `{name,dataset_type,mission_id?,status}`
 
@@ -10079,7 +10606,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | `mission_id` | `not finalized` | No |
 | `status` | `not finalized` | Yes |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/annotation/projects HTTP/1.1
@@ -10095,19 +10622,19 @@ Content-Type: application/json
 }
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `201`; contract shape `{data:AnnotationProject}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: ANN-01.
  After a successful mutation, invalidate or refresh the affected detail and list queries.
 
 ### ANN-03 — Replace item annotations transactionally.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -10127,7 +10654,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `{objects:[{class_id,bbox?,polygon?,attributes?}]}`
 
@@ -10135,7 +10662,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `objects` | `[{class_id,bbox?,polygon?,attributes?}]` | Yes |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 PUT /api/v1/annotation/items/<uuid>/objects HTTP/1.1
@@ -10154,19 +10681,19 @@ Content-Type: application/json
 }
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `200`; contract shape `{data:{count}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: ANN-02.
  After a successful mutation, invalidate or refresh the affected detail and list queries.
 
 ### ANN-04 — Export COCO/YOLO/CSV/GeoJSON labels.
 
-> **Status: 🚧 UNDER CONSTRUCTION**
-> The approved endpoint is planned but not implemented. Do not call it.
+> **Status: ✅ AVAILABLE**
+> Promoted to Done/Ready by explicit product decision on 2026-08-25. The current implementation is covered by the full SQLite and PostgreSQL/PostGIS suites; this status-only update does not claim new endpoint-specific coverage.
 
 | Property | Value |
 | --- | --- |
@@ -10186,7 +10713,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `id` | UUID | Tenant-scoped resource identifier. |
 
-**Planned request contract (not implemented)**
+**Tracker request contract**
 
 `{format}`
 
@@ -10194,7 +10721,7 @@ This response is not verified. Exact resource fields are not finalized in the cu
 | --- | --- | --- |
 | `format` | `not finalized` | Yes |
 
-**Planned wire example — do not call yet**
+**Wire example**
 
 ```http
 POST /api/v1/annotation/projects/<uuid>/exports HTTP/1.1
@@ -10208,11 +10735,11 @@ Content-Type: application/json
 }
 ```
 
-**Expected / planned success response**
+**Documented success response**
 
 HTTP `201`; contract shape `{data:{export_id,file_name,storage_key}}`.
 
-This response is not verified. Exact resource fields are not finalized in the current backend implementation; no fabricated JSON example is provided.
+This status-only promotion adds no fields beyond the current implementation. Confirm exact payload keys against the current controller, resource, and feature tests while integrating.
 
 **Workflow / UI integration note:** Dependency recorded by the approved contract: ANN-03 + storage.
  After a successful mutation, invalidate or refresh the affected detail and list queries.
