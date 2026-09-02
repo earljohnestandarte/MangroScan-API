@@ -46,7 +46,7 @@ final class RbacSeedData
         'missions.update' => 'Update survey missions',
         'missions.approve' => 'Approve survey missions',
         'missions.complete' => 'Complete survey missions',
-	'missions.delete' => 'Archive survey missions',
+        'missions.delete' => 'Archive survey missions',
         'mission_team.manage' => 'Manage mission teams',
         'flights.read' => 'Read flight sessions',
         'flights.create' => 'Create flight sessions',
@@ -85,6 +85,7 @@ final class RbacSeedData
         'sensors.manage' => 'Manage drone sensor inventory',
         'sensor_calibrations.manage' => 'Manage sensor calibrations',
         'batteries.read' => 'Read battery inventory',
+        'batteries.manage' => 'Manage battery inventory',
         'species.manage' => 'Manage species reference data',
         'share_links.manage' => 'Manage shareable links and expiration',
     ];
@@ -100,6 +101,9 @@ final class RbacSeedData
             'drones.manage',
             'sensors.manage',
             'sensor_calibrations.manage',
+            'batteries.read',
+            'batteries.manage',
+            'media.delete',
             'ai_services.manage',
             'ai_models.read',
             'ai_models.manage',
@@ -144,6 +148,7 @@ final class RbacSeedData
             'notifications.read',
             'drones.read',
             'batteries.read',
+            'media.delete',
             'share_links.manage',
         ],
         'environmental_specialist' => [
@@ -182,6 +187,7 @@ final class RbacSeedData
             'notifications.read',
             'drones.read',
             'batteries.read',
+            'media.delete',
         ],
     ];
 
@@ -217,4 +223,3 @@ final class RbacSeedData
         ],
     ];
 }
-

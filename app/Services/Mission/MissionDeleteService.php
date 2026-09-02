@@ -21,20 +21,25 @@ class MissionDeleteService
         ?string $agent,
         ?string $requestId
     ): void {
-        if ($mission->mission_status !== 'planned') {
-            throw new WorkflowConflictException(
-                'Only planned missions can be archived.',
-                ['current_status' => $mission->mission_status]
-            );
-        }
-
         DB::transaction(function () use (
             $mission,
             $actor,
             $ip,
             $agent,
             $requestId
-        ) {
+        ): void {
+            $mission = SurveyMission::query()
+                ->whereKey($mission->mission_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($mission->mission_status !== 'planned') {
+                throw new WorkflowConflictException(
+                    'Only planned missions can be archived.',
+                    ['current_status' => $mission->mission_status],
+                );
+            }
+
             $old = [
                 'mission_id' => $mission->mission_id,
                 'site_id' => $mission->site_id,
@@ -46,17 +51,17 @@ class MissionDeleteService
             $mission->delete();
 
             $this->auditLogger->record(
-                'mission.delete',
-                'survey_missions',
-                $mission->mission_id,
-                $actor->user_id,
-                $old,
-                [
+                action: 'mission.delete',
+                tableName: 'survey_missions',
+                recordId: $mission->mission_id,
+                userId: $actor->user_id,
+                oldValues: $old,
+                newValues: [
                     'deleted_at' => $mission->deleted_at,
                 ],
-                $ip,
-                $agent,
-                $requestId
+                ipAddress: $ip,
+                userAgent: $agent,
+                requestId: $requestId,
             );
         });
     }

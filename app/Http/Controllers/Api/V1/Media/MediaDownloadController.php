@@ -23,7 +23,7 @@ class MediaDownloadController extends Controller
             ->addMinutes((int) config('mangroscan.media.download_url_ttl_minutes', 10));
 
         $target = $issuer->issue(
-            $asset->storage_disk,
+            (string) config('mangroscan.media.disk', config('filesystems.default')),
             $asset->storage_key,
             $expiresAt,
         );

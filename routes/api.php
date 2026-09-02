@@ -1,7 +1,5 @@
 <?php
-use App\Http\Controllers\Api\V1\Flight\EnvironmentLogStoreController;
-use App\Http\Controllers\Api\V1\Drone\DroneSensorUpdateController;
-use App\Http\Controllers\Api\V1\Drone\SensorCalibrationStoreController;
+
 use App\Http\Controllers\Api\V1\Ai\AiModelIndexController;
 use App\Http\Controllers\Api\V1\Ai\AiModelShowController;
 use App\Http\Controllers\Api\V1\Ai\AiModelVersionDeployController;
@@ -25,6 +23,7 @@ use App\Http\Controllers\Api\V1\Auth\PasswordForgotController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\RefreshTokenController;
 use App\Http\Controllers\Api\V1\Battery\BatteryIndexController;
+use App\Http\Controllers\Api\V1\Battery\BatteryStoreController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardOverviewController;
 use App\Http\Controllers\Api\V1\Dashboard\MissionDashboardController;
 use App\Http\Controllers\Api\V1\Dashboard\SavedViewDeleteController;
@@ -33,26 +32,30 @@ use App\Http\Controllers\Api\V1\Dashboard\SavedViewStoreController;
 use App\Http\Controllers\Api\V1\Dashboard\SavedViewUpdateController;
 use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorStoreController;
+use App\Http\Controllers\Api\V1\Drone\DroneSensorUpdateController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
 use App\Http\Controllers\Api\V1\Drone\DroneStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneUpdateController;
+use App\Http\Controllers\Api\V1\Drone\SensorCalibrationStoreController;
 use App\Http\Controllers\Api\V1\Export\ExportDownloadController;
 use App\Http\Controllers\Api\V1\Export\ExportedFileIndexController;
 use App\Http\Controllers\Api\V1\Export\ExportStoreController;
+use App\Http\Controllers\Api\V1\Flight\BatteryUsageStoreController;
+use App\Http\Controllers\Api\V1\Flight\EnvironmentLogStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightChecklistStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightCompleteController;
 use App\Http\Controllers\Api\V1\Flight\FlightFailController;
 use App\Http\Controllers\Api\V1\Flight\FlightShowController;
 use App\Http\Controllers\Api\V1\Flight\FlightStartController;
 use App\Http\Controllers\Api\V1\Flight\FlightUpdateController;
-use App\Http\Controllers\Api\V1\Flight\BatteryUsageStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightWaypointReplaceController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightIndexController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightStoreController;
 use App\Http\Controllers\Api\V1\Media\FlightMediaIndexController;
+use App\Http\Controllers\Api\V1\Media\MediaDeleteController;
+use App\Http\Controllers\Api\V1\Media\MediaDownloadController;
 use App\Http\Controllers\Api\V1\Media\MediaQualityUpdateController;
 use App\Http\Controllers\Api\V1\Media\MediaShowController;
-use App\Http\Controllers\Api\V1\Media\MediaDownloadController;
 use App\Http\Controllers\Api\V1\Media\MediaUploadCompleteController;
 use App\Http\Controllers\Api\V1\Media\MediaUploadInitiateController;
 use App\Http\Controllers\Api\V1\Mission\MissionApprovalController;
@@ -65,9 +68,9 @@ use App\Http\Controllers\Api\V1\Mission\MissionStoreController;
 use App\Http\Controllers\Api\V1\Mission\MissionTeamReplaceController;
 use App\Http\Controllers\Api\V1\Mission\MissionUpdateController;
 use App\Http\Controllers\Api\V1\Mobile\MobileBootstrapController;
-use App\Http\Controllers\Api\V1\Mobile\MobileSyncStatusController;
-use App\Http\Controllers\Api\V1\Mobile\MobileSyncController;
 use App\Http\Controllers\Api\V1\Mobile\MobileMissionBundleController;
+use App\Http\Controllers\Api\V1\Mobile\MobileSyncController;
+use App\Http\Controllers\Api\V1\Mobile\MobileSyncStatusController;
 use App\Http\Controllers\Api\V1\Mobile\SyncDeviceRegisterController;
 use App\Http\Controllers\Api\V1\Notification\NotificationIndexController;
 use App\Http\Controllers\Api\V1\Notification\NotificationReadAllController;
@@ -97,6 +100,11 @@ use App\Http\Controllers\Api\V1\Report\ReportStoreController;
 use App\Http\Controllers\Api\V1\Report\ReportUpdateController;
 use App\Http\Controllers\Api\V1\Sensor\SensorDatasetUploadCompleteController;
 use App\Http\Controllers\Api\V1\Sensor\SensorDatasetUploadInitiateController;
+use App\Http\Controllers\Api\V1\Setting\SystemSettingIndexController;
+use App\Http\Controllers\Api\V1\Setting\SystemSettingUpdateController;
+use App\Http\Controllers\Api\V1\Site\PlotUpdateController;
+use App\Http\Controllers\Api\V1\Site\SiteAccessPermissionIndexController;
+use App\Http\Controllers\Api\V1\Site\SiteAccessPermissionStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteBoundaryIndexController;
 use App\Http\Controllers\Api\V1\Site\SiteBoundaryStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteBoundaryUpdateController;
@@ -106,11 +114,6 @@ use App\Http\Controllers\Api\V1\Site\SitePlotStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteShowController;
 use App\Http\Controllers\Api\V1\Site\SiteStoreController;
 use App\Http\Controllers\Api\V1\Site\SiteUpdateController;
-use App\Http\Controllers\Api\V1\Setting\SystemSettingIndexController;
-use App\Http\Controllers\Api\V1\Setting\SystemSettingUpdateController;
-use App\Http\Controllers\Api\V1\Site\PlotUpdateController;
-use App\Http\Controllers\Api\V1\Site\SiteAccessPermissionIndexController;
-use App\Http\Controllers\Api\V1\Site\SiteAccessPermissionStoreController;
 use App\Http\Controllers\Api\V1\Training\TrainingDatasetIndexController;
 use App\Http\Controllers\Api\V1\Training\TrainingDatasetItemStoreController;
 use App\Http\Controllers\Api\V1\Training\TrainingDatasetStoreController;
@@ -465,10 +468,10 @@ Route::prefix('v1')->group(function () {
     Route::patch('/missions/{mission}', MissionUpdateController::class)->whereUuid('mission')->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.update', 'throttle:auth.authenticated',
     ]);
-	// [MSN-05] DELETE /api/v1/missions/{id}
-Route::delete('/missions/{mission}', MissionDeleteController::class)->whereUuid('mission')->middleware([
-    'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.delete', 'throttle:auth.authenticated',
-]);
+    // [MSN-05] DELETE /api/v1/missions/{id}
+    Route::delete('/missions/{mission}', MissionDeleteController::class)->whereUuid('mission')->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.delete', 'throttle:auth.authenticated',
+    ]);
 
     // [TEAM-01] PUT /api/v1/missions/{id}/team
     Route::put('/missions/{mission}/team', MissionTeamReplaceController::class)->whereUuid('mission')->middleware([
@@ -506,7 +509,7 @@ Route::delete('/missions/{mission}', MissionDeleteController::class)->whereUuid(
     ]);
 
     // [DRONE-04] PATCH /api/v1/drones/{id}
-    Route::patch('/drones/{drone}', DroneUpdateController::class) ->whereUuid('drone') ->middleware([
+    Route::patch('/drones/{drone}', DroneUpdateController::class)->whereUuid('drone')->middleware([
         'auth:sanctum',  EnsureActiveIdentity::class,  'permission:drones.manage',  'throttle:auth.authenticated',
     ]);
 
@@ -515,29 +518,34 @@ Route::delete('/missions/{mission}', MissionDeleteController::class)->whereUuid(
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:sensors.manage', 'throttle:auth.authenticated',
     ]);
 
-// [SENSOR-02] PATCH /api/v1/sensors/{id}
-Route::patch('/sensors/{sensor}', DroneSensorUpdateController::class)
-    ->whereUuid('sensor')
-    ->middleware([
-        'auth:sanctum',
-        EnsureActiveIdentity::class,
-        'permission:sensors.manage',
-        'throttle:auth.authenticated',
-    ]);
+    // [SENSOR-02] PATCH /api/v1/sensors/{id}
+    Route::patch('/sensors/{sensor}', DroneSensorUpdateController::class)
+        ->whereUuid('sensor')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:sensors.manage',
+            'throttle:auth.authenticated',
+        ]);
 
-// [CAL-01] POST /api/v1/sensors/{sensor}/calibrations
-Route::post('/sensors/{sensor}/calibrations', SensorCalibrationStoreController::class)
-    ->whereUuid('sensor')
-    ->middleware([
-        'auth:sanctum',
-        EnsureActiveIdentity::class,
-        'permission:sensor_calibrations.manage',
-        'throttle:auth.authenticated',
-    ]);
+    // [CAL-01] POST /api/v1/sensors/{sensor}/calibrations
+    Route::post('/sensors/{sensor}/calibrations', SensorCalibrationStoreController::class)
+        ->whereUuid('sensor')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:sensor_calibrations.manage',
+            'throttle:auth.authenticated',
+        ]);
 
     // [BAT-01] GET /api/v1/batteries
     Route::get('/batteries', BatteryIndexController::class)->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:batteries.read', 'throttle:auth.authenticated',
+    ]);
+
+    // [BAT-02] POST /api/v1/batteries
+    Route::post('/batteries', BatteryStoreController::class)->middleware([
+        'auth:sanctum', EnsureActiveIdentity::class, 'permission:batteries.manage', 'throttle:auth.authenticated',
     ]);
 
     // [FLT-01] GET /api/v1/missions/{id}/flights
@@ -571,15 +579,15 @@ Route::post('/sensors/{sensor}/calibrations', SensorCalibrationStoreController::
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:flights.update', 'throttle:auth.authenticated',
         ]);
-// [BAT-03] POST /api/v1/flights/{id}/battery-usage
-Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::class)
-    ->whereUuid('flight')
-    ->middleware([
-        'auth:sanctum',
-        EnsureActiveIdentity::class,
-        'permission:flights.update',
-        'throttle:auth.authenticated',
-    ]);
+    // [BAT-03] POST /api/v1/flights/{id}/battery-usage
+    Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::class)
+        ->whereUuid('flight')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:flights.update',
+            'throttle:auth.authenticated',
+        ]);
 
     // [WPT-01] PUT /api/v1/flights/{id}/waypoints
     Route::put('/flights/{flight}/waypoints', FlightWaypointReplaceController::class)->whereUuid('flight')->middleware([
@@ -664,6 +672,14 @@ Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::clas
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:media.quality_review', 'throttle:auth.authenticated',
+        ]);
+
+    // [MEDIA-07] DELETE /api/v1/media/{id}
+    Route::delete('/media/{media}', MediaDeleteController::class)
+        ->whereUuid('media')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:media.delete', 'throttle:auth.authenticated',
         ]);
 
     // [JOB-01] GET /api/v1/processing-jobs
@@ -1114,5 +1130,3 @@ Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::clas
             'throttle:auth.authenticated',
         ]);
 });
-
-

@@ -17,7 +17,7 @@ class MobileSyncRequest extends FormRequest
         return [
             'device_id' => ['required', 'uuid'],
             'base_cursor' => ['required', 'string', 'max:10000'],
-            'changes' => ['required', 'array'],
+            'changes' => ['present', 'array', 'max:100'],
             'changes.*.client_id' => ['required', 'string', 'max:150'],
             'changes.*.entity' => [
                 'required',

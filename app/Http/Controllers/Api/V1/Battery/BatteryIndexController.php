@@ -7,7 +7,6 @@ use App\Http\Requests\Battery\BatteryIndexRequest;
 use App\Http\Resources\BatteryResource;
 use App\Models\Battery;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 
 class BatteryIndexController extends Controller

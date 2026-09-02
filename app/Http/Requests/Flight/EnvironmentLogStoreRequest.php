@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Flight;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class EnvironmentLogStoreRequest extends FormRequest
 {

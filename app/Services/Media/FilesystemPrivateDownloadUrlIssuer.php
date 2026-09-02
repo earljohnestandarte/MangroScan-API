@@ -15,6 +15,14 @@ class FilesystemPrivateDownloadUrlIssuer implements PrivateDownloadUrlIssuer
         try {
             $filesystem = Storage::disk($disk);
 
+            if (! $filesystem->exists($storageKey)) {
+                throw new DownstreamServiceException(
+                    'The media object is unavailable.',
+                    503,
+                    'SERVICE_UNAVAILABLE',
+                );
+            }
+
             if (! $filesystem->providesTemporaryUrls()) {
                 throw new DownstreamServiceException(
                     'Private download transport is unavailable.',

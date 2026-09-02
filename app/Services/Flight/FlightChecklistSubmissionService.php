@@ -51,6 +51,13 @@ class FlightChecklistSubmissionService
                 'created_at' => now(),
             ]);
 
+            DB::table('flight_sessions')
+                ->where('flight_session_id', $current->flight_session_id)
+                ->update([
+                    'sync_version' => DB::raw('sync_version + 1'),
+                    'updated_at' => now(),
+                ]);
+
             $this->auditLogger->record(
                 action: 'flight.checklist.submit',
                 tableName: 'flight_checklists',

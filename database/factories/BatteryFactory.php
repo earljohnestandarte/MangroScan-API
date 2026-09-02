@@ -15,7 +15,7 @@ class BatteryFactory extends Factory
     {
         return [
             'organization_id' => Organization::factory(),
-            'battery_code' => 'BAT-' . fake()->unique()->numerify('#####'),
+            'battery_code' => 'BAT-'.fake()->unique()->numerify('#####'),
             'battery_type' => fake()->randomElement([
                 'lipo',
                 'li-ion',

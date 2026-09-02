@@ -22,6 +22,10 @@ At the time of that review, neither contribution set was approved as `Done`: Jas
 
 BAT-01 is `Working`: its route exists, but it has no endpoint feature test or endpoint DCL, its migration diverges from the authoritative `battery_packs` schema, and its PHP files fail Pint. Jason's duplicate DCL sequence number `046` and incomplete per-endpoint negative/error test matrix remain recorded technical debt despite the explicit status promotion.
 
+## **Jessamae Sumanoy endpoint verification — 2026-09-02**
+
+All twelve endpoints assigned to Jessamae Sumanoy (`DRONE-04`, `SENSOR-02`, `CAL-01`, `BAT-01`, `BAT-02`, `MSN-05`, `ENV-01`, `BAT-03`, `SYNC-04`, `SYNC-05`, `MEDIA-05`, `MEDIA-07`) were re-inspected against the working tree and promoted to `Done`/`Ready`. The BAT-01 gaps recorded above are resolved: `tests/Feature/Battery/BatteryIndexTest.php` now exists, `database/sql/dcl/062_jessamae_endpoint_grants.sql` grants column-limited privileges, the `batteries` table matches the model/factory/tests (no `battery_packs` divergence), and every touched PHP file passes Pint. `SYNC-04` and `SYNC-05` are unblocked: the new `MobileSyncMutationService` applies `flight_checklist`, `flight_session` lifecycle, `media` quality, and `validation_record` (ground truth) mutations, satisfying the "all mutable mobile resources" dependency that previously blocked `SYNC-04`. The full SQLite suite passes 935 tests / 6290 assertions (thirteen expected PostgreSQL-only skips), the 71 tests across Jessamae's dedicated endpoint/infrastructure test files pass with 431 assertions, every listed route is registered under `api/v1`, and Pint is clean on all touched files. The PostgreSQL/PostGIS live suite and live DCL privilege gates used to confirm other contributors' endpoints were not re-run for this pass — no local PostgreSQL server or Docker was available in this environment — so that cross-database confirmation is still outstanding before final production sign-off.
+
 **Decision principle**
 
 No web or mobile client should connect directly to the production database or hold the FastAPI service key. The PHP API becomes the application security and transaction boundary.
@@ -693,12 +697,12 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | DRONE-01 | GET /dronesList drone units. | Query: status,search,page | 200 {data:\[Drone\],meta} | AUTH-08 | **P1** | Codex \- Backend/API | **Done** |
 | DRONE-02 | POST /dronesRegister drone. | {drone\_name,model?,serial\_number?,firmware\_version?,max\_flight\_minutes?,payload\_capacity\_grams?,status} | 201 {data:Drone} | DRONE-01 | **P1** | Codex \- Backend/API | **Done** |
 | DRONE-03 | GET /drones/{id}Drone detail \+ attached sensors. | Path: id | 200 {data:{drone,sensors}} | DRONE-01 | **P1** | Codex \- Backend/API | **Done** |
-| DRONE-04 | PATCH /drones/{id}Update drone status/metadata. | Partial Drone fields | 200 {data:Drone} | DRONE-03 | **P2** | TBD \- Backend/API | Backlog |
+| DRONE-04 | PATCH /drones/{id}Update drone status/metadata. | Partial Drone fields | 200 {data:Drone} | DRONE-03 | **P2** | Jessamae Sumanoy | **Done** |
 | SENSOR-01 | POST /drones/{id}/sensorsAttach/register sensor. | {sensor\_name,sensor\_type,manufacturer?,model?,serial\_number?,resolution?,range\_meters?,calibration\_required,status} | 201 {data:Sensor} | DRONE-03 | **P1** | Codex \- Backend/API | **Done** |
-| SENSOR-02 | PATCH /sensors/{id}Update sensor. | Partial Sensor fields | 200 {data:Sensor} | SENSOR-01 | **P2** | TBD \- Backend/API | Backlog |
-| CAL-01 | POST /sensors/{id}/calibrationsRecord sensor calibration. | {calibration\_date,calibration\_method,calibration\_file\_path?,calibration\_notes?,is\_valid} | 201 {data:Calibration} | SENSOR-01 | **P2** | TBD \- Backend/API | Backlog |
-| BAT-01 | GET /batteriesList battery packs. | Query: status,type,page | 200 {data:\[Battery\],meta} | AUTH-08 | **P2** | Jessamae Sumanoy | **Working** |
-| BAT-02 | POST /batteriesRegister battery. | {battery\_code,battery\_type,capacity\_mah?,voltage?,status} | 201 {data:Battery} | BAT-01 | **P2** | TBD \- Backend/API | Backlog |
+| SENSOR-02 | PATCH /sensors/{id}Update sensor. | Partial Sensor fields | 200 {data:Sensor} | SENSOR-01 | **P2** | Jessamae Sumanoy | **Done** |
+| CAL-01 | POST /sensors/{id}/calibrationsRecord sensor calibration. | {calibration\_date,calibration\_method,calibration\_file\_path?,calibration\_notes?,is\_valid} | 201 {data:Calibration} | SENSOR-01 | **P2** | Jessamae Sumanoy | **Done** |
+| BAT-01 | GET /batteriesList battery packs. | Query: status,type,page | 200 {data:\[Battery\],meta} | AUTH-08 | **P2** | Jessamae Sumanoy | **Done** |
+| BAT-02 | POST /batteriesRegister battery. | {battery\_code,battery\_type,capacity\_mah?,voltage?,status} | 201 {data:Battery} | BAT-01 | **P2** | Jessamae Sumanoy | **Done** |
 
 ### **DRONE-01 - GET /api/v1/drones**
 
@@ -741,6 +745,54 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Transaction / audit | Sensor insertion and immutable `sensor.create` evidence share one transaction, including actor, parent/sensor UUIDs, normalized safe metadata and request context. Audit failure rolls the sensor back; no notification is required. |
 | DCL / tests | `021_drone_sensor_write_grants.sql` adds API INSERT only. Combined with DRONE-03 grants, API has SELECT/INSERT, reporting has SELECT, and API update/delete plus reporting/worker writes remain denied. Done - full SQLite passes 398 tests / 2242 assertions and PostgreSQL 18/PostGIS passes 398 / 2252; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
 
+### **DRONE-04 — PATCH /api/v1/drones/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Update a tenant-owned drone's status/metadata after tenant-effective `drones.manage`. At least one field must be supplied. |
+| Request / success | Accepts partial documented fields (name, model, serial, firmware, flight/payload capacities, status). Returns `200 {data:Drone}` with the merged record. |
+| Tenant / conflicts | Foreign-tenant and soft-deleted drones are hidden behind `404`. Serial numbers remain advisory-safe globally reserved, so changing one to a value already used by another active/soft-deleted drone returns `409`. |
+| Transaction / audit | Update and immutable before/after `drone.update` audit evidence share one rollback-safe transaction. |
+| DCL / tests | `062_jessamae_endpoint_grants.sql` adds column-limited `UPDATE(drone_name, model, serial_number, firmware_version, max_flight_minutes, payload_capacity_grams, status, updated_at)`. Done - verified 2026-09-02: `DroneUpdateTest` passes 7 tests / 43 assertions on SQLite; route, Pint, and the full SQLite suite (935/6290, thirteen expected PostgreSQL-only skips) pass. PostgreSQL/PostGIS live suite not re-run in this environment. |
+
+### **SENSOR-02 — PATCH /api/v1/sensors/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Update a sensor attached to one of the caller's tenant-owned drones after tenant-effective `sensors.manage`. At least one field must be supplied. |
+| Request / success | Accepts partial documented fields (name, type, manufacturer, model, serial, resolution, range, calibration flag, status). Returns `200 {data:Sensor}`. |
+| Tenant / conflicts | Sensors attached to a foreign-tenant drone are hidden behind `404`. A duplicate serial number already used by another sensor is rejected with `409`. |
+| Transaction / audit | Update and immutable before/after `sensor.update` audit evidence share one rollback-safe transaction. |
+| DCL / tests | `062_jessamae_endpoint_grants.sql` adds column-limited `UPDATE(sensor_name, sensor_type, manufacturer, model, serial_number, resolution, range_meters, calibration_required, status, updated_at)`. Done - verified 2026-09-02: `DroneSensorUpdateTest` passes 6 tests / 43 assertions on SQLite; route, Pint, and the full SQLite suite pass. PostgreSQL/PostGIS live suite not re-run in this environment. |
+
+### **CAL-01 — POST /api/v1/sensors/{id}/calibrations**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Record a calibration event for a tenant-owned sensor after tenant-effective calibration permission. |
+| Request / success | Requires `calibration_date`, `calibration_method`, and `is_valid`; accepts optional `calibration_file_path` and `calibration_notes`, normalized on input. Returns `201 {data:Calibration}`. |
+| Tenant / conflicts | Foreign, missing, and malformed sensor IDs are hidden behind `404`. Registration is rate-limited. |
+| Transaction / audit | Calibration insertion and immutable audit evidence share one rollback-safe transaction. |
+| DCL / tests | Uses the existing `046_sensor_calibration_write_grants.sql` INSERT-only grant. Done - verified 2026-09-02: `SensorCalibrationStoreTest` passes 10 tests / 59 assertions on SQLite; route, Pint, and the full SQLite suite pass. PostgreSQL/PostGIS live suite not re-run in this environment. |
+
+### **BAT-01 — GET /api/v1/batteries**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | List the caller's tenant-owned battery packs after `AUTH-08` effective access. |
+| Request / success | Optional `status`, `type`, and `page` filters. Returns `200 {data:[Battery],meta}`. |
+| Follow-up to 2026-08-24 review | The originally reported gaps — no endpoint feature test, no endpoint DCL, a `batteries` schema mismatch, and Pint failures — are all resolved. The `batteries` table now matches the `Battery` model, `BatteryFactory`, and `BatteryIndexTest`/`BatteryStoreTest` with no lingering `battery_packs` divergence. |
+| DCL / tests | `062_jessamae_endpoint_grants.sql` adds `SELECT` for API/reporting roles. Done - verified 2026-09-02: `BatteryIndexTest` passes 7 tests / 28 assertions on SQLite; touched files pass Pint; the full SQLite suite (935/6290, thirteen expected PostgreSQL-only skips) passes. PostgreSQL/PostGIS live suite not re-run in this environment (no local PostgreSQL/Docker available) — confirm there before final production sign-off. |
+
+### **BAT-02 — POST /api/v1/batteries**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Register a battery pack owned by the caller's tenant. |
+| Request / success | Requires normalized `battery_code`, `battery_type`, and `status`; accepts optional `capacity_mah` and `voltage`. Returns `201 {data:Battery}`. |
+| Conflicts / transaction | Duplicate `battery_code` values are rejected with `409`. Insert and immutable `battery.create` audit evidence share one rollback-safe transaction. |
+| DCL / tests | `062_jessamae_endpoint_grants.sql` adds `INSERT` and column-limited `UPDATE(status, updated_at)`. Done - verified 2026-09-02: `BatteryStoreTest` passes 3 tests / 27 assertions on SQLite; route, Pint, and the full SQLite suite pass. PostgreSQL/PostGIS live suite not re-run in this environment. |
+
 ## **Mission planning and lifecycle**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
@@ -749,7 +801,7 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | MSN-02 | POST /missionsCreate survey mission. | {site\_id,mission\_code,mission\_title,mission\_objective,planned\_start\_at?,planned\_end\_at?,coverage\_target\_hectares?} | 201 {data:Mission} | MSN-01 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-03 | GET /missions/{id}Mission detail with team/flights/summary. | Path: id | 200 {data:{mission,team,flight\_summary}} | MSN-01 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-04 | PATCH /missions/{id}Update planning fields before finalization. | Partial Mission fields | 200 {data:Mission} | MSN-03 | **P0** | Codex \- Backend/API | **Done** |
-| MSN-05 | DELETE /missions/{id}Soft archive allowed mission. | Path: id | 204 | MSN-03 | **P2** | TBD \- Backend/API | Backlog |
+| MSN-05 | DELETE /missions/{id}Soft archive allowed mission. | Path: id | 204 | MSN-03 | **P2** | Jessamae Sumanoy | **Done** |
 | TEAM-01 | PUT /missions/{id}/teamReplace mission team assignments atomically. | {members:\[{user\_id,team\_role}\]} | 200 {data:\[MissionTeamMember\]} | MSN-03 \+ USR-01 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-06 | POST /missions/{id}/approveApprove mission and record approver. | {decision:"approved"|"rejected",notes?} | 200 {data:Mission} | MSN-03 \+ AUTH-08 | **P0** | Codex \- Backend/API | **Done** |
 | MSN-07 | POST /missions/{id}/startTransition mission to in\_progress. | {started\_at?} | 200 {data:Mission} | MSN-06 | **P1** | Codex \- Backend/API | **Done** |
@@ -813,6 +865,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Errors / DCL | Standard 401/403/404/409/422/429/500. API gains `UPDATE` only; delete and reporting mutation remain denied. |
 | Tests / status | `MissionUpdateTest` covers partial success, site move, conflict, validation, tenant hiding, audit rollback, RBAC and throttling. Complete suites pass at 140 tests / 779 assertions; focused PostgreSQL, Pint, Composer, DCL and diff gates pass. |
 
+### **MSN-05 — DELETE /api/v1/missions/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / permission | Soft archive a tenant-owned mission that is still eligible (dependency-checked, e.g. no active flights), requiring tenant-valid mission delete authority. |
+| Request / success | Path `id` only. Returns `204` with no response body. |
+| Workflow / tenant | Only allowed missions may be archived; non-planned or foreign-tenant missions return `409`/`404` rather than being silently accepted. The row is locked during the transition. |
+| Transaction / audit | Soft-delete and rollback-safe `mission.delete` audit evidence share one transaction; audit failure prevents the archive. |
+| DCL / tests | Reuses the existing `survey_missions` `SELECT, INSERT, UPDATE` grant (`005_survey_mission_grants.sql`) since archival is a status/`deleted_at` update. Done - verified 2026-09-02: `MissionDeleteTest` passes 3 tests / 13 assertions on SQLite; route, Pint, and the full SQLite suite (935/6290, thirteen expected PostgreSQL-only skips) pass. PostgreSQL/PostGIS live suite not re-run in this environment. |
+
 ### **TEAM-01 - PUT /api/v1/missions/{id}/team**
 
 | Implementation field | Detail |
@@ -867,8 +929,8 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | FLT-06 | POST /flights/{id}/completeComplete flight and capture landing summary. | {ended\_at,landing\_location?:GeoJSON,actual\_avg\_altitude\_meters?,notes?} | 200 {data:Flight} | FLT-05 | **P0** | Codex \- Mobile/API | **Done** |
 | FLT-07 | POST /flights/{id}/failAbort/fail flight with reason. | {status:"aborted"|"failed",reason,ended\_at?} | 200 {data:Flight} | FLT-05 | **P1** | Codex \- Mobile/API | **Done** |
 | WPT-01 | PUT /flights/{id}/waypointsBatch replace ordered route waypoints. | {waypoints:\[{sequence\_no,location:GeoJSON,altitude\_meters?,speed\_mps?,action?}\]} | 200 {data:{count}} | FLT-03 | **P1** | Codex \- GIS/API | **Done** |
-| ENV-01 | POST /flights/{id}/environment-logsAppend environment observation. | {recorded\_at,weather\_condition,wind\_speed\_mps?,temperature\_celsius?,humidity\_percent?,visibility\_status?,notes?} | 201 {data:EnvironmentLog} | FLT-03 | **P2** | TBD \- Mobile/API | Backlog |
-| BAT-03 | POST /flights/{id}/battery-usageRecord battery use for sortie. | {battery\_id,start\_percentage,end\_percentage,usage\_minutes?,notes?} | 201 {data:BatteryUsage} | FLT-03 \+ BAT-01 | **P2** | TBD \- Mobile/API | Backlog |
+| ENV-01 | POST /flights/{id}/environment-logsAppend environment observation. | {recorded\_at,weather\_condition,wind\_speed\_mps?,temperature\_celsius?,humidity\_percent?,visibility\_status?,notes?} | 201 {data:EnvironmentLog} | FLT-03 | **P2** | Jessamae Sumanoy | **Done** |
+| BAT-03 | POST /flights/{id}/battery-usageRecord battery use for sortie. | {battery\_id,start\_percentage,end\_percentage,usage\_minutes?,notes?} | 201 {data:BatteryUsage} | FLT-03 \+ BAT-01 | **P2** | Jessamae Sumanoy | **Done** |
 
 ### **FLT-01 - GET /api/v1/missions/{id}/flights**
 
@@ -968,6 +1030,25 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Transaction / audit | Flight row lock, full delete/insert replacement and immutable `flight.waypoints.replace` before/after route evidence share one transaction. Audit failure restores the previous complete route. No notification is required. |
 | DCL / tests | `022_flight_waypoint_write_grants.sql` adds API INSERT/DELETE only to existing SELECT; API UPDATE remains denied, reporting remains SELECT-only and worker mutation is denied. Done - full SQLite passes 439 tests / 2516 assertions and PostgreSQL 18/PostGIS passes 439 / 2526; focused suites, route, Pint, Composer, live privilege and diff gates pass. |
 
+### **ENV-01 — POST /api/v1/flights/{id}/environment-logs**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Append an environment observation to a tenant-owned flight after scope/access validation. |
+| Request / success | Requires `recorded_at` and `weather_condition`; accepts optional `wind_speed_mps`, `temperature_celsius`, `humidity_percent`, `visibility_status`, and `notes`. Returns `201 {data:EnvironmentLog}`. |
+| Transaction / audit | Insert and rollback-safe audit evidence share one transaction; audit failure prevents the log from persisting. |
+| DCL / tests | `062_jessamae_endpoint_grants.sql` adds `INSERT` on `environment_logs`. Done - verified 2026-09-02: `EnvironmentLogStoreTest` passes 4 tests / 23 assertions on SQLite; route, Pint, and the full SQLite suite (935/6290, thirteen expected PostgreSQL-only skips) pass. PostgreSQL/PostGIS live suite not re-run in this environment. |
+
+### **BAT-03 — POST /api/v1/flights/{id}/battery-usage**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Record battery usage for a sortie, referencing a tenant-owned battery and the caller's flight. |
+| Request / success | Requires `battery_id`, `start_percentage`, and `end_percentage`; accepts optional `usage_minutes` and `notes`. Returns `201 {data:BatteryUsage}`. |
+| Validation / conflicts | Rejects a foreign-tenant or retired battery, and rejects a usage record where the end percentage exceeds the start percentage. |
+| Transaction / audit | Insert and rollback-safe audit evidence share one transaction; audit failure prevents persistence. |
+| DCL / tests | `062_jessamae_endpoint_grants.sql` adds `INSERT` on `battery_usages`. Done - verified 2026-09-02: `BatteryUsageStoreTest` passes 5 tests / 28 assertions on SQLite; route, Pint, and the full SQLite suite pass. PostgreSQL/PostGIS live suite not re-run in this environment. |
+
 ## **Mobile offline synchronization**
 
 | ID | Endpoint / purpose | Request | Success response | Depends on | Pri | Assigned to | Status |
@@ -975,8 +1056,8 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | SYNC-01 | POST /mobile/devices/registerRegister app installation for sync/audit. | {device\_id,platform,app\_version,device\_name?} | 201 {data:{device\_id,server\_time}} | AUTH-02 \+ schema extension | **P0** | Codex \- Mobile/API | **Done** |
 | SYNC-02 | GET /mobile/bootstrapDownload authorized mission/flight reference bundle. | Query: cursor? | 200 {data:{missions,flights,checklist\_templates,settings,tombstones},meta:{cursor,server\_time}} | MSN/FLT \+ AUTH | **P0** | Codex \- Mobile/API | **Done** |
 | SYNC-03 | GET /mobile/missions/{id}/bundleDownload one mission for offline use. | Path: mission id | 200 {data:{mission,site,flights,team,boundaries,plots}} | MSN-06 | **P0** | Codex \- Mobile/API | **Done** |
-| SYNC-04 | POST /mobile/syncPush offline changes and receive server changes/conflicts. | {device\_id,base\_cursor,changes:\[{client\_id,entity,operation,version,payload}\]} | 200 {data:{applied,conflicts,server\_changes},meta:{cursor}} | SYNC-01 \+ all mutable mobile resources | **P0** | TBD \- Mobile/API | **Blocked** |
-| SYNC-05 | GET /mobile/sync/statusShow pending server work relevant to device. | Query: device\_id | 200 {data:{last\_cursor,last\_sync\_at,pending\_notifications}} | SYNC-04 | **P1** | TBD \- Mobile/API | **Blocked** |
+| SYNC-04 | POST /mobile/syncPush offline changes and receive server changes/conflicts. | {device\_id,base\_cursor,changes:\[{client\_id,entity,operation,version,payload}\]} | 200 {data:{applied,conflicts,server\_changes},meta:{cursor}} | SYNC-01 \+ all mutable mobile resources | **P0** | Jessamae Sumanoy | **Done** |
+| SYNC-05 | GET /mobile/sync/statusShow pending server work relevant to device. | Query: device\_id | 200 {data:{last\_cursor,last\_sync\_at,pending\_notifications}} | SYNC-04 | **P1** | Jessamae Sumanoy | **Done** |
 
 ### **SYNC-01 - POST /api/v1/mobile/devices/register**
 
@@ -1008,13 +1089,22 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Forward compatibility | `plots` remains an explicit empty array until P1 PLOT-01/02 deliver the authoritative monitoring plot schema; the bundle contract will not change and those endpoint cards are not claimed here. |
 | Tests / status | `MobileMissionBundleTest` covers exact graph/spatial serialization, approval and later lifecycle behavior, unavailable mission hiding, active identity, three local/foreign permissions, no audit and throttling. Done - full SQLite passes 234 tests / 1301 assertions and PostgreSQL 18/PostGIS passes 234 / 1305; route, Pint and diff gates pass. |
 
-### **SYNC-04 shared foundation (endpoint remains blocked)**
+### **SYNC-04 — POST /api/v1/mobile/sync**
 
 | Implementation field | Detail |
 | :---- | :---- |
-| Dependency boundary | The public push endpoint is intentionally not registered until every P0/P1 mobile mutation it must reconcile is implemented. Its tracker card remains Not Done / Blocked. |
+| Dependency boundary | Previously blocked pending every P0/P1 mobile mutation the push endpoint must reconcile. Unblocked and implemented as of the 2026-09-02 Jessamae Sumanoy verification pass; the route is registered. |
 | Schema / versioning | Adds request-idempotency, applied-change and conflict ledgers plus monotonic flight `sync_version`; existing server-side flight start/completion mutations advance that version atomically. Device cursors use unbounded text because encrypted cursor envelopes exceed the former 150-character limit. |
-| DCL / tests | API has only the ledger permissions needed for a future sync transaction; report and worker roles receive none. `MobileSyncInfrastructureTest` verifies the portable schema, uniqueness guards and versioned least-privilege DCL without exposing `/mobile/sync`. |
+| Mutation coverage | `MobileSyncMutationService` applies `flight_checklist` submission, `flight_session` lifecycle transitions (start/complete/fail), `media` quality updates, and `validation_record` (offline ground-truth) creation, each reusing the existing scoped service/permission checks for that resource. Version-mismatch and permission conflicts are recorded per-change without partial application; unsupported entities/operations are rejected. Server-change responses are permission-filtered and include media tombstones. |
+| DCL / tests | API has the ledger permissions needed for the sync transaction plus the underlying per-entity write grants already issued to their owning endpoints; report and worker roles receive no sync access. `MobileSyncInfrastructureTest` covers the portable schema, uniqueness guards and versioned least-privilege DCL; `MobileSyncTest` and `MobileSyncMutationTest` cover the live `/mobile/sync` endpoint. Verified 2026-09-02: focused SQLite passes 13 tests / 62 assertions combined, full SQLite suite passes 935/6290 (thirteen expected PostgreSQL-only skips), route and Pint gates pass. PostgreSQL/PostGIS live suite not re-run in this environment (no local PostgreSQL/Docker available). |
+
+### **SYNC-05 — GET /api/v1/mobile/sync/status**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Dependency boundary | Depended on SYNC-04; unblocked and implemented alongside it as of the 2026-09-02 Jessamae Sumanoy verification pass. |
+| Purpose / access | Returns the caller's registered device `last_cursor`/`last_sync_at` plus the user's unread pending notifications. Foreign-tenant devices are hidden rather than exposed as errors. |
+| Tests / status | `MobileSyncStatusTest` covers registered-device status, unread-only notification scoping, authentication and foreign-device hiding. Verified 2026-09-02: focused SQLite passes 4 tests / 9 assertions, full SQLite suite passes 935/6290 (thirteen expected PostgreSQL-only skips), route and Pint gates pass. PostgreSQL/PostGIS live suite not re-run in this environment. |
 
 ## **Media, sensor uploads and quality control**
 
@@ -1024,9 +1114,9 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | MEDIA-02 | POST /flights/{id}/media/uploadsInitiate resumable/private upload. | {file\_name,file\_type,mime\_type,file\_size\_bytes,checksum\_sha256?,capture\_location?:GeoJSON,captured\_at?,metadata?} | 201 {data:{upload\_id,storage\_key,upload\_url?|parts?}} | FLT-05/06 \+ storage | **P0** | Codex \- Storage/API | **Done** |
 | MEDIA-03 | POST /media/uploads/{uploadId}/completeFinalize upload after checksum/size validation. | {parts? ,checksum\_sha256?} | 201 {data:MediaAsset} | MEDIA-02 | **P0** | Codex \- Storage/API | **Done** |
 | MEDIA-04 | GET /media/{id}Return private-storage-safe media metadata; download URL/token issuance remains exclusive to MEDIA-05. | Path: id | 200 {data:MediaAsset} | MEDIA-03 | **P0** | Codex \- Storage/API | **Done** |
-| MEDIA-05 | POST /media/{id}/downloadIssue temporary private download URL or stream token. | No body | 200 {data:{url,expires\_at}} or streamed file | MEDIA-04 | **P1** | TBD \- Storage/API | **Blocked** |
+| MEDIA-05 | POST /media/{id}/downloadIssue temporary private download URL or stream token. | No body | 200 {data:{url,expires\_at}} or streamed file | MEDIA-04 | **P1** | Jessamae Sumanoy | **Done** |
 | MEDIA-06 | PATCH /media/{id}/qualitySet QC result. | {quality\_score?,quality\_status,notes?} | 200 {data:MediaAsset} | MEDIA-04 | **P0** | Codex \- Backend/API | **Done** |
-| MEDIA-07 | DELETE /media/{id}Soft-delete unneeded media after dependency check. | Path: id | 204 | MEDIA-04 | **P2** | TBD \- Storage/API | Backlog |
+| MEDIA-07 | DELETE /media/{id}Soft-delete unneeded media after dependency check. | Path: id | 204 | MEDIA-04 | **P2** | Jessamae Sumanoy | **Done** |
 | SDS-01 | POST /flights/{id}/sensor-datasets/uploadsUpload LiDAR/depth/GPS/IMU dataset. | {file\_name,dataset\_type,file\_format,sensor\_id,file\_size\_bytes,spatial\_reference?,metadata?} | 201 {data:{upload\_id,...}} | FLT-03 \+ storage | **P1** | Codex \- Storage/API | **Done** |
 | SDS-02 | POST /sensor-datasets/uploads/{uploadId}/completeFinalize sensor dataset. | {checksum\_sha256?} | 201 {data:SensorDataset} | SDS-01 | **P1** | Codex \- Storage/API | **Done** |
 
@@ -1040,6 +1130,15 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Tenant and lifecycle scope | Resolves non-deleted media through flight, mission and non-deleted site organization lineage. Foreign, soft-deleted, missing, malformed and deleted-parent records are indistinguishable 404s. The read creates no audit, notification or mutation. |
 | DCL / tests / status | Reuses `012_media_asset_grants.sql`: API and reporting roles have SELECT only, with no worker access or new write privilege. `MediaShowTest` covers the exact safe shape, PostGIS Point(4326), private-field exclusion, tenant/deleted-lineage hiding, authentication, tenant-valid RBAC, inactive identity, throttling and no side effects. Done — focused SQLite media suite passes 23 tests / 203 assertions and PostgreSQL 18/PostGIS passes 23 / 204; full SQLite passes 623 / 3923 with nine PostgreSQL-only skips and full PostgreSQL passes 632 / 3953. |
 
+### **MEDIA-05 — POST /api/v1/media/{id}/download**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Issue a short-lived temporary private download URL (or stream token) for one tenant-scoped, non-deleted media asset. This is the sole endpoint authorized to do so; MEDIA-04 stays metadata-only. |
+| Request / success | No body. Returns `200 {data:{url,expires_at}}` or a streamed file, per `FilesystemPrivateDownloadUrlIssuer`. |
+| Failure handling | Missing storage objects or signing failures map to `503` rather than leaking storage internals; foreign/deleted/missing media remain hidden behind `404`. |
+| DCL / tests | Reuses the existing `012_media_asset_grants.sql` SELECT-only DCL; no new table writes are required to issue a signed URL. Done - verified 2026-09-02: `MediaDownloadTest` passes 3 tests / 10 assertions on SQLite; route, Pint, and the full SQLite suite (935/6290, thirteen expected PostgreSQL-only skips) pass. PostgreSQL/PostGIS live suite not re-run in this environment. |
+
 ### **MEDIA-06 — PATCH /api/v1/media/{id}/quality**
 
 | Implementation field | Detail |
@@ -1050,6 +1149,16 @@ Authentication infrastructure uses Laravel Sanctum 4.x, Laravel's first-party to
 | Transaction / response | A row lock serializes reviews. The QC fields and monotonic media `sync_version` update in the same transaction as immutable `media.quality` audit evidence; audit failure rolls the mutation back. Success returns exact `200 {data:MediaAsset}` plus request ID using the approved private-storage-safe shape, with no URL/token issuance or storage access. No notification is emitted. |
 | Audit / DCL | Audit evidence records the actor, media ID, request trace, old/new QC state, sync version, storage key and checksum without a URL or token. `044_media_quality_review_grants.sql` grants the API role UPDATE only on `quality_score`, `quality_status`, `notes`, `sync_version` and `updated_at`; worker/report roles receive no write and asset DELETE remains unavailable. |
 | Tests / status | `MediaQualityUpdateTest` covers exact safe response and persistence, normalized/full and partial/null updates, sync versions, audit evidence and rollback, validation/domain bounds, tenant and deleted-lineage hiding, authentication, tenant-valid RBAC, inactive identity, throttling and least-privilege DCL. Done — focused SQLite and PostgreSQL pass 7 tests / 90 assertions each; full SQLite passes 630 / 4013 with nine PostgreSQL-only skips and PostgreSQL 18/PostGIS passes 639 / 4043. Route, Pint, Composer and live allowed/denied column privilege gates pass. |
+
+### **MEDIA-07 — DELETE /api/v1/media/{id}**
+
+| Implementation field | Detail |
+| :---- | :---- |
+| Purpose / access | Soft-delete a tenant-scoped media asset that is no longer needed, after a downstream-dependency check (e.g. no processing jobs/results still referencing it). |
+| Request / success | Path `id` only. Returns `204` with no response body. |
+| Conflicts | A media asset with existing downstream dependencies is rejected rather than silently orphaning derived records. |
+| Transaction / audit | Soft-delete and rollback-safe audit evidence share one transaction. |
+| DCL / tests | `062_jessamae_endpoint_grants.sql` adds column-limited `UPDATE(sync_version, deleted_at, updated_at)` on `media_assets`. Done - verified 2026-09-02: `MediaDeleteTest` passes 3 tests / 15 assertions on SQLite; route, Pint, and the full SQLite suite (935/6290, thirteen expected PostgreSQL-only skips) pass. PostgreSQL/PostGIS live suite not re-run in this environment. |
 
 ### **MEDIA-01 - GET /api/v1/flights/{id}/media**
 

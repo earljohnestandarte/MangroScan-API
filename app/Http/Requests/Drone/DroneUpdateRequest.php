@@ -45,7 +45,7 @@ class DroneUpdateRequest extends FormRequest
             if (is_string($this->input($key))) {
                 $values[$key] = trim($this->input($key));
             }
-        }   
+        }
 
         if (isset($values['serial_number'])) {
             $values['serial_number'] = Str::upper($values['serial_number']);

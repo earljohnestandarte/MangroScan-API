@@ -18,7 +18,7 @@ class BatteryUsageService
     ) {}
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function record(
         User $actor,

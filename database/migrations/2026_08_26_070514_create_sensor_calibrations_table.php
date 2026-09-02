@@ -30,7 +30,7 @@ return new class extends Migration
 
         if (DB::getDriverName() === 'pgsql') {
             DB::statement(
-                "ALTER TABLE sensor_calibrations ADD CONSTRAINT sensor_calibrations_method_check CHECK (char_length(trim(calibration_method)) > 0)"
+                'ALTER TABLE sensor_calibrations ADD CONSTRAINT sensor_calibrations_method_check CHECK (char_length(trim(calibration_method)) > 0)'
             );
         }
     }

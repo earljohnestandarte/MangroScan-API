@@ -30,7 +30,7 @@ class BatteryIndexTest extends TestCase
         $role = Role::query()->create([
             'organization_id' => $organization->organization_id,
             'role_name' => 'Battery Test Role',
-            'role_code' => 'BATTERY_TEST_' . uniqid(),
+            'role_code' => 'BATTERY_TEST_'.uniqid(),
             'description' => 'Role used for battery feature tests',
             'is_system_role' => false,
         ]);
@@ -181,5 +181,19 @@ class BatteryIndexTest extends TestCase
     {
         $this->getJson('/api/v1/batteries')
             ->assertUnauthorized();
+    }
+
+    public function test_it_requires_read_permission_and_versions_read_only_dcl(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['status' => 'active']), ['*']);
+        $this->getJson('/api/v1/batteries')->assertForbidden();
+
+        $dcl = file_get_contents(database_path('sql/dcl/062_jessamae_endpoint_grants.sql'));
+        $this->assertIsString($dcl);
+        $this->assertStringContainsString(
+            'GRANT SELECT ON TABLE app.batteries TO mangroscan_api_rw, mangroscan_report_ro;',
+            $dcl,
+        );
+        $this->assertStringNotContainsString('GRANT DELETE ON TABLE app.batteries', $dcl);
     }
 }

@@ -109,7 +109,7 @@ class MobileSyncTest extends TestCase
         $this->assertDatabaseHas('sync_conflicts', [
             'device_id' => $device->device_id,
             'client_id' => 'test-client-001',
-            'conflict_code' => 'RESOURCE_RECONCILIATION_REQUIRED',
+            'conflict_code' => 'VALIDATION_FAILED',
         ]);
 
         $this->assertNotNull(
@@ -127,14 +127,17 @@ class MobileSyncTest extends TestCase
         $payload = $this->payload();
         $payload['device_id'] = $device->device_id;
 
-        $this->actingAs($user, 'sanctum')
+        $first = $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/mobile/sync', $payload)
             ->assertOk();
 
-        $this->actingAs($user, 'sanctum')
+        $second = $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/mobile/sync', $payload)
             ->assertOk();
 
+        $this->assertEquals($first->json('data'), $second->json('data'));
+        $this->assertSame($first->json('meta.cursor'), $second->json('meta.cursor'));
+        $this->assertDatabaseCount('sync_requests', 1);
         $this->assertDatabaseCount('sync_change_log', 1);
         $this->assertDatabaseCount('sync_conflicts', 1);
     }

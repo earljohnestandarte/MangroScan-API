@@ -13,7 +13,7 @@ class SyncCursorService
     {
         return Crypt::encryptString(json_encode([
             'version' => 1,
-            'boundary' => $boundary->utc()->toIso8601String(),
+            'boundary' => $boundary->utc()->toISOString(),
         ], JSON_THROW_ON_ERROR));
     }
 

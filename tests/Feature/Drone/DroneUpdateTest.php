@@ -174,10 +174,10 @@ class DroneUpdateTest extends TestCase
         $foreignOrg = (string) Str::uuid();
         $actor = (string) Str::uuid();
 
-       $drone = (string) Str::uuid();
-$otherDrone = (string) Str::uuid();
-$foreignDrone = (string) Str::uuid();
-$deletedDrone = (string) Str::uuid();
+        $drone = (string) Str::uuid();
+        $otherDrone = (string) Str::uuid();
+        $foreignDrone = (string) Str::uuid();
+        $deletedDrone = (string) Str::uuid();
 
         DB::table('organizations')->insert([
             [
@@ -243,64 +243,64 @@ $deletedDrone = (string) Str::uuid();
             'updated_at' => now(),
         ]);
 
-DB::table('drones')->insert([
-    [
-        'drone_id' => $drone,
-        'organization_id' => $org,
-        'drone_name' => 'Primary Drone',
-        'model' => 'Old Model',
-        'serial_number' => 'OLD-SERIAL-001',
-        'firmware_version' => '1.0.0',
-        'max_flight_minutes' => '40.00',
-        'payload_capacity_grams' => '800.00',
-        'status' => 'available',
-        'created_at' => now(),
-        'updated_at' => now(),
-        'deleted_at' => null,
-    ],
-    [
-        'drone_id' => $otherDrone,
-        'organization_id' => $org,
-        'drone_name' => 'Other Drone',
-        'model' => 'Other Model',
-        'serial_number' => 'OTHER-SERIAL-001',
-        'firmware_version' => '1.0.0',
-        'max_flight_minutes' => '40.00',
-        'payload_capacity_grams' => '800.00',
-        'status' => 'available',
-        'created_at' => now(),
-        'updated_at' => now(),
-        'deleted_at' => null,
-    ],
-    [
-        'drone_id' => $foreignDrone,
-        'organization_id' => $foreignOrg,
-        'drone_name' => 'Foreign Drone',
-        'model' => 'Foreign Model',
-        'serial_number' => 'FOREIGN-SERIAL-001',
-        'firmware_version' => '1.0.0',
-        'max_flight_minutes' => '40.00',
-        'payload_capacity_grams' => '800.00',
-        'status' => 'available',
-        'created_at' => now(),
-        'updated_at' => now(),
-        'deleted_at' => null,
-    ],
-    [
-        'drone_id' => $deletedDrone,
-        'organization_id' => $org,
-        'drone_name' => 'Deleted Drone',
-        'model' => 'Deleted Model',
-        'serial_number' => 'DELETED-SERIAL-001',
-        'firmware_version' => '1.0.0',
-        'max_flight_minutes' => '40.00',
-        'payload_capacity_grams' => '800.00',
-        'status' => 'retired',
-        'created_at' => now(),
-        'updated_at' => now(),
-        'deleted_at' => now(),
-    ],
-]);
+        DB::table('drones')->insert([
+            [
+                'drone_id' => $drone,
+                'organization_id' => $org,
+                'drone_name' => 'Primary Drone',
+                'model' => 'Old Model',
+                'serial_number' => 'OLD-SERIAL-001',
+                'firmware_version' => '1.0.0',
+                'max_flight_minutes' => '40.00',
+                'payload_capacity_grams' => '800.00',
+                'status' => 'available',
+                'created_at' => now(),
+                'updated_at' => now(),
+                'deleted_at' => null,
+            ],
+            [
+                'drone_id' => $otherDrone,
+                'organization_id' => $org,
+                'drone_name' => 'Other Drone',
+                'model' => 'Other Model',
+                'serial_number' => 'OTHER-SERIAL-001',
+                'firmware_version' => '1.0.0',
+                'max_flight_minutes' => '40.00',
+                'payload_capacity_grams' => '800.00',
+                'status' => 'available',
+                'created_at' => now(),
+                'updated_at' => now(),
+                'deleted_at' => null,
+            ],
+            [
+                'drone_id' => $foreignDrone,
+                'organization_id' => $foreignOrg,
+                'drone_name' => 'Foreign Drone',
+                'model' => 'Foreign Model',
+                'serial_number' => 'FOREIGN-SERIAL-001',
+                'firmware_version' => '1.0.0',
+                'max_flight_minutes' => '40.00',
+                'payload_capacity_grams' => '800.00',
+                'status' => 'available',
+                'created_at' => now(),
+                'updated_at' => now(),
+                'deleted_at' => null,
+            ],
+            [
+                'drone_id' => $deletedDrone,
+                'organization_id' => $org,
+                'drone_name' => 'Deleted Drone',
+                'model' => 'Deleted Model',
+                'serial_number' => 'DELETED-SERIAL-001',
+                'firmware_version' => '1.0.0',
+                'max_flight_minutes' => '40.00',
+                'payload_capacity_grams' => '800.00',
+                'status' => 'retired',
+                'created_at' => now(),
+                'updated_at' => now(),
+                'deleted_at' => now(),
+            ],
+        ]);
 
         return [
             'org' => $org,

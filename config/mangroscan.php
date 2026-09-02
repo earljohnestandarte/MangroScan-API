@@ -32,6 +32,7 @@ return [
     'media' => [
         'disk' => env('MEDIA_UPLOAD_DISK', env('FILESYSTEM_DISK', 'local')),
         'upload_url_ttl_minutes' => (int) env('MEDIA_UPLOAD_URL_TTL_MINUTES', 30),
+        'download_url_ttl_minutes' => (int) env('MEDIA_DOWNLOAD_URL_TTL_MINUTES', 10),
         'max_upload_bytes' => (int) env('MEDIA_MAX_UPLOAD_BYTES', 5_368_709_120),
     ],
 
