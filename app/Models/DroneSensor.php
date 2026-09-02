@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DroneSensor extends Model
 {
@@ -39,6 +40,19 @@ class DroneSensor extends Model
 
     public function drone(): BelongsTo
     {
-        return $this->belongsTo(Drone::class, 'drone_id', 'drone_id');
+        return $this->belongsTo(
+            Drone::class,
+            'drone_id',
+            'drone_id'
+        );
+    }
+
+    public function calibrations(): HasMany
+    {
+        return $this->hasMany(
+            SensorCalibration::class,
+            'sensor_id',
+            'sensor_id'
+        );
     }
 }

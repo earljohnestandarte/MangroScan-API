@@ -3,13 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Battery extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes;
+
+    protected $table = 'batteries';
 
     protected $primaryKey = 'battery_id';
 
@@ -26,17 +29,17 @@ class Battery extends Model
         'status',
     ];
 
-    /** @return array<string, string> */
-    protected function casts(): array
-    {
-        return [
-            'capacity_mah' => 'decimal:2',
-            'voltage' => 'decimal:2',
-        ];
-    }
+    protected $casts = [
+        'capacity_mah' => 'decimal:2',
+        'voltage' => 'decimal:2',
+    ];
 
     public function organization(): BelongsTo
     {
-        return $this->belongsTo(Organization::class, 'organization_id', 'organization_id');
+        return $this->belongsTo(
+            Organization::class,
+            'organization_id',
+            'organization_id'
+        );
     }
 }

@@ -1,5 +1,7 @@
 <?php
-
+use App\Http\Controllers\Api\V1\Flight\EnvironmentLogStoreController;
+use App\Http\Controllers\Api\V1\Drone\DroneSensorUpdateController;
+use App\Http\Controllers\Api\V1\Drone\SensorCalibrationStoreController;
 use App\Http\Controllers\Api\V1\Ai\AiModelIndexController;
 use App\Http\Controllers\Api\V1\Ai\AiModelShowController;
 use App\Http\Controllers\Api\V1\Ai\AiModelVersionDeployController;
@@ -28,6 +30,7 @@ use App\Http\Controllers\Api\V1\Drone\DroneIndexController;
 use App\Http\Controllers\Api\V1\Drone\DroneSensorStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
 use App\Http\Controllers\Api\V1\Drone\DroneStoreController;
+use App\Http\Controllers\Api\V1\Drone\DroneUpdateController;
 use App\Http\Controllers\Api\V1\Export\ExportDownloadController;
 use App\Http\Controllers\Api\V1\Export\ExportedFileIndexController;
 use App\Http\Controllers\Api\V1\Export\ExportStoreController;
@@ -37,16 +40,19 @@ use App\Http\Controllers\Api\V1\Flight\FlightFailController;
 use App\Http\Controllers\Api\V1\Flight\FlightShowController;
 use App\Http\Controllers\Api\V1\Flight\FlightStartController;
 use App\Http\Controllers\Api\V1\Flight\FlightUpdateController;
+use App\Http\Controllers\Api\V1\Flight\BatteryUsageStoreController;
 use App\Http\Controllers\Api\V1\Flight\FlightWaypointReplaceController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightIndexController;
 use App\Http\Controllers\Api\V1\Flight\MissionFlightStoreController;
 use App\Http\Controllers\Api\V1\Media\FlightMediaIndexController;
 use App\Http\Controllers\Api\V1\Media\MediaQualityUpdateController;
 use App\Http\Controllers\Api\V1\Media\MediaShowController;
+use App\Http\Controllers\Api\V1\Media\MediaDownloadController;
 use App\Http\Controllers\Api\V1\Media\MediaUploadCompleteController;
 use App\Http\Controllers\Api\V1\Media\MediaUploadInitiateController;
 use App\Http\Controllers\Api\V1\Mission\MissionApprovalController;
 use App\Http\Controllers\Api\V1\Mission\MissionCompleteController;
+use App\Http\Controllers\Api\V1\Mission\MissionDeleteController;
 use App\Http\Controllers\Api\V1\Mission\MissionIndexController;
 use App\Http\Controllers\Api\V1\Mission\MissionShowController;
 use App\Http\Controllers\Api\V1\Mission\MissionStartController;
@@ -54,6 +60,8 @@ use App\Http\Controllers\Api\V1\Mission\MissionStoreController;
 use App\Http\Controllers\Api\V1\Mission\MissionTeamReplaceController;
 use App\Http\Controllers\Api\V1\Mission\MissionUpdateController;
 use App\Http\Controllers\Api\V1\Mobile\MobileBootstrapController;
+use App\Http\Controllers\Api\V1\Mobile\MobileSyncStatusController;
+use App\Http\Controllers\Api\V1\Mobile\MobileSyncController;
 use App\Http\Controllers\Api\V1\Mobile\MobileMissionBundleController;
 use App\Http\Controllers\Api\V1\Mobile\SyncDeviceRegisterController;
 use App\Http\Controllers\Api\V1\Notification\NotificationIndexController;
@@ -418,6 +426,10 @@ Route::prefix('v1')->group(function () {
     Route::patch('/missions/{mission}', MissionUpdateController::class)->whereUuid('mission')->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.update', 'throttle:auth.authenticated',
     ]);
+	// [MSN-05] DELETE /api/v1/missions/{id}
+Route::delete('/missions/{mission}', MissionDeleteController::class)->whereUuid('mission')->middleware([
+    'auth:sanctum', EnsureActiveIdentity::class, 'permission:missions.delete', 'throttle:auth.authenticated',
+]);
 
     // [TEAM-01] PUT /api/v1/missions/{id}/team
     Route::put('/missions/{mission}/team', MissionTeamReplaceController::class)->whereUuid('mission')->middleware([
@@ -454,9 +466,34 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:drones.read', 'throttle:auth.authenticated',
     ]);
 
+    // [DRONE-04] PATCH /api/v1/drones/{id}
+    Route::patch('/drones/{drone}', DroneUpdateController::class) ->whereUuid('drone') ->middleware([
+        'auth:sanctum',  EnsureActiveIdentity::class,  'permission:drones.manage',  'throttle:auth.authenticated',
+    ]);
+
     // [SENSOR-01] POST /api/v1/drones/{id}/sensors
     Route::post('/drones/{drone}/sensors', DroneSensorStoreController::class)->whereUuid('drone')->middleware([
         'auth:sanctum', EnsureActiveIdentity::class, 'permission:sensors.manage', 'throttle:auth.authenticated',
+    ]);
+
+// [SENSOR-02] PATCH /api/v1/sensors/{id}
+Route::patch('/sensors/{sensor}', DroneSensorUpdateController::class)
+    ->whereUuid('sensor')
+    ->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:sensors.manage',
+        'throttle:auth.authenticated',
+    ]);
+
+// [CAL-01] POST /api/v1/sensors/{sensor}/calibrations
+Route::post('/sensors/{sensor}/calibrations', SensorCalibrationStoreController::class)
+    ->whereUuid('sensor')
+    ->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:sensor_calibrations.manage',
+        'throttle:auth.authenticated',
     ]);
 
     // [BAT-01] GET /api/v1/batteries
@@ -495,6 +532,15 @@ Route::prefix('v1')->group(function () {
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:flights.update', 'throttle:auth.authenticated',
         ]);
+// [BAT-03] POST /api/v1/flights/{id}/battery-usage
+Route::post('/flights/{flight}/battery-usage', BatteryUsageStoreController::class)
+    ->whereUuid('flight')
+    ->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'permission:flights.update',
+        'throttle:auth.authenticated',
+    ]);
 
     // [WPT-01] PUT /api/v1/flights/{id}/waypoints
     Route::put('/flights/{flight}/waypoints', FlightWaypointReplaceController::class)->whereUuid('flight')->middleware([
@@ -555,6 +601,14 @@ Route::prefix('v1')->group(function () {
         ->middleware([
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:media.upload', 'throttle:auth.authenticated',
+        ]);
+
+    // [MEDIA-05] POST /api/v1/media/{id}/download
+    Route::post('/media/{media}/download', MediaDownloadController::class)
+        ->whereUuid('media')
+        ->middleware([
+            'auth:sanctum', EnsureActiveIdentity::class,
+            'permission:media.read', 'throttle:auth.authenticated',
         ]);
 
     // [MEDIA-04] GET /api/v1/media/{id}
@@ -954,6 +1008,19 @@ Route::prefix('v1')->group(function () {
             'permission:ai_services.manage', 'throttle:auth.authenticated',
         ]);
 
+    // [SYNC-04] POST /api/v1/mobile/sync
+    Route::post('/mobile/sync', MobileSyncController::class)->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'throttle:auth.authenticated',
+    ]);
+
+    // [SYNC-05] GET /api/v1/mobile/sync/status
+    Route::get('/mobile/sync/status', MobileSyncStatusController::class)->middleware([
+        'auth:sanctum',
+        EnsureActiveIdentity::class,
+        'throttle:auth.authenticated',
+    ]);
     // [AISVC-05] POST /api/v1/admin/ai-services/{id}/credentials
     Route::post('/admin/ai-services/{service}/credentials', AiServiceCredentialRotateController::class)
         ->whereUuid('service')
@@ -961,4 +1028,16 @@ Route::prefix('v1')->group(function () {
             'auth:sanctum', EnsureActiveIdentity::class,
             'permission:ai_services.manage', 'throttle:auth.authenticated',
         ]);
+
+    // [ENV-01] POST /api/v1/flights/{flight}/environment-logs
+    Route::post('/flights/{flight}/environment-logs', EnvironmentLogStoreController::class)
+        ->whereUuid('flight')
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:flights.update',
+            'throttle:auth.authenticated',
+        ]);
 });
+
+

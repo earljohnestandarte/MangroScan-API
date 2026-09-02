@@ -46,6 +46,7 @@ final class RbacSeedData
         'missions.update' => 'Update survey missions',
         'missions.approve' => 'Approve survey missions',
         'missions.complete' => 'Complete survey missions',
+	'missions.delete' => 'Archive survey missions',
         'mission_team.manage' => 'Manage mission teams',
         'flights.read' => 'Read flight sessions',
         'flights.create' => 'Create flight sessions',
@@ -148,6 +149,7 @@ final class RbacSeedData
         'environmental_specialist' => [
             'missions.read',
             'missions.approve',
+            'missions.delete',
             'flights.read',
             'media.read',
             'media.quality_review',
@@ -215,3 +217,4 @@ final class RbacSeedData
         ],
     ];
 }
+
