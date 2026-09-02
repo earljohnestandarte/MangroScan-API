@@ -13,10 +13,11 @@ class LoginService
     public function __construct(
         private readonly AuditLogger $auditLogger,
         private readonly EffectiveAccessService $effectiveAccess,
+        private readonly RefreshTokenService $refreshTokens,
     ) {}
 
     /**
-     * @return array{user: array<string, string>, access_token: string, expires_at: string, roles: list<string>, permissions: list<string>}|null
+    * @return array{user: array<string, string>, access_token: string, expires_at: string, refresh_token: string, roles: list<string>, permissions: list<string>}|null
      */
     public function attempt(
         string $email,
@@ -64,6 +65,7 @@ class LoginService
                 ['*'],
                 $expiresAt,
             );
+            $refreshToken = $this->refreshTokens->issue($user->user_id);
 
             $this->auditLogger->record(
                 action: 'auth.login',
@@ -89,6 +91,7 @@ class LoginService
                 ],
                 'access_token' => $issuedToken->plainTextToken,
                 'expires_at' => $expiresAt->toIso8601String(),
+                'refresh_token' => $refreshToken,
                 ...$access,
             ];
         });

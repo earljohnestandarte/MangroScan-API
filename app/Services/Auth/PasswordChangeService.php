@@ -24,6 +24,7 @@ class PasswordChangeService
             $actor->forceFill(['password' => Hash::make($newPassword)])->save();
             $revokedTokens = $actor->tokens()->count();
             $actor->tokens()->delete();
+            DB::table('refresh_tokens')->where('user_id', $actor->user_id)->delete();
 
             $this->auditLogger->record(
                 action: 'auth.password.changed',

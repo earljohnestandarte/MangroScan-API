@@ -13,6 +13,30 @@ class NotificationReadTest extends TestCase
 {
     use RefreshDatabase;
 
+    // [NOTIF-04] A caller marks only their own unread notifications read.
+    public function test_it_marks_all_current_user_unread_notifications_as_read(): void
+    {
+        $graph = $this->createGraph();
+
+        $this->withToken($graph['token'])
+            ->postJson('/api/v1/notifications/read-all')
+            ->assertNoContent();
+
+        $this->assertDatabaseHas('notification_logs', [
+            'notification_id' => $graph['unread_notification_id'], 'is_read' => true,
+        ]);
+        $this->assertDatabaseHas('notification_logs', [
+            'notification_id' => $graph['read_notification_id'], 'is_read' => true,
+        ]);
+        $this->assertDatabaseHas('notification_logs', [
+            'notification_id' => $graph['same_tenant_notification_id'], 'is_read' => false,
+        ]);
+        $this->assertDatabaseHas('notification_logs', [
+            'notification_id' => $graph['foreign_notification_id'], 'is_read' => false,
+        ]);
+        $this->assertDatabaseCount('audit_logs', 0);
+    }
+
     // [NOTIF-03] A caller atomically marks one owned notification read.
     public function test_it_marks_a_current_user_notification_as_read(): void
     {
