@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Models\AuditLog;
 use App\Models\PersonalAccessToken;
+use App\Models\RefreshToken;
 use App\Services\Audit\AuditLogger;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -50,7 +51,7 @@ class LoginTest extends TestCase
         $payload = $response->json();
         $this->assertSame(['data', 'meta'], array_keys($payload));
         $this->assertSame(
-            ['user', 'access_token', 'expires_at', 'roles', 'permissions'],
+            ['user', 'access_token', 'expires_at', 'refresh_token', 'roles', 'permissions'],
             array_keys($payload['data']),
         );
         $this->assertSame([
@@ -69,12 +70,17 @@ class LoginTest extends TestCase
         $token = PersonalAccessToken::query()->findOrFail($tokenId);
         $this->assertSame(hash('sha256', $plainTextSecret), $token->token);
 
+        $refreshToken = RefreshToken::query()->sole();
+        $this->assertSame(hash('sha256', $payload['data']['refresh_token']), $refreshToken->token_hash);
+        $this->assertTrue($refreshToken->expires_at->isAfter(now()->addDays(29)));
+
         $audit = AuditLog::query()->where('action', 'auth.login')->sole();
         $this->assertSame($identity['user_id'], $audit->user_id);
         $this->assertSame('req_auth_01_success', $audit->request_id);
         $this->assertSame('Researcher phone', $audit->new_values['device_name']);
         $this->assertStringNotContainsString('correct-password', $audit->toJson());
         $this->assertStringNotContainsString($plainTextSecret, $audit->toJson());
+        $this->assertStringNotContainsString($payload['data']['refresh_token'], $audit->toJson());
     }
 
     // [AUTH-01] Invalid credentials return 401 and create safe audit evidence.
@@ -192,6 +198,7 @@ class LoginTest extends TestCase
         ])->assertInternalServerError();
 
         $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->assertDatabaseCount('refresh_tokens', 0);
     }
 
     /**

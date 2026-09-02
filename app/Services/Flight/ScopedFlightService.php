@@ -5,7 +5,6 @@ namespace App\Services\Flight;
 use App\Models\FlightSession;
 use App\Models\User;
 use App\Services\Auth\DroneOperatorScope;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +16,7 @@ class ScopedFlightService
     public function find(User $actor, string $id): FlightSession
     {
         // First find the flight by its actual primary key.
-        $flight = FlightSession::query()
+        $flight = $this->operatorScope->flights(FlightSession::query(), $actor)
             ->find($id);
 
         if (! $flight instanceof FlightSession) {

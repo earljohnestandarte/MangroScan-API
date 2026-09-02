@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SurveyMission extends Model
@@ -45,13 +47,18 @@ class SurveyMission extends Model
         'deleted_at' => 'datetime',
     ];
 
-   public function site()
-{
-    return $this->belongsTo(SurveySite::class, 'site_id', 'site_id');
-}
+    public function site(): BelongsTo
+    {
+        return $this->belongsTo(SurveySite::class, 'site_id', 'site_id');
+    }
 
-public function teamMembers()
-{
-    return $this->hasMany(MissionTeamMember::class, 'mission_id', 'mission_id');
-}
+    public function teamMembers(): HasMany
+    {
+        return $this->hasMany(MissionTeamMember::class, 'mission_id', 'mission_id');
+    }
+
+    public function flightSessions(): HasMany
+    {
+        return $this->hasMany(FlightSession::class, 'mission_id', 'mission_id');
+    }
 }
