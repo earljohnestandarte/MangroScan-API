@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Processing;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ProcessAiProcessing;
 use App\Http\Requests\Processing\ProcessingJobStoreRequest;
 use App\Models\User;
 use App\Services\Flight\ScopedFlightService;
@@ -42,6 +43,9 @@ class ProcessingJobStoreController extends Controller
             userAgent: $request->userAgent(),
             requestId: $request->attributes->get('request_id'),
         );
+        if (config('queue.default') !== 'sync') {
+            ProcessAiProcessing::dispatch($job->processing_job_id)->afterCommit();
+        }
 
         return response()->json([
             'data' => [

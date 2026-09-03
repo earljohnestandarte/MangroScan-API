@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Processing;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ProcessAiProcessing;
 use App\Http\Requests\Processing\ProcessingJobRetryRequest;
 use App\Http\Resources\ProcessingJobResource;
 use App\Models\ProcessingJob;
@@ -27,6 +28,9 @@ class ProcessingJobRetryController extends Controller
             $query->where('organization_id', $actor->organization_id);
         })->findOrFail($job);
         $retry = $jobs->retry($source, $actor, $key, $request->validated('reason'), $request->ip(), $request->userAgent(), $request->attributes->get('request_id'));
+        if (config('queue.default') !== 'sync') {
+            ProcessAiProcessing::dispatch($retry->processing_job_id)->afterCommit();
+        }
 
         return response()->json([
             'data' => (new ProcessingJobResource($retry))->resolve($request),

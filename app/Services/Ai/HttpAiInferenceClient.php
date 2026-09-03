@@ -6,6 +6,7 @@ use App\Contracts\Ai\AiInferenceClient;
 use App\Exceptions\DownstreamServiceException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class HttpAiInferenceClient implements AiInferenceClient
@@ -16,6 +17,37 @@ class HttpAiInferenceClient implements AiInferenceClient
         'height_estimator',
         'age_estimator',
     ];
+
+    /** @return array<string, mixed> */
+    public function infer(string $baseUrl, string $apiKey, string $endpoint, string $disk, string $storageKey, array $parameters, string $requestId): array
+    {
+        $stream = Storage::disk($disk)->readStream($storageKey);
+        if (! is_resource($stream)) {
+            throw new DownstreamServiceException('The source media is unavailable to the AI worker.', 422, 'MEDIA_UNAVAILABLE');
+        }
+        try {
+            $response = Http::acceptJson()
+                ->withHeaders(['X-API-Key' => $apiKey, 'X-Request-ID' => $requestId])
+                ->connectTimeout((int) config('mangroscan.ai_services.connect_timeout_seconds'))
+                ->timeout((int) config('mangroscan.ai_services.inference_timeout_seconds', 900))
+                ->attach('file', $stream, basename($storageKey))
+                ->post(rtrim($baseUrl, '/').'/'.ltrim($endpoint, '/'), $parameters);
+        } catch (ConnectionException) {
+            throw new DownstreamServiceException('The AI service is unavailable.', 503, 'SERVICE_UNAVAILABLE');
+        } catch (Throwable) {
+            throw new DownstreamServiceException('The AI inference request failed.', 502, 'BAD_GATEWAY');
+        } finally {
+            fclose($stream);
+        }
+        if (! $response->successful()) {
+            throw new DownstreamServiceException('The AI service rejected the media.', 502, 'BAD_GATEWAY');
+        }
+        $payload = $response->json();
+        if (! is_array($payload)) {
+            throw new DownstreamServiceException('The AI service returned invalid inference data.', 502, 'BAD_GATEWAY');
+        }
+        return $payload;
+    }
 
     /** @return array{status: string, version: string, latency_ms: int} */
     public function health(string $baseUrl, string $apiKey): array

@@ -27,6 +27,7 @@ return [
     'ai_services' => [
         'connect_timeout_seconds' => (int) env('AI_SERVICE_CONNECT_TIMEOUT_SECONDS', 3),
         'timeout_seconds' => (int) env('AI_SERVICE_TIMEOUT_SECONDS', 10),
+        'inference_timeout_seconds' => (int) env('AI_SERVICE_INFERENCE_TIMEOUT_SECONDS', 900),
     ],
 
     'media' => [

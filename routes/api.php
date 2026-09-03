@@ -36,6 +36,7 @@ use App\Http\Controllers\Api\V1\Drone\DroneSensorUpdateController;
 use App\Http\Controllers\Api\V1\Drone\DroneShowController;
 use App\Http\Controllers\Api\V1\Drone\DroneStoreController;
 use App\Http\Controllers\Api\V1\Drone\DroneUpdateController;
+use App\Http\Controllers\Api\V1\Drone\SensorCalibrationIndexController;
 use App\Http\Controllers\Api\V1\Drone\SensorCalibrationStoreController;
 use App\Http\Controllers\Api\V1\Export\ExportDownloadController;
 use App\Http\Controllers\Api\V1\Export\ExportedFileIndexController;
@@ -525,6 +526,15 @@ Route::prefix('v1')->group(function () {
             'auth:sanctum',
             EnsureActiveIdentity::class,
             'permission:sensors.manage',
+            'throttle:auth.authenticated',
+        ]);
+
+    // [CAL-02] GET /api/v1/sensor-calibrations
+    Route::get('/sensor-calibrations', SensorCalibrationIndexController::class)
+        ->middleware([
+            'auth:sanctum',
+            EnsureActiveIdentity::class,
+            'permission:sensor_calibrations.manage',
             'throttle:auth.authenticated',
         ]);
 

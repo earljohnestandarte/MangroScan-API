@@ -78,7 +78,7 @@ class ProcessingJobRetryService
                 'flight_session_id' => $failed->flight_session_id, 'job_type' => $failed->job_type,
                 'job_status' => 'queued', 'input_summary' => json_encode($failed->input_summary, JSON_THROW_ON_ERROR),
                 'created_by' => $actor->user_id, 'idempotency_key' => $key,
-                'request_fingerprint' => $fingerprint, 'retry_of_job_id' => $failed->processing_job_id,
+                'request_fingerprint' => $fingerprint, 'request_id' => $requestId, 'retry_of_job_id' => $failed->processing_job_id,
                 'retry_reason' => $reason, 'created_at' => $timestamp, 'updated_at' => $timestamp,
             ]);
             $runs = $failed->modelRuns->sortBy(fn ($run) => $run->created_at?->getTimestamp().$run->model_run_id)

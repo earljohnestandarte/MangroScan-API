@@ -123,6 +123,7 @@ class ProcessingJobCreationService
                 'created_by' => $actor->user_id,
                 'idempotency_key' => $idempotencyKey,
                 'request_fingerprint' => $fingerprint,
+                'request_id' => $requestId,
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ]);

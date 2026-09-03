@@ -33,6 +33,8 @@ class ProcessingJob extends Model
         'created_by',
         'idempotency_key',
         'request_fingerprint',
+        'request_id',
+        'processing_time_ms',
     ];
 
     /** @return array<string, string> */
@@ -44,6 +46,7 @@ class ProcessingJob extends Model
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'processing_time_ms' => 'integer',
         ];
     }
 

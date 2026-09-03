@@ -4,6 +4,9 @@ namespace App\Contracts\Ai;
 
 interface AiInferenceClient
 {
+    /** @return array<string, mixed> */
+    public function infer(string $baseUrl, string $apiKey, string $endpoint, string $disk, string $storageKey, array $parameters, string $requestId): array;
+
     /** @return array{status: string, version: string, latency_ms: int} */
     public function health(string $baseUrl, string $apiKey): array;
 
